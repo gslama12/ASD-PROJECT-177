@@ -10,15 +10,15 @@
 		* Mail: georgslamanig@gmx.at 
 		* Password: Vubpu3-muhbej-buvqat
 	- DB User: 
-		*Username: asd 
+		* Username: asd 
 		+ Password:asd
 
 
 ## How-To Run
 + Recommended IDE: WebStorm (free with student licence)
-+ Run Server: $cd server; npm start
++ Run Server: `$cd server; npm start`
 	- Server will run on http://localhost:3001
-+ Run Client: $cd client; npm run dev
++ Run Client: `$cd client; npm run dev`
 	 - Client will run on http://localhost:5173
 
 
