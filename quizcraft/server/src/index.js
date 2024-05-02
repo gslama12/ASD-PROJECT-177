@@ -3,10 +3,11 @@ const app = express();
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-const User = require('./models/userModel');
+
 
 
 const connectToDb = require("./connectToDb");
+const {addUser} = require("./controllers/userController");
 
 
 app.use(cors())
@@ -17,20 +18,6 @@ let serverData = "Nothing." // example data for simple server client interaction
 
 // MONGODB DATABASE
 connectToDb()
-
-
-
-
-// Function to add a new user
-async function addUser(username, password) {
-  try {
-    const newUser = new User({ username, password });
-    await newUser.save();
-    console.log('User added successfully:', newUser);
-  } catch (error) {
-    console.error('Error adding user:', error);
-  }
-}
 
 
 // WEBSOCKET CONNECTION
@@ -64,7 +51,7 @@ io.on('connection', (socket) => {
     socket.emit("server-data-response", {message: serverData});
   })
 
-  socket.on("add-user-to-db", (data) => {
-    addUser(data.username, data.password);
+  socket.on("add-user-to-db", async (data) => {
+    await addUser(data.username, data.password);
   })
 })
