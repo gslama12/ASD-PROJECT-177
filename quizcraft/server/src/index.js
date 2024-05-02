@@ -6,6 +6,8 @@ const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const {Schema} = require("mongoose");
 
+const connectToDb = require("./connectToDb");
+
 
 app.use(cors())
 
@@ -14,20 +16,10 @@ let serverData = "Nothing." // example data for simple server client interaction
 
 
 // MONGODB DATABASE
-const uri = "mongodb+srv://asd:asd@cluster0.3cdlamh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-function connectToDb() {
-  try {
-    mongoose.connect(uri)
-    console.log("Connected to DB");
-  } catch (error) {
-    console.error(error);
-  }
-}
-connectToDb();
+connectToDb()
 
 // Example schema
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   username: String,
   password: String
 });
