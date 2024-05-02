@@ -3,8 +3,8 @@ const app = express();
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-const mongoose = require('mongoose');
-const {Schema} = require("mongoose");
+const User = require('./models/userModel');
+
 
 const connectToDb = require("./connectToDb");
 
@@ -18,13 +18,7 @@ let serverData = "Nothing." // example data for simple server client interaction
 // MONGODB DATABASE
 connectToDb()
 
-// Example schema
-const userSchema = new Schema({
-  username: String,
-  password: String
-});
 
-const User = mongoose.model('User', userSchema);
 
 
 // Function to add a new user
