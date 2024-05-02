@@ -1,24 +1,18 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-
-
-
 const connectToDb = require("./connectToDb");
 const {addUser} = require("./controllers/userController");
 
-
+const app = express();
 app.use(cors())
-
 
 let serverData = "Nothing." // example data for simple server client interaction
 
 
 // MONGODB DATABASE
 connectToDb()
-
 
 // WEBSOCKET CONNECTION
 const PORT = process.env.PORT || 3001;
