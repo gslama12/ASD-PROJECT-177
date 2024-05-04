@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser} = require("./controllers/userController");
+const {addUser, authenticateUser} = require("./controllers/userController");
 
 const app = express();
 app.use(cors())
@@ -46,6 +46,12 @@ io.on('connection', (socket) => {
   })
 
   socket.on("add-user-to-db", async (data) => {
-    await addUser(data.username, data.password);
+    const result = await addUser(data.username, data.email, data.password);
+    socket.emit("user-added-response", result);
   })
+
+  socket.on("authenticate-user", async (data) => {
+    const result = await authenticateUser(data.username, data.password);
+    socket.emit("user-authenticated-response", result);
+  });
 })
