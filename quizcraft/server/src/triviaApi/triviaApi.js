@@ -1,4 +1,5 @@
 const {shuffleArrayInPlace} = require("../utils/arrayUtils");
+const getTriviaApiOptions = require("./triviaApiOptions");
 
 TRIVIA_API_BASE_URL = "https://opentdb.com";
 
@@ -72,11 +73,11 @@ class TriviaApi {
         }
 
         try {
-            // TODO This fetch fails if Trivia API is called twice within 5 seconds by the same IP address.
             const response = await fetch(api_url);
+            const responseBody = await response.json();
+
             if (response.ok) {
-                const data = await response.json();
-                const questions = data["results"].map((item) => {
+                const questions = responseBody["results"].map((item) => {
                     // Replace incorrect_answers with answers and shuffle the answers.
                     const newObject = {
                         ...item,
@@ -88,6 +89,12 @@ class TriviaApi {
                 });
                 return questions;
             }
+
+            // TODO handle response codes
+            const responseCode = responseBody["response_code"];
+            // Fetch fails if Trivia API is called twice within 5 seconds by the same IP address.
+            // Fetch also fails if this.questionsPerRequests is higher than the number of "new" question left on server.
+
             return undefined;
         } catch (err) {
             console.error(err);
@@ -103,53 +110,40 @@ async function triviaApiFactory(quizType, category, difficulty) {
     return triviaApi;
 }
 
-async function getAllCategories() {
-    const response = await fetch(`${TRIVIA_API_BASE_URL}/api_category.php`); // TODO try catch
-    if (response.ok) {
-        return await response.json();
-    }
-    return undefined;
-}
 
 async function getTriviaApiSessionToken() {
-   const response = await fetch(`${TRIVIA_API_BASE_URL}/api_token.php?command=request`) // TODO try catch
-    if (response.ok) {
-        const data = await response.json();
-        return data.token;
-    }
-    return undefined;
-}
-
-async function getTriviaApiOptions() {
-    const quizTypes = ["boolean", "multiple"]
-    const categories = await getAllCategories();
-    const difficultyOptions = ["easy", "normal", "hard"];
-    return {
-        "quizTypes": quizTypes,
-        "categories": categories["trivia_categories"],
-        "difficultyOptions": difficultyOptions
-    }
-}
-
-function test() {
-    // hacky way to run async/await test at "top level" (get error otherwise)
-    [""].forEach(async (test) => {
-        console.log(await getTriviaApiOptions());
-        const triviaApi = await triviaApiFactory("multiple");
-        for (let i = 0; i < 7; i++) {
-            const nextQuestion = await triviaApi.getNextQuestion();
-            // console.log(nextQuestion["answers"]);
-            console.log(nextQuestion);
-            const answer = nextQuestion["answers"][0];
-            console.log(`Answer '${answer}' is ${triviaApi.checkAnswer(answer)}`)
+    try {
+        // This should always succeed, unless the Trivia API server is down.
+        const response = await fetch(`${TRIVIA_API_BASE_URL}/api_token.php?command=request`);
+        if (response.ok) {
+            const data = await response.json();
+            return data.token;
         }
-    });
+        return undefined;
+    } catch (err) {
+        console.error(err);
+        return undefined;
+    }
 }
 
+// async function test() {
+//     console.log(await TriviaApi.getTriviaApiOptions());
+//
+//     // const categories = await getTriviaApiOptions()
+//
+//     // console.log(categories);
+//     //     // console.log(await getTriviaApiOptions());
+//     //     const triviaApi = await triviaApiFactory("multiple");
+//     //     for (let i = 0; i < 7; i++) {
+//     //         const nextQuestion = await triviaApi.getNextQuestion();
+//     //         // console.log(nextQuestion);
+//     //         // const answer = nextQuestion["answers"][0];
+//     //         // console.log(`Answer '${answer}' is ${triviaApi.checkAnswer(answer)}`)
+// }
+//
 // test()
 
 
 module.exports = {
-    triviaApiFactory,
-    getTriviaApiOptions
+    triviaApiFactory
 }
