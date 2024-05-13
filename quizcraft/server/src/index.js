@@ -14,7 +14,7 @@ let serverData = "Nothing." // example data for simple server client interaction
 
 
 // MONGODB DATABASE
-// connectToDb()
+connectToDb()
 
 // WEBSOCKET CONNECTION
 const PORT = process.env.PORT || 3001;
