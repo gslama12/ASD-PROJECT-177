@@ -3,7 +3,6 @@ TRIVIA_API_BASE_URL = "https://opentdb.com";
 
 /**
  * Singleton class with the sole purpose of providing the Trivia API options.
- * Having
  */
 class TriviaApiOptions {
     constructor() {
@@ -64,9 +63,16 @@ async function getTriviaApiOptions() {
         await triviaApiOptions.init();
     }
 
-    const quizTypes = ["boolean", "multiple"]
+    const quizTypes = [
+        {"id": 1, "name": "multiple"},
+        {"id": 2, "name": "boolean"}
+    ]
     const categories = triviaApiOptions.categories;
-    const difficultyOptions = ["easy", "normal", "hard"];
+    const difficultyOptions = [
+        {"id": 1, "name": "easy"},
+        {"id": 2, "name": "normal"},
+        {"id": 3, "name": "hard"}
+    ];
     return {
         "quizTypes": quizTypes,
         "categories": categories,
@@ -85,7 +91,7 @@ function filterCategories(allCategories, questionCount) {
         const categoryCombined = {
             "id": categoryId,
             "name": categoryInfo["name"],
-            "question_count": value["total_num_of_verified_questions"]
+            "questionCount": value["total_num_of_verified_questions"]
         }
         filteredCategories.push(categoryCombined);
     }

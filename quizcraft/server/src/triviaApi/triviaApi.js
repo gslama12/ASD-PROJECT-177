@@ -7,7 +7,6 @@ TRIVIA_API_BASE_URL = "https://opentdb.com";
 // number of questions: https://opentdb.com/api_count_global.php
 
 class TriviaApi {
-    // TODO Support TriviaAPI response codes.
     constructor(quizType, category, difficulty) {
         // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
         this.questionsPerRequests = 50;
@@ -15,9 +14,11 @@ class TriviaApi {
 
         // To get questions from any type, category or difficulty, don't specify the respective field.
         // E.g. If category is undefined, questions from any category are used.
+        // TODO somewhere verify that parameters are correct
         this.quizType = quizType;
         this.category = category;
         this.difficulty = difficulty;
+
 
         this.fetchedQuestions = undefined;
         this.activeQuestion = undefined;
@@ -78,19 +79,19 @@ class TriviaApi {
 
             if (response.ok) {
                 const questions = responseBody["results"].map((item) => {
-                    // Replace incorrect_answers with answers and shuffle the answers.
+                    // Replace incorrect_answers with answers
                     const newObject = {
                         ...item,
                         answers:[...item["incorrect_answers"], item["correct_answer"]]
                     };
                     delete newObject["incorrect_answers"];
-                    shuffleArrayInPlace(newObject["answers"]);
                     return newObject;
                 });
+                shuffleArrayInPlace(questions)
                 return questions;
             }
 
-            // TODO handle response codes
+            // TODO handle error response codes
             const responseCode = responseBody["response_code"];
             // Fetch fails if Trivia API is called twice within 5 seconds by the same IP address.
             // Fetch also fails if this.questionsPerRequests is higher than the number of "new" question left on server.
@@ -125,23 +126,6 @@ async function getTriviaApiSessionToken() {
         return undefined;
     }
 }
-
-// async function test() {
-//     console.log(await TriviaApi.getTriviaApiOptions());
-//
-//     // const categories = await getTriviaApiOptions()
-//
-//     // console.log(categories);
-//     //     // console.log(await getTriviaApiOptions());
-//     //     const triviaApi = await triviaApiFactory("multiple");
-//     //     for (let i = 0; i < 7; i++) {
-//     //         const nextQuestion = await triviaApi.getNextQuestion();
-//     //         // console.log(nextQuestion);
-//     //         // const answer = nextQuestion["answers"][0];
-//     //         // console.log(`Answer '${answer}' is ${triviaApi.checkAnswer(answer)}`)
-// }
-//
-// test()
 
 
 module.exports = {
