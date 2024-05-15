@@ -1,7 +1,7 @@
-import LoginComponent from './components/UIComponents/LoginComponent.jsx';
-import HomeComponent from './components/UIComponents/HomeComponent.jsx';
-import Profile from './components/UIComponents/Profile.jsx';
-import QuizFinished from './components/UIComponents/QuizFinished.jsx';
+import LoginComponent from './components/UIComponents/Login/LoginComponent.jsx';
+import HomeComponent from './components/UIComponents/Home/HomeComponent.jsx';
+import Profile from './components/UIComponents/NavBar/Profile.jsx';
+import QuizFinished from './components/UIComponents/Home/QuizFinished.jsx';
 import {Route, Routes, Navigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import io from "socket.io-client";

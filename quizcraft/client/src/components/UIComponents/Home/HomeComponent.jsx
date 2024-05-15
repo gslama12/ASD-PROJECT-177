@@ -1,41 +1,12 @@
-import NavBar from "./NavBar.jsx";
-import { useEffect, useState } from "react";
-import Button from 'react-bootstrap/Button';
+import NavBar from "../NavBar/NavBar.jsx";
 import Card from 'react-bootstrap/Card';
-import Placeholder from 'react-bootstrap/Placeholder';
-import './Header1.css';
-import multipleChoiceImage from './mc.png';
-import trueFalseImage from './true_false.png';
+import '../GenericStyles/CenteredHeader.css';
+import multipleChoiceImage from '../../../assets/mc.png';
+import trueFalseImage from '../../../assets/true_false.png';
 import { Link } from 'react-router-dom';
 
 
 function HomeComponent({ socket }) {
-    const [contentValue, setContentValue] = useState("");
-    const [textInputValue, setTextInputValue] = useState("");
-
-    // request server data on init
-    socket.emit("request-server-data");
-    useEffect(() => {
-        socket.on("server-data-response", (data) => {
-            setContentValue(data.message);
-        })
-    }, [socket]);
-
-    // update text area on server data change
-    useEffect(() => {
-        socket.on("server-data-changed", (data) => {
-            setContentValue(data.message);
-        })
-    }, [socket]);
-
-
-    const onTextInputChange = (event) => {
-        setTextInputValue(event.target.value); // Update input value on change
-    }
-
-    const onSendButtonClick = () => {
-        socket.emit("client-speaks", { data: textInputValue });
-    }
 
     return (
         <>
@@ -48,7 +19,7 @@ function HomeComponent({ socket }) {
             <br></br>
             <div className="d-flex justify-content-around">
                 <Card style={{ width: '36rem' }}>
-                    <Link to="/quizfinished"> // TODO CHANGE LINK TO SAMUEL
+                    <Link to="/quizfinished">  {/* TODO: change Link to redirect to quiz mode */}
                         <Card.Img variant="top" src={multipleChoiceImage} />
                     </Link>
                     <Card.Body>
@@ -59,7 +30,7 @@ function HomeComponent({ socket }) {
                     </Card.Body>
                 </Card>
                 <Card style={{ width: '36rem' }}>
-                    <Link to="/quizfinished"> // TODO CHANGE LINK TO SAMUEL
+                    <Link to="/quizfinished">  {/* TODO: change Link to redirect to quiz mode */}
                         <Card.Img variant="top" src={trueFalseImage} />
                     </Link>
                     <Card.Body>

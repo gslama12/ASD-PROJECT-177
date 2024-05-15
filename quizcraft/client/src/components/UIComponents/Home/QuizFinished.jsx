@@ -1,6 +1,6 @@
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
-import NavBar from './NavBar';
+import NavBar from '../NavBar/NavBar.jsx';
 
 function QuizFinished() {
     return (

@@ -1,6 +1,4 @@
-import Card from 'react-bootstrap/Card';
-import ListGroup from 'react-bootstrap/ListGroup';
-import NavBar from './NavBar';
+import NavBar from './NavBar.jsx';
 
 function Profile() {
     return (
@@ -17,8 +15,6 @@ function Profile() {
     </>
   );
 }
-
-
 
 
 export default Profile
