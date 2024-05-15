@@ -4,8 +4,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
 const {addUser} = require("./controllers/userController");
-const getTriviaApiOptions = require("./triviaApi/triviaApiOptions");
-const {triviaApiFactory} = require("./triviaApi/triviaApi");
 
 const app = express();
 app.use(cors())
@@ -51,30 +49,5 @@ io.on('connection', (socket) => {
     await addUser(data.username, data.password);
   })
 
-
-
-  socket.on("test-trivia-api", async (body) => {
-    // Technically, all question options are optional.
-    const clientId = socket.id;
-    const gameMode = body?.mode;
-    const category = body?.category;
-    const difficulty = body?.difficulty;
-
-    // TODO verify client input
-
-    // The TriviaApi object should be created for each individual game and stored somewhere else.
-    const triviaApi = await triviaApiFactory(gameMode, category, difficulty);
-
-    const question = await triviaApi.getNextQuestion();
-    if (!question) {
-      io.to(clientId).emit("test-trivia-api", {error: "couldn't retrieve question"})
-    } else {
-      io.to(clientId).emit("test-trivia-api", {message: question})
-    }
-  });
-
-  socket.on("get-category-options", async () => {
-    const categoryOptions = await getTriviaApiOptions();
-    socket.emit("get-category-options", {message: categoryOptions});
-  });
+  require("./socketEvents/quizEvents")(socket, io);
 })

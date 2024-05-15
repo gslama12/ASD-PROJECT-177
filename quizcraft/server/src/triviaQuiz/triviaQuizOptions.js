@@ -1,15 +1,17 @@
-const {parse} = require("nodemon/lib/cli");
 TRIVIA_API_BASE_URL = "https://opentdb.com";
 
 /**
  * Singleton class with the sole purpose of providing the Trivia API options.
  */
-class TriviaApiOptions {
+class TriviaQuizOptions {
+
+    static #instance;
+
     constructor() {
-        if (TriviaApiOptions._instance) {
+        if (TriviaQuizOptions.#instance) {
             throw new Error("Singleton classes can't be instantiated more than once.")
         }
-        TriviaApiOptions._instance = this;
+        TriviaQuizOptions.#instance = this;
 
         // Filtered categories
         this.categories = undefined;
@@ -58,16 +60,16 @@ class TriviaApiOptions {
     }
 }
 
-async function getTriviaApiOptions() {
-    if (triviaApiOptions.categories === undefined) {
-        await triviaApiOptions.init();
+async function getTriviaQuizOptions() {
+    if (triviaQuizOptions.categories === undefined) {
+        await triviaQuizOptions.init();
     }
 
     const quizTypes = [
         {"id": 1, "name": "multiple"},
         {"id": 2, "name": "boolean"}
     ]
-    const categories = triviaApiOptions.categories;
+    const categories = triviaQuizOptions.categories;
     const difficultyOptions = [
         {"id": 1, "name": "easy"},
         {"id": 2, "name": "normal"},
@@ -80,9 +82,19 @@ async function getTriviaApiOptions() {
     }
 }
 
+/**
+ * Filter categories in that only those with insufficient questions are removed.
+ * @param allCategories Array of category objects. Only needed because it has category IDs.
+ * @param questionCount Array of category objects with question count. Doesn't include category ID.
+ * @returns {*[]} Array of objects of structure {id, name, questionCount}
+ */
 function filterCategories(allCategories, questionCount) {
+    const minimum_num_of_questions = 100
+
     const questionCountArray = Object.entries(questionCount.categories);
-    const filteredCategoriesTemp = questionCountArray.filter(([key, value]) => value["total_num_of_verified_questions"] >= 100)
+    const filteredCategoriesTemp = questionCountArray.filter(([key, value]) => {
+        return value["total_num_of_verified_questions"] >= minimum_num_of_questions
+    })
     const filteredCategories = [];
 
     for ([key, value] of filteredCategoriesTemp) {
@@ -98,7 +110,7 @@ function filterCategories(allCategories, questionCount) {
     return filteredCategories;
 }
 
+// This is only run once
+const triviaQuizOptions = new TriviaQuizOptions();
 
-const triviaApiOptions = new TriviaApiOptions();
-
-module.exports = getTriviaApiOptions;
+module.exports = getTriviaQuizOptions;

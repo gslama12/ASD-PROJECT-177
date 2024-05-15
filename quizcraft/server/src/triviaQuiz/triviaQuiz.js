@@ -1,12 +1,10 @@
 const {shuffleArrayInPlace} = require("../utils/arrayUtils");
-const getTriviaApiOptions = require("./triviaApiOptions");
 
 TRIVIA_API_BASE_URL = "https://opentdb.com";
-
 // number of questions for a category https://opentdb.com/api_count.php?category=CATEGORY_ID_HERE
 // number of questions: https://opentdb.com/api_count_global.php
 
-class TriviaApi {
+class TriviaQuiz {
     constructor(quizType, category, difficulty) {
         // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
         this.questionsPerRequests = 50;
@@ -105,10 +103,10 @@ class TriviaApi {
 }
 
 
-async function triviaApiFactory(quizType, category, difficulty) {
-    const triviaApi = new TriviaApi(quizType, category, difficulty);
-    await triviaApi.init()
-    return triviaApi;
+async function triviaQuizFactory(quizType, category, difficulty) {
+    const triviaQuiz = new TriviaQuiz(quizType, category, difficulty);
+    await triviaQuiz.init()
+    return triviaQuiz;
 }
 
 
@@ -129,5 +127,5 @@ async function getTriviaApiSessionToken() {
 
 
 module.exports = {
-    triviaApiFactory
+    triviaQuizFactory
 }
