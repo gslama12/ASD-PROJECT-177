@@ -65,20 +65,20 @@ async function getTriviaQuizOptions() {
         await triviaQuizOptions.init();
     }
 
-    const quizTypes = [
+    const gameModes = [
         {"id": 1, "name": "multiple"},
         {"id": 2, "name": "boolean"}
     ]
     const categories = triviaQuizOptions.categories;
-    const difficultyOptions = [
+    const difficulties = [
         {"id": 1, "name": "easy"},
         {"id": 2, "name": "normal"},
         {"id": 3, "name": "hard"}
     ];
     return {
-        "quizTypes": quizTypes,
+        "gameModes": gameModes,
         "categories": categories,
-        "difficultyOptions": difficultyOptions
+        "difficulties": difficulties
     }
 }
 
@@ -89,11 +89,11 @@ async function getTriviaQuizOptions() {
  * @returns {*[]} Array of objects of structure {id, name, questionCount}
  */
 function filterCategories(allCategories, questionCount) {
-    const minimum_num_of_questions = 100
+    const minimumNumOfQuestions = 100
 
     const questionCountArray = Object.entries(questionCount.categories);
     const filteredCategoriesTemp = questionCountArray.filter(([key, value]) => {
-        return value["total_num_of_verified_questions"] >= minimum_num_of_questions
+        return value["total_num_of_verified_questions"] >= minimumNumOfQuestions
     })
     const filteredCategories = [];
 

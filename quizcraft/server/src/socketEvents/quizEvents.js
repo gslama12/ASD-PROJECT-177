@@ -1,53 +1,73 @@
-const {triviaQuizFactory} = require("../triviaQuiz/triviaQuiz");
 const getTriviaApiOptions = require("../triviaQuiz/triviaQuizOptions");
 const triviaQuizManager = require("../triviaQuiz/triviaQuizManager");
 
 
+const EVENTS = {
+    NEW_SINGLE_PLAYER_GAME: "quiz-new-single-player-game",
+    GET_NEXT_QUESTION: "quiz-get-next-question",
+    ANSWER_QUESTION: "quiz-answer-question",
+    GET_GAME_OPTIONS: "quiz-get-game-options"
+}
+
+
+
+// TODO Don't use socket.id.: https://stackoverflow.com/questions/49338970/how-to-send-data-to-a-users-socket-id-after-they-have-refreshed-socket-io
+// TODO Authorization for roomId
 module.exports = (socket, io) => {
-    socket.on("quiz-new-single-player-game", async (body
+    socket.on(EVENTS.NEW_SINGLE_PLAYER_GAME, async (body
     ) => {
         // Technically, all question options are optional.
-        const clientId = socket.id;
+        const userId = socket.id;
         const gameMode = body?.mode;
         const category = body?.category;
         const difficulty = body?.difficulty;
 
         // TODO verify client input
 
-        const quizObject = await triviaQuizManager.createSinglePlayerGame(clientId)
+        const quizObject = await triviaQuizManager.createSinglePlayerGame(userId, gameMode, category, difficulty)
 
         if (quizObject === undefined) {
-            io.to(clientId).emit("quiz-new-single-player-game", {error: "Couldn't create new game."})
+            socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {error: "Couldn't create new game."})
             return;
         }
 
-        // Send question to client upon creating a new game
-
-
-
-
-        // The TriviaQuiz object should be created for each individual game and stored somewhere else.
-        const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty);
-
-        const question = await triviaQuiz.getNextQuestion();
+        // Send initial question to client upon creating a new game
+        const question = await quizObject.getNextQuestion();
         if (!question) {
-            io.to(clientId).emit("quiz-new-single-player-game", {error: "Couldn't retrieve question"})
-        } else {
-            io.to(clientId).emit("quiz-new-single-player-game", {message: question})
+            socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {error: "Couldn't retrieve initial question."})
+            return;
         }
+
+        socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {data: question})
     });
 
-    socket.on("quiz-get-next-question", async (body) => {
-      // TODO create
+    socket.on(EVENTS.GET_NEXT_QUESTION, async (body) => {
+        const userId = socket.id;
+        let roomId = body?.roomId;
+        roomId = roomId ? roomId : userId;
+
+        const quizObject = triviaQuizManager.getSinglePlayerGame(userId);
+        if (!quizObject) {
+            socket.emit(EVENTS.GET_NEXT_QUESTION, {error: `Couldn't find game for user ${userId}.`})
+            return;
+        }
+
+        const question = await quizObject.getNextQuestion();
+        if (!question) {
+            socket.emit(EVENTS.GET_NEXT_QUESTION, {error: "Couldn't retrieve next question."})
+            return;
+        }
+
+        socket.emit(EVENTS.GET_NEXT_QUESTION, {data: question})
     });
 
-    socket.on("quiz-answer-question", async (body) => {
+    socket.on(EVENTS.ANSWER_QUESTION, async (body) => {
         // body not used right now, may be relevant to pass socket roomId.
     })
 
-    socket.on("quiz-get-game-options", async () => {
+    socket.on(EVENTS.GET_GAME_OPTIONS, async () => {
         const categoryOptions = await getTriviaApiOptions();
-        socket.emit("quiz-get-game-options", {message: categoryOptions});
+        socket.emit(EVENTS.GET_GAME_OPTIONS, {data: categoryOptions});
     });
 }
 

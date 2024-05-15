@@ -14,18 +14,26 @@ class TriviaQuizManager {
         this.multiPlayerGames = new Map()
     }
 
-    async createSinglePlayerGame(socketId) {
-        if (!this.singlePlayerGames.has(socketId)) {
+    async createSinglePlayerGame(userId, gameMode, category, difficulty) {
+        if (!this.singlePlayerGames.has(userId)) {
             try {
-                const triviaQuiz = await triviaQuizFactory()
-                this.singlePlayerGames[socketId] = triviaQuiz;
+                const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty)
+                this.singlePlayerGames.set(userId, triviaQuiz);
             } catch (err) {
                 console.error(err);
                 return undefined;
             }
         }
 
-        return this.singlePlayerGames[socketId];
+        return this.singlePlayerGames.get(userId);
+    }
+
+    getSinglePlayerGame(userId) {
+        // TODO we don't have game IDs as of now
+        if (!this.singlePlayerGames.has(userId)) {
+            return undefined;
+        }
+        return this.singlePlayerGames.get(userId);
     }
 }
 
