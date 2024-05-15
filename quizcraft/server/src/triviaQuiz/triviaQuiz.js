@@ -1,5 +1,6 @@
 const TriviaQuestionGenerator = require("./triviaQuestionGenerator");
 const TriviaQuestionSettings = require("./triviaQuestionSettings");
+const {generateRandomUUID} = require("../utils/randomUtils");
 
 
 class TriviaQuiz {
@@ -7,6 +8,7 @@ class TriviaQuiz {
         this.questionSettings = undefined
         this.fetchedQuestions = undefined;
         this.activeQuestion = undefined;
+        this.quizId = generateRandomUUID();
         // TODO game status
     }
 

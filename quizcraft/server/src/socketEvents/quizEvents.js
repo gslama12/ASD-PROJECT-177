@@ -15,15 +15,14 @@ const EVENTS = {
 // TODO Authorization for roomId
 module.exports = (socket, io) => {
     socket.on(EVENTS.NEW_SINGLE_PLAYER_GAME, async (body) => {
-        // Technically, all question options are optional.
-        const userId = socket.id;
+        // Technically, all question settings are optional.
         const gameMode = body?.mode;
         const category = body?.category;
         const difficulty = body?.difficulty;
 
         // TODO verify client input
 
-        const quizObject = await triviaQuizManager.createSinglePlayerGame(userId, gameMode, category, difficulty)
+        const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty)
 
         if (quizObject === undefined) {
             socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {error: "Couldn't create new game."})
@@ -37,17 +36,25 @@ module.exports = (socket, io) => {
             return;
         }
 
-        socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {data: question})
+
+        const responseData = {
+            gameId: quizObject.quizId,
+            question: question
+        }
+        socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {data: responseData});
     });
 
     socket.on(EVENTS.GET_NEXT_QUESTION, async (body) => {
-        const userId = socket.id;
-        let roomId = body?.roomId;
-        roomId = roomId ? roomId : userId;
+        const gameId = body?.gameId;
 
-        const quizObject = triviaQuizManager.getSinglePlayerGame(userId);
+        if (!gameId) {
+            socket.emit(EVENTS.GET_NEXT_QUESTION, {error: "Request needs 'gameId' parameter."})
+            return;
+        }
+
+        const quizObject = triviaQuizManager.getSinglePlayerGame(gameId);
         if (!quizObject) {
-            socket.emit(EVENTS.GET_NEXT_QUESTION, {error: `Couldn't find game for user ${userId}.`})
+            socket.emit(EVENTS.GET_NEXT_QUESTION, {error: `Couldn't find game for gameId ${gameId}.`})
             return;
         }
 
