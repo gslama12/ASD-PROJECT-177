@@ -14,8 +14,7 @@ const EVENTS = {
 // TODO Don't use socket.id.: https://stackoverflow.com/questions/49338970/how-to-send-data-to-a-users-socket-id-after-they-have-refreshed-socket-io
 // TODO Authorization for roomId
 module.exports = (socket, io) => {
-    socket.on(EVENTS.NEW_SINGLE_PLAYER_GAME, async (body
-    ) => {
+    socket.on(EVENTS.NEW_SINGLE_PLAYER_GAME, async (body) => {
         // Technically, all question options are optional.
         const userId = socket.id;
         const gameMode = body?.mode;

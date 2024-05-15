@@ -4,7 +4,6 @@ TRIVIA_API_BASE_URL = "https://opentdb.com";
  * Singleton class with the sole purpose of providing the Trivia API options.
  */
 class TriviaQuizOptions {
-
     static #instance;
 
     constructor() {
