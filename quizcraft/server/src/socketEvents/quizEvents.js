@@ -10,8 +10,6 @@ const EVENTS = {
 }
 
 
-
-// TODO Don't use socket.id.: https://stackoverflow.com/questions/49338970/how-to-send-data-to-a-users-socket-id-after-they-have-refreshed-socket-io
 // TODO Authorization for roomId
 module.exports = (socket, io) => {
     socket.on(EVENTS.NEW_SINGLE_PLAYER_GAME, async (body) => {
@@ -19,10 +17,10 @@ module.exports = (socket, io) => {
         const gameMode = body?.mode;
         const category = body?.category;
         const difficulty = body?.difficulty;
-
         // TODO verify client input
 
-        const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty)
+        const playerId ="PlayerId";
+        const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty, playerId)
 
         if (quizObject === undefined) {
             socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {error: "Couldn't create new game."})
@@ -44,7 +42,9 @@ module.exports = (socket, io) => {
         socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, {data: responseData});
     });
 
+
     socket.on(EVENTS.GET_NEXT_QUESTION, async (body) => {
+        // TODO how to handle to support multiplayer? Wait until all players clicked "next question" before you do anything?
         const gameId = body?.gameId;
 
         if (!gameId) {
@@ -52,7 +52,7 @@ module.exports = (socket, io) => {
             return;
         }
 
-        const quizObject = triviaQuizManager.getSinglePlayerGame(gameId);
+        const quizObject = triviaQuizManager.getSinglePlayerGame(gameId); // currently "hardcoded" for single player
         if (!quizObject) {
             socket.emit(EVENTS.GET_NEXT_QUESTION, {error: `Couldn't find game for gameId ${gameId}.`})
             return;
@@ -67,9 +67,40 @@ module.exports = (socket, io) => {
         socket.emit(EVENTS.GET_NEXT_QUESTION, {data: question})
     });
 
+
     socket.on(EVENTS.ANSWER_QUESTION, async (body) => {
-        // body not used right now, may be relevant to pass socket roomId.
-    })
+        const playerId = "PlayerId";
+
+        const gameId = body?.gameId;
+        const answer = body?.answer;
+
+        if (!gameId || !answer) {
+            socket.emit(EVENTS.ANSWER_QUESTION, {error: "Request needs 'gameId' and 'answer' parameters."});
+            return;
+        }
+
+        const quizObject = triviaQuizManager.getSinglePlayerGame(gameId); // currently "hardcoded" for single player
+        if (!quizObject) {
+            socket.emit(EVENTS.ANSWER_QUESTION, {error: `Couldn't find game for gameId ${gameId}.`});
+            return;
+        }
+
+        if(!quizObject.setPlayerAnswer(playerId, answer)) {
+            socket.emit(EVENTS.ANSWER_QUESTION, {error: `Couldn't answer for gameId ${gameId} and playerId ${playerId}.`});
+            return;
+        }
+
+        if (!quizObject.allPlayersAnswered()) {
+            // You need to wait for other players to make an answer
+            return;
+        }
+
+        // You are the final player to make an answer, emit roundResults to all players of the game.
+        // TODO For multiplayer, need to use socket rooms
+        const roundResults = quizObject.evaluateAnswers();
+        socket.emit(EVENTS.ANSWER_QUESTION, {data: roundResults});
+    });
+
 
     socket.on(EVENTS.GET_GAME_OPTIONS, async () => {
         const categoryOptions = await getTriviaApiOptions();

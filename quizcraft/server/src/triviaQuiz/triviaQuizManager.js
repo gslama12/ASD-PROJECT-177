@@ -14,9 +14,9 @@ class TriviaQuizManager {
         this.multiPlayerGames = new Map()
     }
 
-    async createSinglePlayerGame(gameMode, category, difficulty) {
+    async createSinglePlayerGame(gameMode, category, difficulty, playerId) {
         try {
-            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty)
+            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, [playerId])
             if (triviaQuiz === undefined) {
                 return false;
             }
@@ -36,9 +36,10 @@ class TriviaQuizManager {
     }
 
     getSinglePlayerGame(quizId) {
-        if (!quizId || !this.singlePlayerGames.has(quizId)) {
+        if (!quizId) {
             return undefined;
         }
+
         return this.singlePlayerGames.get(quizId);
     }
 }
