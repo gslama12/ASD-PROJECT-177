@@ -1,5 +1,7 @@
 import LoginComponent from './components/UIComponents/LoginComponent.jsx';
 import HomeComponent from './components/UIComponents/HomeComponent.jsx';
+import Profile from './components/UIComponents/Profile.jsx';
+import QuizFinished from './components/UIComponents/QuizFinished.jsx';
 import {Route, Routes, Navigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import io from "socket.io-client";
@@ -23,6 +25,8 @@ function App() {
             <Route path='/' element={<Navigate to="/login" />} />
             <Route path='/home' element={<HomeComponent socket={socket} />} />
             <Route path='/login' element={<LoginComponent socket={socket}/>} />
+            <Route path='/profile' element={<Profile socket={socket}/>} />
+            <Route path='/quizfinished' element={<QuizFinished socket={socket}/>} />
         </Routes>
       </>
   );
