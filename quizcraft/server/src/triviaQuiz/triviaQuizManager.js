@@ -10,37 +10,36 @@ class TriviaQuizManager {
         }
         TriviaQuizManager._instance = this;
 
-        this.singlePlayerGames = new Map()
-        this.multiPlayerGames = new Map()
+        this.games = new Map()
     }
 
     async createSinglePlayerGame(gameMode, category, difficulty, playerId) {
         try {
             const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, [playerId])
             if (triviaQuiz === undefined) {
-                return false;
+                return undefined;
             }
 
             const quizId = triviaQuiz.quizId;
-            if (this.singlePlayerGames.has(quizId)) {
+            if (this.games.has(quizId)) {
                 console.error("Duplicate UUID; or bug in code.")
                 return undefined;
             }
 
-            this.singlePlayerGames.set(quizId, triviaQuiz);
-            return this.singlePlayerGames.get(quizId);
+            this.games.set(quizId, triviaQuiz);
+            return this.games.get(quizId);
         } catch (err) {
             console.error(err);
             return undefined;
         }
     }
 
-    getSinglePlayerGame(quizId) {
+    getGame(quizId) {
         if (!quizId) {
             return undefined;
         }
 
-        return this.singlePlayerGames.get(quizId);
+        return this.games.get(quizId);
     }
 }
 

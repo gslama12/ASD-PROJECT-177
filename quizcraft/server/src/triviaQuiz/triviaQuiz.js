@@ -15,13 +15,13 @@ class TriviaQuiz {
 
         this.gameComplete = false;
         this.numOfRounds = 10;
-        this.currentRound = 1;
+        this.currentRound = 0;
     }
 
 
     async initGameSettings(quizMode, category, difficulty) {
         // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
-        const questionsPerRequest = this.numOfRounds +1;
+        const questionsPerRequest = this.numOfRounds;
 
         const apiSessionToken = await TriviaQuestionGenerator.getSessionToken();
         if (apiSessionToken === undefined) {
@@ -48,6 +48,11 @@ class TriviaQuiz {
     }
 
     async getNextQuestion() {
+        if (this.activeQuestion !== undefined || this.gameComplete) {
+            // Current question is not answered or game already completed
+            return false;
+        }
+
         const questionsLeft = Array.isArray(this.fetchedQuestions) && this.fetchedQuestions.length;
         if (!questionsLeft) {
             const questionsFetched = await this.#fetchQuestions();
@@ -56,12 +61,13 @@ class TriviaQuiz {
             }
         }
 
+        this.currentRound += 1;
         this.activeQuestion = this.fetchedQuestions.shift();
         return this.activeQuestion;
     }
 
     setPlayerAnswer(playerId, answer){
-        if (!answer || !this.activeQuestion) {
+        if (!answer || !this.activeQuestion || this.gameComplete) {
             return false;
         }
 
@@ -90,35 +96,67 @@ class TriviaQuiz {
     }
 
     evaluateAnswers() {
-        if (this.activeQuestion === undefined) {
-            console.error("Cannot evaluate player answers. No active question is set.");
+        if (this.activeQuestion === undefined || this.gameComplete) {
+            console.error("Cannot evaluate player answers. No active question is set or game already completed.");
             return undefined;
         }
 
-        const playerAnswers = []
         for (const player of this.players) {
             const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer())
             if (isCorrectAnswer) {
                 player.increaseScore();
             }
+        }
+
+        const roundResults = this.getAllGameData();
+        this.#questionComplete();
+        // needed since "gameComplete" is set in #questionComplete (kinda hacky)
+        roundResults["gameInfo"] = this.#getGameInfo();
+
+        return roundResults
+    }
+
+    getAllGameData() {
+        const gameData = {
+            "gameInfo": this.#getGameInfo(),
+            "players": this.#getPlayersInfo(),
+        }
+
+        if (this.activeQuestion !== undefined) {
+            gameData["question"] = this.activeQuestion
+        }
+
+        return gameData;
+    }
+
+    #getGameInfo() {
+        return {
+            "gameId": this.quizId,
+            "gameComplete": this.gameComplete,
+            "numOfRounds": this.numOfRounds,
+            "currentRound": this.currentRound
+        }
+    }
+
+    #getPlayersInfo() {
+        const playersInfo = []
+        for (const player of this.players) {
+
 
             const playerDetails = {
                 id: player.id,
-                answer: player.getAnswer(),
-                isCorrectAnswer: isCorrectAnswer,
                 score: player.getScore()
             }
-            playerAnswers.push(playerDetails);
+
+            if (player.answer !== undefined) {
+                const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer())
+                playerDetails["answer"] = player.getAnswer();
+                playerDetails["isCorrectAnswer"] = isCorrectAnswer;
+            }
+
+            playersInfo.push(playerDetails);
         }
-
-        const roundResults =  {
-            "correctAnswer": this.activeQuestion["correct_answer"],
-            "playerAnswers": playerAnswers,
-            "gameFinished": this.gameComplete
-        };
-
-        this.#questionComplete();
-        return roundResults
+        return playersInfo
     }
 
     async #fetchQuestions() {
@@ -138,12 +176,11 @@ class TriviaQuiz {
     }
 
     #isAnswerCorrect(answer) {
-        return answer === this.activeQuestion["correct_answer"]
+        return answer === this.activeQuestion["correctAnswer"]
     }
 
     #questionComplete() {
         this.activeQuestion = undefined;
-        this.currentRound += 1;
 
         for (const player of this.players) {
             player.resetAnswer();

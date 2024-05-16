@@ -39,9 +39,11 @@ class TriviaQuestionGenerator {
                     // Replace incorrect_answers with answers
                     const newObject = {
                         ...item,
-                        answers:[...item["incorrect_answers"], item["correct_answer"]]
+                        answers: [...item["incorrect_answers"], item["correct_answer"]],
+                        correctAnswer: item["correct_answer"]
                     };
                     delete newObject["incorrect_answers"];
+                    delete newObject["correct_answer"];
                     return newObject;
                 });
                 shuffleArrayInPlace(questions)
