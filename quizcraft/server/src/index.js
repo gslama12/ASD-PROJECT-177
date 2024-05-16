@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser, authenticateUser} = require("./controllers/userController");
+const {addUser, authenticateUser, forgotPassword} = require("./controllers/userController");
 
 const app = express();
 app.use(cors())
@@ -53,5 +53,10 @@ io.on('connection', (socket) => {
   socket.on("authenticate-user", async (data) => {
     const result = await authenticateUser(data.username, data.password);
     socket.emit("user-authenticated-response", result);
+  });
+
+  socket.on("forgot-password", async (data) => {
+    const result = await forgotPassword(data.email);
+    socket.emit("forgot-password-response", result);
   });
 })

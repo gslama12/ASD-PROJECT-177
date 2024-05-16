@@ -1,6 +1,15 @@
 const { User } = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 
+// Configure the email transport using nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'asdproject8@gmail.com',
+        pass: 'kqrigykchdtupyso'
+    }
+});
 // Function to add a new user (registration)
 async function addUser(username, email, password) {
     try {
@@ -38,7 +47,36 @@ async function authenticateUser(username, password) {
     }
 }
 
+// Function to handle forgot password
+async function forgotPassword(email) {
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return { success: false, message: "User with this email does not exist" };
+        }
+
+        // Generate a new password or a password reset link
+        const newPassword = Math.random().toString(36).slice(-8);
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        // Send an email with the new password
+        await transporter.sendMail({
+            from: 'asdproject8@gmail.com',
+            to: email,
+            subject: 'Password Reset',
+            text: `Your new password is: ${newPassword}`
+        });
+
+        return { success: true, message: "A new password has been sent to your email" };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+}
+
 module.exports = {
     addUser,
-    authenticateUser
+    authenticateUser,
+    forgotPassword
 };
