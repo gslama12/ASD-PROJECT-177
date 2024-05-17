@@ -38,6 +38,17 @@ On error, requests are always responded in the form:
 | [quiz-get-game-options](#quiz-get-game-options)             |
 | [quiz-get-game-info](#quiz-get-game-info)                   |
 
+### Game Steps
+
+The following example shows in which order events are to be called to play games.
+
+1) Call [quiz-get-game-options](#quiz-get-game-options) to get all available game options.
+2) Call [quiz-new-single-player-game](#quiz-new-single-player-game) with the desired options to create a new game. `gameId` needs to be used in other calls.
+3) Call [quiz-answer-question](#quiz-answer-question) with the `answer` and `gameId`.
+4) Call [quiz-get-next-question](#quiz-get-next-question) with `gameId` to get the next question.
+5) A game is over after the final question is answered (`gameComplete: True`).
+6) [quiz-get-game-info](#quiz-get-game-info) can be called via `gameId` to get all information about a game.
+
 
 ---
 
