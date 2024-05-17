@@ -1,0 +1,86 @@
+.loginContainer {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding-top: 100px;
+}
+
+.loginForm {
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.formGroup {
+    margin-bottom: 15px;
+}
+
+.formControl {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: #fff;
+    cursor: pointer;
+}
+
+.btnSecondary {
+    margin-top: 10px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: #fff;
+}
+
+.forgotPassword {
+    margin-top: 10px;
+}
+
+.socialLogin {
+    text-align: center;
+}
+
+.socialButtons {
+    display: flex;
+    justify-content: center;
+}
+
+.btnSocial {
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: #555;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.googleIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.signup {
+    text-align: center;
+}
+
+.signupA {
+    color: #2575fc;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.alert {
+    color: red;
+    margin-bottom: 10px;
+}
