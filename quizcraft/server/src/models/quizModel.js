@@ -1,25 +1,36 @@
 const mongoose = require('mongoose');
 
-/**
- * Quiz schema to represent a quiz.
- * Includes a title, description, and an array of questions.
- * PLACEHOLDER!!!!!!!!!!
- * quizId not implemented yet!!! check trackingModel.js
- */
-const quizSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: [true, "Quiz title is required"],
-        unique: true  // Assuming each quiz title should be unique ¯\_(ツ)_/¯
-    },
-    description: {
-        type: String,
-        required: false  // This is optional
-    },
-    questions: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question'  // References to the Question model
+// Player Schema
+const playerSchema = new mongoose.Schema({
+    playerId: String,
+    score: { type: Number, default: 0 },
+    answers: [{
+        question: String,
+        answer: String,
+        correctAnswer: String,
+        isCorrect: Boolean
     }]
 });
 
-module.exports = mongoose.model("Quiz", quizSchema);
+// Question Schema
+const questionSchema = new mongoose.Schema({
+    questionId: String,
+    question: String,
+    correctAnswer: String,
+    options: [String]
+});
+
+// Game Schema
+const gameSchema = new mongoose.Schema({
+    gameId: String,
+    players: [playerSchema],
+    questions: [questionSchema],
+    currentRound: { type: Number, default: 0 },
+    numOfRounds: { type: Number, default: 10 },
+    gameComplete: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Game = mongoose.model('Game', gameSchema);
+
+module.exports = { Game, gameSchema };

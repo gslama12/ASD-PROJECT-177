@@ -1,5 +1,16 @@
 {
+  "type": "module",
   "dependencies": {
     "reactstrap": "^9.2.2"
+  },
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "mocha": "^10.4.0",
+    "mongodb-memory-server": "^9.2.0",
+    "mongoose": "^8.4.0",
+    "supertest": "^7.0.0"
+  },
+  "scripts": {
+    "test": "mocha --timeout 10000 'quizcraft/server/test/**/*.mjs'"
   }
 }
