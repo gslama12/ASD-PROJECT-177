@@ -12,6 +12,10 @@
 	- DB User: 
 		* Username: asd 
 		+ Password:asd
++ Gmail Account:
+  + username: asdproject8@gmail.com 
+  + pw gugfo6-zerroZ-vopcek 
+  + ap-pw (for access within intellij): kqrigykchdtupyso
 
 
 ## How-To Run

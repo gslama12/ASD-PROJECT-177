@@ -10,10 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "bootstrap": "^5.3.3",
+    "card": "^2.5.4",
+    "nodemailer": "^6.9.13",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.0",
+    "reactstrap": "^9.2.2",
     "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
