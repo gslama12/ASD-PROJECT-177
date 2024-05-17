@@ -12,13 +12,17 @@ function LoginComponent() {
     const [password, setPassword] = useState("");
     const [isLogin, setIsLogin] = useState(true);
     const [alertMessage, setAlertMessage] = useState("");
+    const [feedbackMessage, setFeedbackMessage] = useState("");
     const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
+    const [canResend, setCanResend] = useState(true);
+    const [resetButtonText, setResetButtonText] = useState("RESET PASSWORD");
 
     const handleLoginClick = () => {
         if (!username || !password) {
             setAlertMessage("Username or password cannot be empty");
             return;
         }
+        setFeedbackMessage("Logging in...");
         socket.emit("authenticate-user", { username, password });
     };
 
@@ -27,15 +31,27 @@ function LoginComponent() {
             setAlertMessage("Username, email, and password cannot be empty");
             return;
         }
+        setFeedbackMessage("Signing up...");
         socket.emit("add-user-to-db", { username, email, password });
     };
 
     const handleForgotPasswordClick = () => {
+        if (resetButtonText === "LOG IN") {
+            setForgotPasswordMode(false);
+            setIsLogin(true);
+            setAlertMessage("");
+            setFeedbackMessage("");
+            setResetButtonText("RESET PASSWORD");
+            return;
+        }
         if (!email) {
             setAlertMessage("Please enter your email to reset your password.");
             return;
         }
+        setFeedbackMessage("Sending reset email...");
         socket.emit("forgot-password", { email });
+        setCanResend(false);
+        setTimeout(() => setCanResend(true), 60000); // 1 minute
     };
 
     useEffect(() => {
@@ -45,6 +61,7 @@ function LoginComponent() {
             } else {
                 setAlertMessage(response.message);
             }
+            setFeedbackMessage("");
         });
 
         socket.on("user-added-response", (response) => {
@@ -53,10 +70,15 @@ function LoginComponent() {
             } else {
                 setAlertMessage(response.message);
             }
+            setFeedbackMessage("");
         });
 
         socket.on("forgot-password-response", (response) => {
             setAlertMessage(response.message);
+            setFeedbackMessage("");
+            if (response.success) {
+                setResetButtonText("LOG IN");
+            }
         });
 
         return () => {
@@ -71,6 +93,7 @@ function LoginComponent() {
             <div className="loginForm">
                 <h2>{isLogin ? "Login" : "Sign Up"}</h2>
                 {alertMessage && <div className="alert">{alertMessage}</div>}
+                {feedbackMessage && <div className="feedback">{feedbackMessage}</div>}
                 {forgotPasswordMode ? (
                     <div className="formGroup">
                         <input
@@ -80,8 +103,8 @@ function LoginComponent() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        <button className="btn" onClick={handleForgotPasswordClick}>
-                            RESET PASSWORD
+                        <button className="btn" onClick={handleForgotPasswordClick} disabled={!canResend && resetButtonText !== "LOG IN"}>
+                            {resetButtonText}
                         </button>
                         <button className="btnSecondary" onClick={() => setForgotPasswordMode(false)}>
                             CANCEL
