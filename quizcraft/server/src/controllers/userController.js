@@ -66,7 +66,7 @@ async function forgotPassword(email) {
             from: 'asdproject8@gmail.com',
             to: email,
             subject: 'Password Reset',
-            text: `Your new password is: ${newPassword}`
+            text: `Hello ${user.username},\nyour new password is: ${newPassword}`
         });
 
         return { success: true, message: "A new password has been sent to your email" };
