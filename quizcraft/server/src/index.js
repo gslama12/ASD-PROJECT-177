@@ -47,4 +47,6 @@ io.on('connection', (socket) => {
     const result = await forgotPassword(data.email);
     socket.emit("forgot-password-response", result);
   });
+
+  require("./socketEvents/quizEvents")(socket, io);
 })

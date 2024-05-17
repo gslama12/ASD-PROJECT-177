@@ -28,6 +28,8 @@
 + Run Client: `$cd client; npm run dev`
 	 - Client will run on http://localhost:5173
 
+## Socket Events Documentation
+Socket events and examples are documented [here](quizcraft/server/README.md).
 
 ## Team Members
 - Tobias Fuchs
