@@ -31,14 +31,20 @@
 ## Socket Events Documentation
 Socket events and examples are documented [here](quizcraft/server/README.md).
 
+## Notes Regarding the First Release
+This repo is still a WIP. Currrently the following functionality is implemented:
+* Login form UI
+* Quiz selection UI and navigation bar
+* Question Api: implemented in the back-end, front-end is not available yet (can be tested using Postman: https://www.postman.com)
+
 ## Team Members
-- Tobias Fuchs
-- Besjana Jaçaj
-- Dominik Kolak
-- Simon Mußbacher
-- Tamara Puzić
-- Philipp Schrank
-- Georg Slamanig
-- Tarik Spahic
-- Markus Strimitzer
-- Samuel Traussnig
+- Tobias Fuchs (Dev)
+- Besjana Jaçaj (Dev-Ops)
+- Dominik Kolak (Dev)
+- Simon Mußbacher (Dev)
+- Tamara Puzić (Scrum Master)
+- Philipp Schrank (Dev)
+- Georg Slamanig (DevLead)
+- Tarik Spahic (Product Owner)
+- Markus Strimitzer (Dev)
+- Samuel Traussnig (Dev)
