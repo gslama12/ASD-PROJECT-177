@@ -1,6 +1,7 @@
 const getTriviaApiOptions = require("../triviaQuiz/triviaQuizOptions");
 const triviaQuizManager = require("../triviaQuiz/triviaQuizManager");
 const {constructErrorResponse, constructDataResponse} = require("./messageHelper");
+const { getGameStats, getUserGames} = require("../controllers/gameStatsController");
 
 
 const EVENTS = {
@@ -8,7 +9,8 @@ const EVENTS = {
     GET_NEXT_QUESTION: "quiz-get-next-question",
     ANSWER_QUESTION: "quiz-answer-question",
     GET_GAME_OPTIONS: "quiz-get-game-options",
-    GET_GAME_INFO: "quiz-get-game-info"
+    GET_GAME_INFO: "quiz-get-game-info",
+    GAME_COMPLETE: "game-complete" // For serving stats to client.
 }
 
 
@@ -105,6 +107,14 @@ module.exports = (socket, io) => {
         // You are the final player to make an answer, emit roundResults to all players of the game.
         // TODO For multiplayer, need to use socket rooms
         const gameData = quizObject.evaluateAnswers(); // sending all game info, not only answer results
+
+        // Check if the game is complete
+        if (gameData.gameInfo.gameComplete) {
+            // If the game is complete, save the game stats and emit the 'game-complete' event
+            const gameStatsData = await quizObject.saveGameStats();
+            socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameStatsData));
+        }
+
         socket.emit(EVENTS.ANSWER_QUESTION, constructDataResponse(gameData));
     });
 
@@ -133,6 +143,39 @@ module.exports = (socket, io) => {
 
         const gameData = quizObject.getAllGameData();
         socket.emit(EVENTS.GET_GAME_INFO, constructDataResponse(gameData));
+    });
+
+    // This event is triggered when a game is completed.
+    socket.on(EVENTS.GAME_COMPLETE, async (gameStatsData) => {
+        socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameStatsData));
+    });
+
+    // This event is triggered when the game statistics for a specific game are requested.
+    socket.on("get-game-stats", async (body) => {
+        const gameId = body?.gameId;
+
+        if (!gameId) {
+            const errorObject = constructErrorResponse("Request needs 'gameId' parameter.");
+            socket.emit("get-game-stats-response", errorObject);
+            return;
+        }
+
+        const result = await getGameStats(gameId);
+        socket.emit("get-game-stats-response", constructDataResponse(result));
+    });
+
+    // This event is triggered when the games played by a specific user are requested.
+    socket.on("get-user-games", async (body) => {
+        const username = body?.username;
+
+        if (!username) {
+            const errorObject = constructErrorResponse("Request needs 'username' parameter.");
+            socket.emit("get-user-games-response", errorObject);
+            return;
+        }
+
+        const result = await getUserGames(username);
+        socket.emit("get-user-games-response", constructDataResponse(result));
     });
 };
 

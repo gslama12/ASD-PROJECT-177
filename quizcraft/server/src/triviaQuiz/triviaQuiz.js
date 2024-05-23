@@ -1,27 +1,35 @@
 const TriviaQuestionGenerator = require("./triviaQuestionGenerator");
 const TriviaQuestionSettings = require("./triviaQuestionSettings");
-const { generateRandomUUID } = require("../utils/randomUtils");
-const { Game } = require("../models/quizModel");
+const {generateRandomUUID} = require("../utils/randomUtils");
 const TriviaQuizPlayer = require("./triviaQuizPlayer");
+const { Game, GameStats } = require('../models/quizModels');
+
 
 class TriviaQuiz {
-    constructor() {
+    constructor(questionGenerator, questionSettings) {
         this.quizId = generateRandomUUID();
 
-        this.questionSettings = undefined;
+        // dependency injection for testing
+        this.questionGenerator = questionGenerator || TriviaQuestionGenerator;
+        this.questionSettings = questionSettings || TriviaQuestionSettings;
+
         this.fetchedQuestions = undefined;
         this.activeQuestion = undefined;
-        this.players = undefined; // Can be fully implemented once actual playerIds are passed.
+        this.players = undefined // Can be fully implemented once actual playerIds are passed.
 
         this.gameComplete = false;
         this.numOfRounds = 10;
         this.currentRound = 0;
+
+        this.correctAnswers = 0; // For tracking
+        this.wrongAnswers = 0; // For tracking
     }
 
     async initGameSettings(quizMode, category, difficulty) {
+        // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
         const questionsPerRequest = this.numOfRounds;
 
-        const apiSessionToken = await TriviaQuestionGenerator.getSessionToken();
+        const apiSessionToken = await this.questionGenerator.getSessionToken();
         if (apiSessionToken === undefined) {
             return false;
         }
@@ -29,14 +37,22 @@ class TriviaQuiz {
         this.questionSettings = new TriviaQuestionSettings(
             quizMode, category, difficulty, apiSessionToken, questionsPerRequest
         );
+
+        console.log('Initialized game settings:', this.questionSettings);
+
         return true;
     }
 
+
     async initQuestions() {
-        const questionsFetched = await this.#fetchQuestions();
+        console.log('Fetching questions...');
+        const questionsFetched = await this.questionGenerator.fetchQuestions(this.questionSettings);
         if (!questionsFetched) {
+            console.error('Failed to fetch questions.');
             return false;
         }
+        this.fetchedQuestions = questionsFetched;
+        console.log('Questions fetched successfully.');
         return true;
     }
 
@@ -46,6 +62,7 @@ class TriviaQuiz {
 
     async getNextQuestion() {
         if (this.activeQuestion !== undefined || this.gameComplete) {
+            // Current question is not answered or game already completed
             return false;
         }
 
@@ -81,6 +98,7 @@ class TriviaQuiz {
         return this.players.find(player => player.id === playerId);
     }
 
+
     allPlayersAnswered() {
         for (const player of this.players) {
             if (player.answer === undefined) {
@@ -90,7 +108,7 @@ class TriviaQuiz {
         return true;
     }
 
-    async evaluateAnswers() {
+    evaluateAnswers() {
         if (this.activeQuestion === undefined || this.gameComplete) {
             console.error("Cannot evaluate player answers. No active question is set or game already completed.");
             return undefined;
@@ -98,68 +116,31 @@ class TriviaQuiz {
 
         for (const player of this.players) {
             const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer());
+            // If the player's answer is correct, add the correct answer to the player's details for tracking
             if (isCorrectAnswer) {
                 player.increaseScore();
+                this.correctAnswers += 1;
+            } else {
+                this.wrongAnswers += 1;
             }
         }
 
         const roundResults = this.getAllGameData();
         this.#questionComplete();
+        // needed since "gameComplete" is set in #questionComplete (kinda hacky)
         roundResults["gameInfo"] = this.#getGameInfo();
 
-        // Save game state to database
-        await this.saveGameState();
-
         return roundResults;
-    }
-
-    // Saves the current game state to the database
-    // tries to find a game with same id
-    // if found, updates the game data with current data
-    // if not found create new game in database
-    async saveGameState() {
-        try {
-            const game = await Game.findOne({ gameId: this.quizId });
-            if (game) {
-                // Update existing game
-                game.players = this.players.map(player => ({
-                    playerId: player.id,
-                    score: player.getScore(),
-                    answers: player.answers
-                }));
-                game.questions = this.fetchedQuestions;
-                game.currentRound = this.currentRound;
-                game.gameComplete = this.gameComplete;
-                await game.save();
-            } else {
-                // Create new game
-                const newGame = new Game({
-                    gameId: this.quizId,
-                    players: this.players.map(player => ({
-                        playerId: player.id,
-                        score: player.getScore(),
-                        answers: player.answers
-                    })),
-                    questions: this.fetchedQuestions,
-                    currentRound: this.currentRound,
-                    numOfRounds: this.numOfRounds,
-                    gameComplete: this.gameComplete
-                });
-                await newGame.save();
-            }
-        } catch (err) {
-            console.error("Error saving game state:", err);
-        }
     }
 
     getAllGameData() {
         const gameData = {
             "gameInfo": this.#getGameInfo(),
             "players": this.#getPlayersInfo(),
-        };
+        }
 
         if (this.activeQuestion !== undefined) {
-            gameData["question"] = this.activeQuestion;
+            gameData["question"] = this.activeQuestion
         }
 
         return gameData;
@@ -171,46 +152,53 @@ class TriviaQuiz {
             "gameComplete": this.gameComplete,
             "numOfRounds": this.numOfRounds,
             "currentRound": this.currentRound
-        };
+        }
     }
 
     #getPlayersInfo() {
-        const playersInfo = [];
+        const playersInfo = []
         for (const player of this.players) {
             const playerDetails = {
                 id: player.id,
                 score: player.getScore()
-            };
+            }
 
             if (player.answer !== undefined) {
-                const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer());
+                const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer())
                 playerDetails["answer"] = player.getAnswer();
                 playerDetails["isCorrectAnswer"] = isCorrectAnswer;
+                // If the player's answer is not correct, add the correct answer to the player's details
+                if (!isCorrectAnswer) {
+                    playerDetails["correctAnswer"] = this.activeQuestion["correctAnswer"];
+                }
             }
 
             playersInfo.push(playerDetails);
         }
-        return playersInfo;
+        return playersInfo
     }
 
     async #fetchQuestions() {
         try {
+            console.log('Fetching questions from TriviaQuestionGenerator...');
             const questions = await TriviaQuestionGenerator.fetchQuestions(this.questionSettings);
 
             if (questions === undefined) {
+                console.error('No questions received from TriviaQuestionGenerator.');
                 return false;
             }
 
             this.fetchedQuestions = questions;
+            console.log('Questions received:', questions);
             return true;
         } catch (err) {
-            console.error(err);
+            console.error('Error fetching questions:', err);
             return false;
         }
     }
 
     #isAnswerCorrect(answer) {
-        return answer === this.activeQuestion["correctAnswer"];
+        return answer === this.activeQuestion["correctAnswer"]
     }
 
     #questionComplete() {
@@ -221,6 +209,11 @@ class TriviaQuiz {
         }
 
         this.#updateGameFinished();
+
+        // save game data to database
+        if (this.gameComplete) {
+            this.saveGameStats();
+        }
     }
 
     #updateGameFinished() {
@@ -228,7 +221,44 @@ class TriviaQuiz {
             this.gameComplete = true;
         }
     }
+
+    /**
+     *  saves the game statistics to the database.
+     *  returns a promise array of game statisitcs
+     */
+    async saveGameStats() {
+        try {
+            const gameData = new Game({
+                gameMode: this.questionSettings.gameMode,
+                difficulty: this.questionSettings.difficulty,
+                category: this.questionSettings.category,
+                numOfRounds: this.numOfRounds
+            });
+            const savedGame = await gameData.save();
+
+            const gameStatsData = [];
+
+            for (const player of this.players) {
+                const gameStats = new GameStats({
+                    gameId: savedGame._id,
+                    playerId: player.id,
+                    questionsAnsweredCorrectly: this.correctAnswers,
+                    totalQuestions: this.numOfRounds,
+                    questionsAnsweredWrongly: this.wrongAnswers
+                });
+                await gameStats.save();
+                gameStatsData.push(gameStats);
+            }
+            console.log('Game stats saved successfully.');
+
+            // Return the game stats data to event
+            return gameStatsData;
+        } catch (err) {
+            console.error('Error saving game stats:', err);
+        }
+    }
 }
+
 
 async function triviaQuizFactory(gameMode, category, difficulty, playerIds) {
     const triviaQuiz = new TriviaQuiz(gameMode, category, difficulty);
@@ -248,6 +278,7 @@ async function triviaQuizFactory(gameMode, category, difficulty, playerIds) {
     return triviaQuiz;
 }
 
+
 module.exports = {
     triviaQuizFactory
-};
+}

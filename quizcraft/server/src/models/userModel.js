@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { gameSchema } = require('./quizModel');
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -15,8 +14,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Password is required"]
-    },
-    games: [gameSchema] // stores game data/history
+    }
 });
 
 const User = mongoose.model("User", userSchema);
