@@ -23,6 +23,8 @@ class TriviaQuiz {
 
         this.correctAnswers = 0; // For tracking
         this.wrongAnswers = 0; // For tracking
+
+        this.questionAnswerHistory = []; // Tracks player answers for each question in detail.
     }
 
     async initGameSettings(quizMode, category, difficulty) {
@@ -116,6 +118,15 @@ class TriviaQuiz {
 
         for (const player of this.players) {
             const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer());
+
+            // Store the question, player's answer, and whether it was correct
+            this.questionAnswerHistory.push({
+                question: this.activeQuestion,
+                playerId: player.id,
+                answer: playerAnswer,
+                isCorrect: isCorrectAnswer
+            });
+
             // If the player's answer is correct, add the correct answer to the player's details for tracking
             if (isCorrectAnswer) {
                 player.increaseScore();
@@ -133,10 +144,15 @@ class TriviaQuiz {
         return roundResults;
     }
 
+    getQuestionAnswerHistory() {
+        return this.questionAnswerHistory;
+    }
+
     getAllGameData() {
         const gameData = {
             "gameInfo": this.#getGameInfo(),
             "players": this.#getPlayersInfo(),
+            "questionAnswerHistory": this.getQuestionAnswerHistory()
         }
 
         if (this.activeQuestion !== undefined) {
@@ -151,7 +167,9 @@ class TriviaQuiz {
             "gameId": this.quizId,
             "gameComplete": this.gameComplete,
             "numOfRounds": this.numOfRounds,
-            "currentRound": this.currentRound
+            "currentRound": this.currentRound,
+            "correctAnswers": this.correctAnswers,
+            "wrongAnswers": this.wrongAnswers
         }
     }
 
