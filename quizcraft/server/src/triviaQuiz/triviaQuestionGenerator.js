@@ -30,9 +30,13 @@ class TriviaQuestionGenerator {
             api_url = `${api_url}&token=${questionSettings.apiSessionToken}`;
         }
 
+        console.log('Fetching questions with URL:', api_url);
+
         try {
             const response = await fetch(api_url);
             const responseBody = await response.json();
+
+            console.log('API response:', responseBody);
 
             if (response.ok) {
                 const questions = responseBody["results"].map((item) => {
@@ -54,10 +58,11 @@ class TriviaQuestionGenerator {
             const responseCode = responseBody["response_code"];
             // Fetch fails if Trivia API is called twice within 5 seconds by the same IP address.
             // Fetch also fails if this.questionsPerRequests is higher than the number of "new" question left on server.
+            console.error('Trivia API error, response code:', responseCode);
 
             return undefined;
         } catch (err) {
-            console.error(err);
+            console.error('Error fetching questions:', err);
             return undefined;
         }
     }
