@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser, authenticateUser, forgotPassword} = require("./controllers/userController");
+const {addUser, authenticateUser, forgotPassword, getActiveUserInfo} = require("./controllers/userController");
 
 
 const app = express();
@@ -46,6 +46,11 @@ io.on('connection', (socket) => {
   socket.on("forgot-password", async (data) => {
     const result = await forgotPassword(data.email);
     socket.emit("forgot-password-response", result);
+  });
+
+  socket.on("get-active-user-info", async (data) => {
+    const result = await getActiveUserInfo(data.userId);
+    socket.emit("active-user-info-response", result);
   });
 
   require("./socketEvents/quizEvents")(socket, io);
