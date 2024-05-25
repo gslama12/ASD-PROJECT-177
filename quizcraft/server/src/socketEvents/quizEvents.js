@@ -150,9 +150,9 @@ module.exports = (socket, io) => {
     // This event is triggered when a game is completed.
     // Triggered from within the ANSWER_QUESTION event, in case all players answeared and game is over!
     // Emits the game statistics data to all players in the game.
-    socket.on(EVENTS.GAME_COMPLETE, async (gameStatsData) => {
-        socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameStatsData));
-    });
+    // socket.on(EVENTS.GAME_COMPLETE, async (gameStatsData) => {
+    //     socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameStatsData));
+    //});
 
     // This event is triggered when the game statistics for a specific game are requested.
     // Used to fetch game data from databse for a specific game#
