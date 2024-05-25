@@ -75,8 +75,25 @@ async function forgotPassword(email) {
     }
 }
 
+/**
+ * This function retrieves the active user's information.
+ */
+async function getActiveUserInfo(userId) {
+    try {
+        const user = await User.findById(userId, 'username email');
+        if (!user) {
+            return { success: false, message: "User not found" };
+        }
+        return { success: true, user };
+    } catch (error) {
+        console.error('Error retrieving user info:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
 module.exports = {
     addUser,
     authenticateUser,
-    forgotPassword
+    forgotPassword,
+    getActiveUserInfo
 };

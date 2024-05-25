@@ -2,13 +2,17 @@ const TriviaQuestionGenerator = require("./triviaQuestionGenerator");
 const TriviaQuestionSettings = require("./triviaQuestionSettings");
 const {generateRandomUUID} = require("../utils/randomUtils");
 const TriviaQuizPlayer = require("./triviaQuizPlayer");
+const { Game, GameStats } = require('../models/quizModels');
 
 
 class TriviaQuiz {
-    constructor() {
+    constructor(questionGenerator, questionSettings) {
         this.quizId = generateRandomUUID();
 
-        this.questionSettings = undefined
+        // dependency injection for testing
+        this.questionGenerator = questionGenerator || TriviaQuestionGenerator;
+        this.questionSettings = questionSettings || TriviaQuestionSettings;
+
         this.fetchedQuestions = undefined;
         this.activeQuestion = undefined;
         this.players = undefined // Can be fully implemented once actual playerIds are passed.
@@ -16,14 +20,18 @@ class TriviaQuiz {
         this.gameComplete = false;
         this.numOfRounds = 10;
         this.currentRound = 0;
-    }
 
+        this.correctAnswers = 0; // For tracking
+        this.wrongAnswers = 0; // For tracking
+
+        this.questionAnswerHistory = []; // Tracks player answers for each question in detail.
+    }
 
     async initGameSettings(quizMode, category, difficulty) {
         // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
         const questionsPerRequest = this.numOfRounds;
 
-        const apiSessionToken = await TriviaQuestionGenerator.getSessionToken();
+        const apiSessionToken = await this.questionGenerator.getSessionToken();
         if (apiSessionToken === undefined) {
             return false;
         }
@@ -31,16 +39,23 @@ class TriviaQuiz {
         this.questionSettings = new TriviaQuestionSettings(
             quizMode, category, difficulty, apiSessionToken, questionsPerRequest
         );
+
+        console.log('Initialized game settings:', this.questionSettings);
+
         return true;
     }
 
+
     async initQuestions() {
-        const questionsFetched = await this.#fetchQuestions();
+        console.log('Fetching questions...');
+        const questionsFetched = await this.questionGenerator.fetchQuestions(this.questionSettings);
         if (!questionsFetched) {
+            console.error('Failed to fetch questions.');
             return false;
         }
-
-        return true
+        this.fetchedQuestions = questionsFetched;
+        console.log('Questions fetched successfully.');
+        return true;
     }
 
     initPlayers(playerIds) {
@@ -66,15 +81,15 @@ class TriviaQuiz {
         return this.activeQuestion;
     }
 
-    setPlayerAnswer(playerId, answer){
+    setPlayerAnswer(playerId, answer) {
         if (!answer || !this.activeQuestion || this.gameComplete) {
             return false;
         }
 
         const player = this.getQuizPlayer(playerId);
         if (player === undefined) {
-            console.error(`playerId ${playerId} answered in quizId ${this.quizId} but is not a player of it.`)
-            return false
+            console.error(`playerId ${playerId} answered in quizId ${this.quizId} but is not a player of it.`);
+            return false;
         }
 
         player.setAnswer(answer);
@@ -102,9 +117,22 @@ class TriviaQuiz {
         }
 
         for (const player of this.players) {
-            const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer())
+            const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer());
+
+            // Store the question, player's answer, and whether it was correct
+            this.questionAnswerHistory.push({
+                question: this.activeQuestion,
+                playerId: player.id,
+                answer: playerAnswer,
+                isCorrect: isCorrectAnswer
+            });
+
+            // If the player's answer is correct, add the correct answer to the player's details for tracking
             if (isCorrectAnswer) {
                 player.increaseScore();
+                this.correctAnswers += 1;
+            } else {
+                this.wrongAnswers += 1;
             }
         }
 
@@ -113,13 +141,18 @@ class TriviaQuiz {
         // needed since "gameComplete" is set in #questionComplete (kinda hacky)
         roundResults["gameInfo"] = this.#getGameInfo();
 
-        return roundResults
+        return roundResults;
+    }
+
+    getQuestionAnswerHistory() {
+        return this.questionAnswerHistory;
     }
 
     getAllGameData() {
         const gameData = {
             "gameInfo": this.#getGameInfo(),
             "players": this.#getPlayersInfo(),
+            "questionAnswerHistory": this.getQuestionAnswerHistory()
         }
 
         if (this.activeQuestion !== undefined) {
@@ -134,15 +167,15 @@ class TriviaQuiz {
             "gameId": this.quizId,
             "gameComplete": this.gameComplete,
             "numOfRounds": this.numOfRounds,
-            "currentRound": this.currentRound
+            "currentRound": this.currentRound,
+            "correctAnswers": this.correctAnswers,
+            "wrongAnswers": this.wrongAnswers
         }
     }
 
     #getPlayersInfo() {
         const playersInfo = []
         for (const player of this.players) {
-
-
             const playerDetails = {
                 id: player.id,
                 score: player.getScore()
@@ -152,6 +185,10 @@ class TriviaQuiz {
                 const isCorrectAnswer = this.#isAnswerCorrect(player.getAnswer())
                 playerDetails["answer"] = player.getAnswer();
                 playerDetails["isCorrectAnswer"] = isCorrectAnswer;
+                // If the player's answer is not correct, add the correct answer to the player's details
+                if (!isCorrectAnswer) {
+                    playerDetails["correctAnswer"] = this.activeQuestion["correctAnswer"];
+                }
             }
 
             playersInfo.push(playerDetails);
@@ -161,16 +198,19 @@ class TriviaQuiz {
 
     async #fetchQuestions() {
         try {
+            console.log('Fetching questions from TriviaQuestionGenerator...');
             const questions = await TriviaQuestionGenerator.fetchQuestions(this.questionSettings);
 
             if (questions === undefined) {
+                console.error('No questions received from TriviaQuestionGenerator.');
                 return false;
             }
 
             this.fetchedQuestions = questions;
+            console.log('Questions received:', questions);
             return true;
         } catch (err) {
-            console.error(err);
+            console.error('Error fetching questions:', err);
             return false;
         }
     }
@@ -187,11 +227,52 @@ class TriviaQuiz {
         }
 
         this.#updateGameFinished();
+
+        // save game data to database
+        if (this.gameComplete) {
+            this.saveGameStats();
+        }
     }
 
     #updateGameFinished() {
         if (this.currentRound === this.numOfRounds) {
             this.gameComplete = true;
+        }
+    }
+
+    /**
+     *  saves the game statistics to the database.
+     *  returns a promise array of game statisitcs
+     */
+    async saveGameStats() {
+        try {
+            const gameData = new Game({
+                gameMode: this.questionSettings.gameMode,
+                difficulty: this.questionSettings.difficulty,
+                category: this.questionSettings.category,
+                numOfRounds: this.numOfRounds
+            });
+            const savedGame = await gameData.save();
+
+            const gameStatsData = [];
+
+            for (const player of this.players) {
+                const gameStats = new GameStats({
+                    gameId: savedGame._id,
+                    playerId: player.id,
+                    questionsAnsweredCorrectly: this.correctAnswers,
+                    totalQuestions: this.numOfRounds,
+                    questionsAnsweredWrongly: this.wrongAnswers
+                });
+                await gameStats.save();
+                gameStatsData.push(gameStats);
+            }
+            console.log('Game stats saved successfully.');
+
+            // Return the game stats data to event
+            return gameStatsData;
+        } catch (err) {
+            console.error('Error saving game stats:', err);
         }
     }
 }

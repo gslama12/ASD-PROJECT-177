@@ -37,6 +37,9 @@ On error, requests are always responded in the form:
 | [quiz-answer-question](#quiz-answer-question)               |
 | [quiz-get-game-options](#quiz-get-game-options)             |
 | [quiz-get-game-info](#quiz-get-game-info)                   |
+| [quiz-game-complete](#quiz-get-game-info)                   |
+| [quiz-get-game-stats](#quiz-get-game-info)                   |
+| [quiz-get-user-games](#quiz-get-game-info)                   |
 
 ### Game Steps
 
@@ -336,3 +339,93 @@ Displays all game information about a game. This includes current and total roun
 **Note:** If there is no question (e.g. when `"gameComplete": true`), the `question` property is omitted.
 
 ---
+
+### quiz-game-complete
+This event is triggered when the game completes. It emits the final game statistics to all players involved in the game. The event is internally triggered within the `ANSWER_QUESTION` event.
+
+**Response:**
+```json
+{
+  "gameStats": {
+    "totalQuestions": 10,
+    "correctAnswers": 7,
+    "gameDuration": "15 minutes",
+    "playerScores": {
+      "player1": {
+        "score": 70,
+        "correctAnswers": 7
+      }
+    }
+  },
+  "questionAnswerHistory": [
+    {
+      "question": "What is the capital of France?",
+      "correctAnswer": "Paris",
+      "playerAnswers": {
+        "player1": "Paris"
+      }
+    }
+  ]
+}
+```
+
+---
+
+
+### quiz-get-game-stats
+This event retrieves the statistics of a specific game by its game ID from the DB.
+
+**Request:**
+```json
+{
+  "gameId": "unique_game_id"
+}
+```
+
+**Response:**
+```json
+{
+  "gameId": "unique_game_id",
+  "totalQuestions": 10,
+  "correctAnswers": 7,
+  "gameDuration": "15 minutes",
+  "playerScores": {
+    "player1": {
+      "score": 70,
+      "correctAnswers": 7
+    }
+  }
+}
+```
+
+---
+
+### quiz-get-user-games
+This event is used to fetch all games played by a specific user fro mthe db. It is intended for use in a post game history display.
+
+**Request:**
+```json
+{
+  "username": "player_username"
+}
+```
+
+**Response:**
+```json
+{
+  "games": [
+    {
+      "gameId": "game1",
+      "date": "2023-05-20",
+      "result": "Won",
+      "score": 80
+    },
+    {
+      "gameId": "game2",
+      "date": "2023-05-21",
+      "result": "Lost",
+      "score": 45
+    }
+  ]
+}
+```
