@@ -1,11 +1,8 @@
 body {
     background:
-            radial-gradient(circle at 50% 0,
-            rgba(255,50,0,.5), rgba(255,50,0,0) 70.71%),
-            radial-gradient(circle at 6.7% 75%,
-            rgba(0,50,255,.5), rgba(0,50,255,0) 70.71%),
-            radial-gradient(circle at 93.3% 75%,
-            rgba(0,255,50,.5), rgba(0,255,50,0) 70.71%);
+            radial-gradient(circle at 50% 0, rgba(255, 50, 0, .5), rgba(255, 50, 0, 0) 70.71%),
+            radial-gradient(circle at 6.7% 75%, rgba(0, 50, 255, .5), rgba(0, 50, 255, 0) 70.71%),
+            radial-gradient(circle at 93.3% 75%, rgba(0, 255, 50, .5), rgba(0, 255, 50, 0) 70.71%);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     display: flex;
@@ -18,7 +15,6 @@ body {
 
 .mainContainer {
     display: flex;
-    justify-content: center;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -38,17 +34,19 @@ body {
 }
 
 .loginContainer {
-    background: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     padding: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 }
 
 .loginForm {
-    background: #fff;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     padding: 40px;
     border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     text-align: center;
 }
 
@@ -65,7 +63,7 @@ body {
     margin-bottom: 15px;
 }
 
-.btn {
+.btnMain {
     width: 100%;
     padding: 15px;
     border-radius: 25px;

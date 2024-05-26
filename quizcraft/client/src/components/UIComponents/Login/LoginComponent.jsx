@@ -144,7 +144,7 @@ function LoginComponent({ socket }) {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {errorFields.email && <div className="errorMessage">{errorFields.email}</div>}
-                        <button className="btn" onClick={handleForgotPasswordClick}>
+                        <button className="btnMain" onClick={handleForgotPasswordClick}>
                             RESET PASSWORD
                         </button>
                         <button className="btnSecondary" onClick={() => setForgotPasswordMode(false)}>
@@ -199,13 +199,13 @@ function LoginComponent({ socket }) {
                         )}
                         {isLogin ? (
                             <div className="formGroup">
-                                <button className="btn" onClick={handleLoginClick}>
+                                <button className="btnMain" onClick={handleLoginClick}>
                                     LOGIN
                                 </button>
                             </div>
                         ) : (
                             <div className="formGroup">
-                                <button className="btn" onClick={handleSignUpClick}>
+                                <button className="btnMain" onClick={handleSignUpClick}>
                                     SIGN UP
                                 </button>
                             </div>
@@ -226,84 +226,6 @@ function LoginComponent({ socket }) {
                         {isLogin ? "SIGN UP" : "LOG IN"}
                     </button>
                 </div>
-        <div className="loginForm">
-            <h2>{isLogin ? "Login" : "Sign Up"}</h2>
-            {alertMessage && <div className="alert">{alertMessage}</div>}
-            {forgotPasswordMode ? (
-                <div className="formGroup">
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        className="formControl"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <button className="btn" onClick={handleForgotPasswordClick}>
-                        RESET PASSWORD
-                    </button>
-                    <button className="btnSecondary" onClick={() => setForgotPasswordMode(false)}>
-                        CANCEL
-                    </button>
-                </div>
-            ) : (
-                <>
-                    <div className="formGroup">
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            className="formControl"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </div>
-                    {!isLogin && (
-                        <div className="formGroup">
-                            <input
-                                type="email"
-                                placeholder="Email"
-                                className="formControl"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                    )}
-                    <div className="formGroup">
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            className="formControl"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    {isLogin ? (
-                        <div className="formGroup">
-                            <button className="btn" onClick={handleLoginClick}>
-                                LOGIN
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="formGroup">
-                            <button className="btn" onClick={handleSignUpClick}>
-                                SIGN UP
-                            </button>
-                        </div>
-                    )}
-                    {isLogin && (
-                        <div className="forgotPassword">
-                            <a href="#" onClick={() => setForgotPasswordMode(true)}>Forgot password?</a>
-                        </div>
-                    )}
-                </>
-            )}
-            <div className="signup">
-                <p>{isLogin ? "Or Sign Up Using" : "Or Log In Using"}</p>
-                <button
-                    className="btnSecondary"
-                    onClick={() => setIsLogin(!isLogin)}
-                >
-                    {isLogin ? "SIGN UP" : "LOG IN"}
-                </button>
             </div>
         </div>
     );
