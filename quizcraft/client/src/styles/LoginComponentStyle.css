@@ -81,6 +81,23 @@
 }
 
 .alert {
-    color: red;
-    margin-bottom: 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.formControl.error {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.errorMessage {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
 }
