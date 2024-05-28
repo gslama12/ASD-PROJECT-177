@@ -133,7 +133,7 @@ function LoginComponent({ socket }) {
         <div className="loginContainer">
             <div className="loginForm">
                 <h2>{isLogin ? "Login" : "Sign Up"}</h2>
-                {alertMessage && <div className="alert">{alertMessage}</div>}
+                {alertMessage && <div className="alertMessage">{alertMessage}</div>}
                 {forgotPasswordMode ? (
                     <div className="formGroup">
                         <input
