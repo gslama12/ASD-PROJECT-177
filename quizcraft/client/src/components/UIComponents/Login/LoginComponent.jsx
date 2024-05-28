@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
 import "../../../styles/LoginComponentStyle.css";
 
-const socket = io("http://localhost:3001");
-
-function LoginComponent() {
+function LoginComponent({ socket }) {
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -157,7 +154,13 @@ function LoginComponent() {
             socket.off("user-added-response");
             socket.off("forgot-password-response");
         };
-    }, [navigate]);
+    }, [navigate, socket]);
+
+    const switchMode = () => {
+        setIsLogin(!isLogin);
+        setAlertMessage("");
+        setErrorFields({});
+    };
 
     return (
         <div className="loginContainer">
@@ -174,10 +177,6 @@ function LoginComponent() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        {errorFields.email && <div className="errorMessage">{errorFields.email}</div>}
-                        <button className="btn" onClick={handleForgotPasswordClick}>
-                            RESET PASSWORD
-                        </button>
                         <div className="buttonGroup">
                             <button className="btnMain" onClick={handleForgotPasswordClick} disabled={!canResend && resetButtonText !== "LOG IN"}>
                                 {resetButtonText}
@@ -238,7 +237,7 @@ function LoginComponent() {
                         )}
                         {isLogin ? (
                             <div className="formGroup">
-                                <button className="btnLogin" onClick={handleLoginClick}>
+                                <button className="btnMain" onClick={handleLoginClick}>
                                     LOGIN
                                 </button>
                             </div>

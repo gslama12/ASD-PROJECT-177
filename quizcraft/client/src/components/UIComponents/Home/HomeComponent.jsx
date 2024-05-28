@@ -7,11 +7,9 @@ import { Link } from 'react-router-dom';
 
 
 function HomeComponent({ socket }) {
-
     return (
         <>
             <NavBar />
-
             <br></br>
             <br></br>
             <h1 className="centered-header">Choose your Game-Mode</h1>
