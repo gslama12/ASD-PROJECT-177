@@ -6,7 +6,8 @@ import HomeComponent from "./components/UIComponents/Home/HomeComponent.jsx";
 import Profile from "./components/UIComponents/NavBar/Profile.jsx";
 import QuizFinished from "./components/UIComponents/Home/QuizFinished.jsx";
 import "../src/styles/LoginComponentStyle.css";
-import quizMeImage from '../src/assets/quiz_me.png'; // Adjust the path as necessary
+import "./components/UIComponents/GenericStyles/CenteredHeader.css";
+import quizMeImage from '../src/assets/quiz_me.png';
 
 const WEBSOCKET_URL = "http://localhost:3001";
 
@@ -36,7 +37,7 @@ function App() {
 
 function LoginPage({ socket }) {
     return (
-        <div className="mainContainer">
+        <div className="loginPageContainer">
             <div className="quoteContainer">
                 <img src={quizMeImage} alt="Quiz Me" className="quizImage"/>
             </div>
