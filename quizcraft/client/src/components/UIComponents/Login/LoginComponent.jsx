@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
 import "../../../styles/LoginComponentStyle.css";
 
-const socket = io("http://localhost:3001");
-
-function LoginComponent() {
+function LoginComponent({ socket }) {
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -124,7 +121,7 @@ function LoginComponent() {
             socket.off("user-added-response");
             socket.off("forgot-password-response");
         };
-    }, [navigate]);
+    }, [navigate, socket]);
 
     const switchMode = () => {
         setIsLogin(!isLogin);
@@ -136,7 +133,7 @@ function LoginComponent() {
         <div className="loginContainer">
             <div className="loginForm">
                 <h2>{isLogin ? "Login" : "Sign Up"}</h2>
-                {alertMessage && <div className="alert">{alertMessage}</div>}
+                {alertMessage && <div className="alertMessage">{alertMessage}</div>}
                 {forgotPasswordMode ? (
                     <div className="formGroup">
                         <input
@@ -147,7 +144,7 @@ function LoginComponent() {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {errorFields.email && <div className="errorMessage">{errorFields.email}</div>}
-                        <button className="btn" onClick={handleForgotPasswordClick}>
+                        <button className="btnMain" onClick={handleForgotPasswordClick}>
                             RESET PASSWORD
                         </button>
                         <button className="btnSecondary" onClick={() => setForgotPasswordMode(false)}>
@@ -202,13 +199,13 @@ function LoginComponent() {
                         )}
                         {isLogin ? (
                             <div className="formGroup">
-                                <button className="btn" onClick={handleLoginClick}>
+                                <button className="btnMain" onClick={handleLoginClick}>
                                     LOGIN
                                 </button>
                             </div>
                         ) : (
                             <div className="formGroup">
-                                <button className="btn" onClick={handleSignUpClick}>
+                                <button className="btnMain" onClick={handleSignUpClick}>
                                     SIGN UP
                                 </button>
                             </div>
