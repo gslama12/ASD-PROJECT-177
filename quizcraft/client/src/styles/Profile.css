@@ -1,0 +1,41 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.header-container {
+    text-align: center;
+}
+
+.header-container h1 {
+    font-size: 3em;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 20px;
+}
+
+.button-container p {
+    font-size: 1.5em;
+    margin: 0;
+    padding-right: 10px;
+    align-self: center;
+}
+
+.custom-button {
+    background-color: transparent;
+    color: #ff0000;
+    border: 2px solid #ff0000;
+    width: 200px;
+    height: 50px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.custom-button:hover {
+    background-color: #ff0000;
+    color: white;
+}
