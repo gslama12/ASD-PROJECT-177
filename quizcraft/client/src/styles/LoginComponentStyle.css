@@ -27,6 +27,12 @@
     margin-bottom: 15px;
 }
 
+.formControl.error {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+    margin-bottom: 15px;
+}
+
 .btnMain {
     width: 100%;
     padding: 15px;
@@ -74,11 +80,6 @@
     text-align: center;
 }
 
-.formControl.error {
-    border-color: #dc3545;
-    background-color: #f8d7da;
-}
-
 .errorMessage {
     color: #dc3545;
     font-size: 12px;
@@ -113,4 +114,13 @@
     height: auto;
 }
 
-
+.alertMessage {
+    color: #721c24;
+    background-color: #f8d7da;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 15px;
+    font-weight: bold;
+    text-align: center;
+}

@@ -166,8 +166,8 @@ function LoginComponent({ socket }) {
         <div className="loginContainer">
             <div className="loginForm">
                 <h2>{isLogin ? "Login" : "Sign Up"}</h2>
-                {alertMessage && <div className="alert">{alertMessage}</div>}
                 {feedbackMessage && <div className="feedback">{feedbackMessage}</div>}
+                {alertMessage && <div className="alertMessage">{alertMessage}</div>}
                 {forgotPasswordMode ? (
                     <div className="formGroup">
                         <input
@@ -177,6 +177,10 @@ function LoginComponent({ socket }) {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
+                        {errorFields.email && <div className="errorMessage">{errorFields.email}</div>}
+                        <button className="btnMain" onClick={handleForgotPasswordClick}>
+                            RESET PASSWORD
+                        </button>
                         <div className="buttonGroup">
                             <button className="btnMain" onClick={handleForgotPasswordClick} disabled={!canResend && resetButtonText !== "LOG IN"}>
                                 {resetButtonText}
