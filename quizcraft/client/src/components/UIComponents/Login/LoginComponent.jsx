@@ -37,6 +37,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleLoginClick = () => {
+        setFeedbackMessage("")
+        setAlertMessage("")
         const errors = {};
         if (!username) {
             errors.username = "Username cannot be empty";
@@ -54,6 +56,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleSignUpClick = () => {
+        setAlertMessage("");
+        setFeedbackMessage("");
         const errors = {};
         if (!username) {
             errors.username = "Username cannot be empty";
@@ -86,6 +90,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleForgotPasswordClick = () => {
+        setAlertMessage("");
+        setFeedbackMessage("");
         if (resetButtonText === "LOG IN") {
             setForgotPasswordMode(false);
             setIsLogin(true);
@@ -108,7 +114,7 @@ function LoginComponent({ socket }) {
         setFeedbackMessage("Sending reset email...");
         socket.emit("forgot-password", { email });
         setCanResend(false);
-        setTimeout(() => setCanResend(true), 60000); // 1 minute
+        setTimeout(() => setCanResend(true), 10000);
     };
 
     const handleResendEmailClick = () => {
@@ -119,7 +125,7 @@ function LoginComponent({ socket }) {
         setFeedbackMessage("Resending reset email...");
         socket.emit("forgot-password", { email });
         setCanResend(false);
-        setTimeout(() => setCanResend(true), 60000); // 1 minute
+        setTimeout(() => setCanResend(true), 10000);
     };
 
     useEffect(() => {
@@ -142,8 +148,8 @@ function LoginComponent({ socket }) {
         });
 
         socket.on("forgot-password-response", (response) => {
-            setAlertMessage(response.message);
-            setFeedbackMessage("");
+            setAlertMessage("");
+            setFeedbackMessage(response.message);
             if (response.success) {
                 setResetButtonText("LOG IN");
             }
@@ -162,6 +168,19 @@ function LoginComponent({ socket }) {
         setErrorFields({});
     };
 
+    const handleCancelClick = () => {
+        setForgotPasswordMode(false);
+        setAlertMessage("");
+        setFeedbackMessage("");
+        setResetButtonText("RESET PASSWORD")
+    };
+
+    const handleForgotPasswordLinkClick = () => {
+        setForgotPasswordMode(true);
+        setAlertMessage("");
+        setFeedbackMessage("");
+    }
+
     return (
         <div className="loginContainer">
             <div className="loginForm">
@@ -179,17 +198,12 @@ function LoginComponent({ socket }) {
                         />
                         {errorFields.email && <div className="errorMessage">{errorFields.email}</div>}
                         <button className="btnMain" onClick={handleForgotPasswordClick}>
-                            RESET PASSWORD
+                            {resetButtonText}
                         </button>
-                        <div className="buttonGroup">
-                            <button className="btnMain" onClick={handleForgotPasswordClick} disabled={!canResend && resetButtonText !== "LOG IN"}>
-                                {resetButtonText}
-                            </button>
-                            <button className="btnSecondary" onClick={handleResendEmailClick} disabled={!canResend}>
-                                RESEND EMAIL
-                            </button>
-                        </div>
-                        <button className="btnSecondary" onClick={() => setForgotPasswordMode(false)}>
+                        <button className="btnSecondary" onClick={handleResendEmailClick} disabled={!canResend}>
+                            RESEND EMAIL
+                        </button>
+                        <button className="btnSecondary" onClick={handleCancelClick}>
                             CANCEL
                         </button>
                     </div>
@@ -254,7 +268,7 @@ function LoginComponent({ socket }) {
                         )}
                         {isLogin && (
                             <div className="forgotPassword">
-                                <a href="#" onClick={() => setForgotPasswordMode(true)}>Forgot password?</a>
+                                <a href="#" onClick={handleForgotPasswordLinkClick}>Forgot password?</a>
                             </div>
                         )}
                     </>
