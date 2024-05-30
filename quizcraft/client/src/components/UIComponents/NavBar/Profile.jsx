@@ -6,6 +6,7 @@ import {useState} from "react";
 
 function Profile() {
     const [showModal, setShowModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const handleDeleteProfile = () => {
         setShowModal(true);
@@ -16,21 +17,34 @@ function Profile() {
     };
 
     const handleConfirmDelete = () => {
-        // PROFILE DELETE LOGIC
         setShowModal(false);
+        setShowSuccessModal(true);
+        setTimeout(() => {
+            setShowSuccessModal(false);
+            window.location.href = "/login";
+        }, 2000);
+    };
+
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
     };
 
     return (
-        <div className="profile-container">
+        <div className="profile">
             <NavBar/>
-            <br/><br/>
-            <br/><br/>
             <div className="header-container">
                 <h1> Profile </h1>
             </div>
-            <br/><br/>
+            <div className="profile-container">
+                <p> HIER KÖNNTE IHR PROFIL STEHEN... </p>
+                <p> Name: Max Mustermann </p>
+                <p> Age: 22 Years </p>
+                <p> Job: Student </p>
+                <p> E-Mail: max.mustermann@gmail.com </p>
+                <p> HIER KÖNNTE IHR PROFIL STEHEN... </p>
+            </div>
             <div className="button-container">
-                <button className="custom-button" onClick={handleDeleteProfile}> Delete Profile </button>
+                <Button variant="outline-danger" className="custom-button" onClick={handleDeleteProfile}> Delete Profile </Button>
             </div>
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>
@@ -45,6 +59,12 @@ function Profile() {
                         Confirm
                     </Button>
                 </Modal.Footer>
+            </Modal>
+            <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Profile Deleted</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Profile successfully deleted!</Modal.Body>
             </Modal>
         </div>
     );
