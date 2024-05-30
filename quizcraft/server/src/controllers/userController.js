@@ -10,6 +10,7 @@ const transporter = nodemailer.createTransport({
         pass: 'kqrigykchdtupyso'
     }
 });
+
 // Function to add a new user (registration)
 async function addUser(username, email, password) {
     try {
@@ -75,9 +76,8 @@ async function forgotPassword(email) {
     }
 }
 
-/**
- * This function retrieves the active user's information.
- */
+
+// This function retrieves the active user's information.
 async function getActiveUserInfo(userId) {
     try {
         const user = await User.findById(userId, 'username email');
