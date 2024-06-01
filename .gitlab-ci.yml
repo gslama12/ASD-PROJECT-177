@@ -8,8 +8,8 @@ build-job:
     projectDirectory: 'quizcraft'
 
   script:
-    - cd "${projectDirectory}/client" && npm install && npm run build
-    - cd "${projectDirectory}/server" && npm install && npm start
+    - cd "${projectDirectory}/client" && npm install && npm run build $$ cd ..
+    - cd "${projectDirectory}/server" && npm install && npm start $$ cd ..
   artifacts:
     paths:
       - "build/"
