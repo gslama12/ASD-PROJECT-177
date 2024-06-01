@@ -11,7 +11,7 @@ build-job:
     - npm -v #debug purposes
     - npm i
     - cd "${projectDirectory}/client" && npm i && cd ..
-    - cd "client" && npm run build && cd ..
+    - cd "client" && npm run build && cd "../../"
   artifacts:
     paths:
       - "build/"
