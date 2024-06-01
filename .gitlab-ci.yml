@@ -9,9 +9,8 @@ build-job:
 
   script:
     - npm i
-    - cd "${projectDirectory}/client" && npm install
-    - npm run build $$ cd ..
-  artifacts:
-    paths:
-      - "build/"
+#
+#  artifacts:
+#    paths:
+#      - "build/"
 
