@@ -8,9 +8,10 @@ build-job:
     projectDirectory: 'quizcraft'
 
   script:
+    - echo npm -v
     - npm i
     - cd "${projectDirectory}/client" && npm i && cd ..
-    - cd "${projectDirectory}/client" && npm run dev && cd ..
+    - cd "client" && npm run dev && cd ..
   artifacts:
     paths:
       - "build/"
