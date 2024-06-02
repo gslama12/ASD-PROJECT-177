@@ -16,6 +16,7 @@ build-job:
     - cd "../../"
 
 eslint:
+  stage: lint
   script:
     - node_modules/eslint/bin/eslint.js .
 
