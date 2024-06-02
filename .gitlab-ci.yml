@@ -1,0 +1,24 @@
+stages:
+  - build
+  - lint
+
+image: node:latest
+
+
+build-job:
+  stage: build
+  script:
+    - npm -v #debug purposes
+    - npm i
+    #    - cd "${projectDirectory}/server" && npm i && npm start
+    #    - cd "../../"
+    - cd "${projectDirectory}/client" && npm i && npm run build
+    - cd "../../"
+
+eslint:
+  script:
+    - node_modules/eslint/bin/eslint.js .
+
+  artifacts:
+    paths:
+      - "${projectDirectory}/client/dist/"
