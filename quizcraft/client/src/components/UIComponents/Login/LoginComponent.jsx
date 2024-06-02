@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../../UserContext";
 import "../../../styles/LoginComponentStyle.css";
 
 function LoginComponent({ socket }) {
     const navigate = useNavigate();
+    const { setUser } = useUser();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isLogin, setIsLogin] = useState(true);
     const [alertMessage, setAlertMessage] = useState("");
+    const [feedbackMessage, setFeedbackMessage] = useState("");
     const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
+    const [canResend, setCanResend] = useState(true);
+    const [resetButtonText, setResetButtonText] = useState("RESET PASSWORD");
     const [errorFields, setErrorFields] = useState({});
 
     const validatePassword = (password) => {
@@ -46,6 +51,7 @@ function LoginComponent({ socket }) {
             return;
         }
         setErrorFields({});
+        setFeedbackMessage("Logging in...");
         socket.emit("authenticate-user", { username, password });
     };
 
@@ -76,11 +82,20 @@ function LoginComponent({ socket }) {
             setErrorFields(errors);
             return;
         }
+        setFeedbackMessage("Signing up...");
         setErrorFields({});
         socket.emit("add-user-to-db", { username, email, password });
     };
 
     const handleForgotPasswordClick = () => {
+        if (resetButtonText === "LOG IN") {
+            setForgotPasswordMode(false);
+            setIsLogin(true);
+            setAlertMessage("");
+            setFeedbackMessage("");
+            setResetButtonText("RESET PASSWORD");
+            return;
+        }
         const errors = {};
         if (!email) {
             errors.email = "Please enter your email to reset your password";
@@ -92,28 +107,50 @@ function LoginComponent({ socket }) {
             return;
         }
         setErrorFields({});
+        setFeedbackMessage("Sending reset email...");
         socket.emit("forgot-password", { email });
+        setCanResend(false);
+        setTimeout(() => setCanResend(true), 60000); // 1 minute
+    };
+
+    const handleResendEmailClick = () => {
+        if (!email) {
+            setAlertMessage("Please enter your email to resend the password reset link.");
+            return;
+        }
+        setFeedbackMessage("Resending reset email...");
+        socket.emit("forgot-password", { email });
+        setCanResend(false);
+        setTimeout(() => setCanResend(true), 60000); // 1 minute
     };
 
     useEffect(() => {
         socket.on("user-authenticated-response", (response) => {
             if (response.success) {
+                setUser(response.user);
                 navigate("/home");
             } else {
                 setAlertMessage(response.message);
             }
+            setFeedbackMessage("");
         });
 
         socket.on("user-added-response", (response) => {
             if (response.success) {
+                setUser(response.user);
                 navigate("/home");
             } else {
                 setAlertMessage(response.message);
             }
+            setFeedbackMessage("");
         });
 
         socket.on("forgot-password-response", (response) => {
             setAlertMessage(response.message);
+            setFeedbackMessage("");
+            if (response.success) {
+                setResetButtonText("LOG IN");
+            }
         });
 
         return () => {
@@ -121,7 +158,7 @@ function LoginComponent({ socket }) {
             socket.off("user-added-response");
             socket.off("forgot-password-response");
         };
-    }, [navigate, socket]);
+    }, [navigate, socket, setUser]);
 
     const switchMode = () => {
         setIsLogin(!isLogin);
@@ -129,10 +166,17 @@ function LoginComponent({ socket }) {
         setErrorFields({});
     };
 
+    const handleCancelClick = () => {
+        setForgotPasswordMode(false);
+        setAlertMessage("");
+        setFeedbackMessage("");
+    };
+
     return (
         <div className="loginContainer">
             <div className="loginForm">
                 <h2>{isLogin ? "Login" : "Sign Up"}</h2>
+                {feedbackMessage && <div className="feedback">{feedbackMessage}</div>}
                 {alertMessage && <div className="alertMessage">{alertMessage}</div>}
                 {forgotPasswordMode ? (
                     <div className="formGroup">
@@ -145,9 +189,12 @@ function LoginComponent({ socket }) {
                         />
                         {errorFields.email && <div className="errorMessage">{errorFields.email}</div>}
                         <button className="btnMain" onClick={handleForgotPasswordClick}>
-                            RESET PASSWORD
+                            {resetButtonText}
                         </button>
-                        <button className="btnSecondary" onClick={() => setForgotPasswordMode(false)}>
+                        <button className="btnSecondary" onClick={handleResendEmailClick} disabled={!canResend}>
+                            RESEND EMAIL
+                        </button>
+                        <button className="btnSecondary" onClick={handleCancelClick}>
                             CANCEL
                         </button>
                     </div>
