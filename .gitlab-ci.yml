@@ -18,7 +18,7 @@ build-job:
 eslint:
   stage: lint
   script:
-    - node_modules/eslint/bin/eslint.js .
+    - npm run lint
 
   artifacts:
     paths:
