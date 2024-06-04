@@ -43,7 +43,7 @@ function HomeComponent({ socket }) {
                         </Link>
                     </div>
                     <div className="mode-card challenges-card">
-                        <Link to="/quizmode" className="mode-link">
+                        <Link to="/challengemode" className="mode-link">
                             <h2>Challenges</h2>
                             <p>Test your skills with our weekly challenges!</p>
                         </Link>
