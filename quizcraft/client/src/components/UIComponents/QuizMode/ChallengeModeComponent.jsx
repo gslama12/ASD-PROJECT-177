@@ -17,16 +17,16 @@ function ChallengeModeComponent({ socket }) {
 
         socket.on("challenge-new-game", (response) => {
             if (response.data) {
-                const { gameInfo, currentQuestion } = response.data;
+                const { gameInfo, question } = response.data;
                 setGameId(gameInfo.gameId);
-                setQuestion(currentQuestion);
-                setAnswers(currentQuestion.answers);
+                setQuestion(question);
+                setAnswers(question.answers);
             }
         });
 
         socket.on("challenge-answer-question", (response) => {
             if (response.data) {
-                const { correctAnswer , isCorrect, nextQuestion, gameComplete } = response.data;
+                const { correctAnswer , isCorrect, question, gameComplete } = response.data;
                 setCorrectAnswer(correctAnswer);
                 setIsAnswered(true);
                 setFeedback(isCorrect ? "Correct!" : "Wrong!");
@@ -34,8 +34,8 @@ function ChallengeModeComponent({ socket }) {
                     navigate("./challengefinished");
                 } else {
                     setTimeout(() => {
-                        setQuestion(nextQuestion);
-                        setAnswers(nextQuestion.answers);
+                        setQuestion(question);
+                        setAnswers(question.answers);
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");

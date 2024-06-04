@@ -17,16 +17,16 @@ function QuizModeComponent({ socket }) {
 
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
-                const { gameInfo, currentQuestion } = response.data;
+                const { gameInfo, question } = response.data;
                 setGameId(gameInfo.gameId);
-                setQuestion(currentQuestion.question);
-                setAnswers(currentQuestion.answers);
+                setQuestion(question.question);
+                setAnswers(question.answers);
             }
         });
 
         socket.on("quiz-answer-question", (response) => {
             if (response.data) {
-                const { correctAnswer, isCorrect, nextQuestion, gameComplete } = response.data;
+                const { correctAnswer, isCorrect, question, gameComplete } = response.data;
                 setCorrectAnswer(correctAnswer);
                 setIsAnswered(true);
                 setFeedback(isCorrect ? "Correct!" : "Wrong!");
@@ -34,8 +34,8 @@ function QuizModeComponent({ socket }) {
                     navigate("/quizfinished");
                 } else {
                     setTimeout(() => {
-                        setQuestion(nextQuestion.question);
-                        setAnswers(nextQuestion.answers);
+                        setQuestion(question.question);
+                        setAnswers(question.answers);
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");

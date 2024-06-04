@@ -123,7 +123,7 @@ class TriviaQuiz {
             this.questionAnswerHistory.push({
                 question: this.activeQuestion,
                 playerId: player.id,
-                answer: playerAnswer,
+                answer: player.answer,
                 isCorrect: isCorrectAnswer
             });
 
