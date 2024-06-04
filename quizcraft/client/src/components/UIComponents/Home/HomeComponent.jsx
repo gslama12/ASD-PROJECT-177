@@ -37,7 +37,7 @@ function HomeComponent({ socket }) {
                         </Link>
                     </div>
                     <div className="mode-card trivia-card">
-                        <Link to="/quizmode" className="mode-link">
+                        <Link to="/triviamode" className="mode-link">
                             <h2>Trivia</h2>
                             <p>Go full on trivia mode and reach highscores!</p>
                         </Link>
