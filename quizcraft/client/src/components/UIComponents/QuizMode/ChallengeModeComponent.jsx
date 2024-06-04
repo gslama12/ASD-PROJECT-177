@@ -13,7 +13,7 @@ function ChallengeModeComponent({ socket }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        socket.emit("challenge-new-game", { gameMode: "random" });
+        socket.emit("challenge-new-game", { gameMode: "multiple" });
 
         socket.on("challenge-new-game", (response) => {
             if (response.data) {

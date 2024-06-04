@@ -13,7 +13,7 @@ function QuizModeComponent({ socket }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        socket.emit("quiz-new-single-player-game", { gameMode: "random" });
+        socket.emit("quiz-new-single-player-game", { gameMode: "multiple" });
 
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {

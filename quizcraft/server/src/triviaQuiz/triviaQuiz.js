@@ -279,7 +279,9 @@ class TriviaQuiz {
 
 
 async function triviaQuizFactory(gameMode, category, difficulty, playerIds) {
-    const triviaQuiz = new TriviaQuiz(gameMode, category, difficulty);
+    const quizSettings = new TriviaQuestionSettings(gameMode, category, difficulty);
+    // TODO ensure this works with new constructor
+    const triviaQuiz = new TriviaQuiz(null, quizSettings);
 
     const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty);
     if (!initSettingsSuccess) {

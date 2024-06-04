@@ -13,7 +13,7 @@ function TriviaModeComponent({ socket }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        socket.emit("trivia-new-game", { gameMode: "random" });
+        socket.emit("trivia-new-game", { gameMode: "multiple" });
 
         socket.on("trivia-new-game", (response) => {
             if (response.data) {
