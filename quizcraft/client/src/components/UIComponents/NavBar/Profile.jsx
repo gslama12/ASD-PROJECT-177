@@ -44,7 +44,8 @@ function Profile() {
                 <p> HIER KÖNNTE IHR PROFIL STEHEN... </p>
             </div>
             <div className="button-container">
-                <Button variant="outline-danger" className="custom-button" onClick={handleDeleteProfile}> Delete Profile </Button>
+                <Button variant="primary" className="custom-password-button"> Change Password </Button>
+                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </Button>
             </div>
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>
