@@ -7,6 +7,7 @@ import HomeComponent from "./components/UIComponents/Home/HomeComponent.jsx";
 import Profile from "./components/UIComponents/Profile/Profile.jsx";
 import QuizFinished from "./components/UIComponents/Home/QuizFinished.jsx";
 import QuizModeComponent from "./components/UIComponents/QuizMode/QuizModeComponent.jsx";
+import TriviaModeComponent from "./components/UIComponents/QuizMode/TriviaModeComponent.jsx";
 import "../src/styles/LoginComponentStyle.css";
 import "./components/UIComponents/GenericStyles/CenteredHeader.css";
 import quizMeImage from '../src/assets/quiz_me.png';
@@ -33,6 +34,7 @@ function App() {
                 <Route path='/profile' element={<Profile />} />
                 <Route path='/quizfinished' element={<QuizFinished socket={socket} />} />
                 <Route path='/quizmode' element={<QuizModeComponent socket={socket} />} />
+                <Route path='/triviamode' element={<TriviaModeComponent socket={socket} />} />
             </Routes>
         </UserProvider>
     );
