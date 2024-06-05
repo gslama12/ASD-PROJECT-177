@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/QuizModeComponentStyle.css";
+import he from 'he';
 
 function QuizModeComponent({ socket }) {
     const [question, setQuestion] = useState(null);
@@ -19,7 +20,7 @@ function QuizModeComponent({ socket }) {
             if (response.data) {
                 const { gameInfo, question } = response.data;
                 setGameId(gameInfo.gameId);
-                setQuestion(question.question);
+                setQuestion(he.decode(question.question));
                 setAnswers(question.answers);
             }
         });
