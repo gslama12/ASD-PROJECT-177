@@ -54,5 +54,6 @@ remove_ip_whitelist:
       curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
       --digest -X DELETE \
       --header "Content-Type: application/json" \
+      --header "Accept: application/vnd.atlas.2023-01-01+json" \
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
 
