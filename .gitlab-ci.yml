@@ -25,5 +25,5 @@ build-job:
 eslint:
   stage: lint
   script:
-    - npm i 
-    - npm run lint
+    - cd "${projectDirectory}/client" && npm run lint
+    - cd "../../"
