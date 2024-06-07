@@ -22,11 +22,11 @@ add_ip_whitelist:
     - echo $CI_IP
     - |
       curl -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
-      --digest -X POST \
+      --digest -X  \
       --header "Accept: application/vnd.atlas.2024-05-30+json" \
       --header "Content-Type: application/json" \
-      -d '[{ \"ipAddress\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }]' \
-      "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
+      -d '\[{ \"ipAddress\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }\]' \
+      --location"$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
 
 cache:
   paths:
