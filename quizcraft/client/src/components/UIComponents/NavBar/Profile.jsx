@@ -6,14 +6,44 @@ import '../../../styles/Profile.css';
 import { useState } from "react";
 
 function Profile() {
+    const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+
+    const [profile, setProfile] = useState({
+        name: "Max Mustermann",
+        age: 22,
+        job: "Student",
+        email: "max.mustermann@gmail.com"
+    });
+
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-    const [showPasswordChangeSuccessModal, setShowPasswordChangeSuccessModal] = useState(false); // New state for password change success modal
+    const [showPasswordChangeSuccessModal, setShowPasswordChangeSuccessModal] = useState(false);
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
+
+    const handleEditProfile = () => {
+        setShowEditProfileModal(true);
+    };
+
+    const handleCloseEditProfileModal = () => {
+        setShowEditProfileModal(false);
+    };
+
+    const handleProfileChange = (e) => {
+        const { name, value } = e.target;
+        setProfile((prevProfile) => ({
+            ...prevProfile,
+            [name]: value
+        }));
+    };
+
+    const handleProfileSubmit = () => {
+        console.log('Profile updated:', profile);
+        setShowEditProfileModal(false);
+    };
 
     const handleDeleteProfile = () => {
         setShowModal(true);
@@ -70,18 +100,72 @@ function Profile() {
                 <h1> Profile </h1>
             </div>
             <div className="profile-container">
-                <p> HIER KÖNNTE IHR PROFIL STEHEN... </p>
-                <p> Name: Max Mustermann </p>
-                <p> Age: 22 Years </p>
-                <p> Job: Student </p>
-                <p> E-Mail: max.mustermann@gmail.com </p>
-                <p> HIER KÖNNTE IHR PROFIL STEHEN... </p>
+                <p> Name: {profile.name} </p>
+                <p> Age: {profile.age} Years </p>
+                <p> Job: {profile.job} </p>
+                <p> E-Mail: {profile.email} </p>
             </div>
             <div className="button-container">
-                <Button variant="secondary" className="custom-profile-button"> Edit Profile </Button> {/* TODO: Implement functionality for the button (edit profile details) */}
-                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change Password </Button> {/* TODO: Connect DB (password) with this button */}
-                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </Button> {/* TODO: Connect DB (user/profile) with this button */}
+                <Button variant="secondary" className="custom-profile-button" onClick={handleEditProfile}> Edit Profile </Button>
+                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change Password </Button>
+                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </Button>
             </div>
+            <Modal show={showEditProfileModal} onHide={handleCloseEditProfileModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Profile</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="formName">
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                value={profile.name}
+                                onChange={handleProfileChange}
+                            />
+                            <br/>
+                        </Form.Group>
+                        <Form.Group controlId="formAge">
+                            <Form.Label>Age</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="age"
+                                value={profile.age}
+                                onChange={handleProfileChange}
+                            />
+                            <br/>
+                        </Form.Group>
+                        <Form.Group controlId="formJob">
+                            <Form.Label>Job</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="job"
+                                value={profile.job}
+                                onChange={handleProfileChange}
+                            />
+                            <br/>
+                        </Form.Group>
+                        <Form.Group controlId="formEmail">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control
+                                type="email"
+                                name="email"
+                                value={profile.email}
+                                onChange={handleProfileChange}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="outline-danger" onClick={handleCloseEditProfileModal}>
+                        Cancel
+                    </Button>
+                    <Button variant="outline-success" onClick={handleProfileSubmit}>
+                        Confirm
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Delete Profile</Modal.Title>
@@ -116,7 +200,7 @@ function Profile() {
                                 value={oldPassword}
                                 onChange={(e) => setOldPassword(e.target.value)}
                             />
-                            <br></br>
+                            <br />
                         </Form.Group>
                         <Form.Group controlId="formNewPassword">
                             <Form.Label>New Password</Form.Label>
@@ -126,7 +210,7 @@ function Profile() {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                             />
-                            <br></br>
+                            <br />
                         </Form.Group>
                         <Form.Group controlId="formConfirmNewPassword">
                             <Form.Label>Confirm New Password</Form.Label>
