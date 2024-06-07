@@ -23,10 +23,11 @@ add_ip_whitelist:
     - echo $CI_IP
     - |
       curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
-        --digest -X POST \
-        -H "Content-Type: application/vnd.atlas.2023-01-01+json" \
-        -d "{ \"cidrBlock\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }" \
-        "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
+      --digest -X "POST" \
+      -H "Content-Type: application/vnd.atlas.2023-01-01+json" \
+      -d "{ \"ipAddress\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }" \
+      "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
+
 cache:
   paths:
     - ${projectDirectory}/client/node_modules/
@@ -51,14 +52,14 @@ eslint:
     - cd "${projectDirectory}/client" && npm run lint
 
 
-remove_ip_whitelist:
-  stage: cleanup
-  script:
-    - export CI_IP=$(curl -s https://api.ipify.org)
-    - echo $CI_IP
-    - |
-      curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
-        --digest -X DELETE \
-        -H "Content-Type: application/json" \
-        "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP/32"
+# remove_ip_whitelist:
+  # stage: cleanup
+  # script:
+  #   - export CI_IP=$(curl -s https://api.ipify.org)
+  #   - echo $CI_IP
+  #   - |
+  #     curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
+  #       --digest -X DELETE \
+  #       -H "Content-Type: application/json" \
+  #       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP/32"
 
