@@ -13,8 +13,8 @@ build-job:
   script:
     - npm -v #debug purposes
     - npm i
-    #    - cd "${projectDirectory}/server" && npm i && npm start
-    #    - cd "../../"
+    - cd "${projectDirectory}/server" && npm i && npm start
+    - cd "../../"
     - cd "${projectDirectory}/client" && npm i && npm run build
     - cd "../../"
 
