@@ -7,7 +7,6 @@ image: node:latest
 
 variables:
   projectDirectory: quizcraft 
-  MONGO_URI: "mongodb+srv://asd:asd@cluster0.3cdlamh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
   ATLAS_PUBLIC_KEY: ${{ secrets.ATLAS_PUBLIC_KEY }}
   ATLAS_PRIVATE_KEY: ${{ secrets.ATLAS_PRIVATE_KEY }}
   ATLAS_PROJECT_ID: ${{ secrets.ATLAS_PROJECT_ID }}
@@ -22,7 +21,6 @@ add_ip_whitelist:
     - export CI_IP=$(curl -s https://api.ipify.org)
     - echo $CI_IP
     - |
-
       curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
       --digest -X POST \
       --header "Content-Type: application/json" \
