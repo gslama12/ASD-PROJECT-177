@@ -12,17 +12,18 @@ build-job:
   stage: build
   script:
     - npm -v #debug purposes
-    - npm i
     - cd "${projectDirectory}/server" && npm i && npm start
     - cd "../../"
     - cd "${projectDirectory}/client" && npm i && npm run build
     - cd "../../"
 
-eslint:
-  stage: lint
-  script:
-    - npm run lint
-
   artifacts:
     paths:
       - "${projectDirectory}/client/dist/"
+
+
+eslint:
+  stage: lint
+  script:
+    - npm i 
+    - npm run lint
