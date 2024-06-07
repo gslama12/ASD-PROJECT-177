@@ -6,6 +6,26 @@ image: node:latest
 
 variables:
   projectDirectory: quizcraft 
+  MONGO_URI: "mongodb+srv://asd:asd@cluster0.3cdlamh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  ATLAS_PUBLIC_KEY: ${{ secrets.ATLAS_PUBLIC_KEY }}
+  ATLAS_PRIVATE_KEY: ${{ secrets.ATLAS_PRIVATE_KEY }}
+  ATLAS_PROJECT_ID: ${{ secrets.ATLAS_PROJECT_ID }}
+  ATLAS_API_URL: "https://cloud.mongodb.com/api/atlas/v1.0"
+
+before_script:
+  - apt-get update && apt-get install -y jq curl
+
+add_ip_whitelist:
+  stage: build
+  script:
+    - export CI_IP=$(curl -s https://api.ipify.org)
+    - echo $CI_IP
+    - |
+      curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
+        --digest -X POST \
+        -H "Content-Type: application/json" \
+        -d "{ \"cidrBlock\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }" \
+        "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
 
 cache:
   paths:
@@ -29,3 +49,16 @@ eslint:
   stage: lint
   script:
     - cd "${projectDirectory}/client" && npm run lint
+
+
+remove_ip_whitelist:
+  stage: cleanup
+  script:
+    - export CI_IP=$(curl -s https://api.ipify.org)
+    - echo $CI_IP
+    - |
+      curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
+        --digest -X DELETE \
+        -H "Content-Type: application/json" \
+        "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP/32"
+
