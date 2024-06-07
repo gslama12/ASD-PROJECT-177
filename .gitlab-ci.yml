@@ -36,7 +36,7 @@ build-job:
   stage: build
   script:
     - npm -v #debug purposes
-    - cd "${projectDirectory}/server" && npm i && npm start
+    - cd "${projectDirectory}/server" && npm i && npm run build --if-present
     - cd "../../"
     - pwd
     - cd "${projectDirectory}/client" && npm i && npm run build
