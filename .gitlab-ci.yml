@@ -12,7 +12,7 @@ variables:
   ATLAS_PRIVATE_KEY: ${{ secrets.ATLAS_PRIVATE_KEY }}
   ATLAS_PROJECT_ID: ${{ secrets.ATLAS_PROJECT_ID }}
   ATLAS_API_URL: "https://cloud.mongodb.com/api/atlas/v2"
-
+  
 before_script:
   - apt-get update && apt-get install -y jq curl
 
@@ -24,10 +24,9 @@ add_ip_whitelist:
     - |
       curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
         --digest -X POST \
-        -H "Content-Type: application/json" \
+        -H "Content-Type: application/vnd.atlas.2023-01-01+json" \
         -d "{ \"cidrBlock\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }" \
         "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
-
 cache:
   paths:
     - ${projectDirectory}/client/node_modules/
