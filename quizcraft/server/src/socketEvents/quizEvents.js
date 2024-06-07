@@ -23,9 +23,15 @@ module.exports = (socket, io) => {
         const gameMode = body?.gameMode;
         const category = body?.category;
         const difficulty = body?.difficulty;
-        // TODO verify client input
+        const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
 
-        const playerId ="PlayerId";
+        if (!playerId) {
+            const errorObject = constructErrorResponse("Need 'usedId' parameter.");
+            socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, errorObject);
+            return;
+        }
+
+
         const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty, playerId)
 
         if (quizObject === undefined) {
@@ -79,13 +85,13 @@ module.exports = (socket, io) => {
 
     // ----------------------
     socket.on(EVENTS.ANSWER_QUESTION, async (body) => {
-        const playerId = "PlayerId";
 
         const gameId = body?.gameId;
         const answer = body?.answer;
+        const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
 
-        if (!gameId || !answer) {
-            const errorObject = constructErrorResponse("Request requires 'gameId' and 'answer' parameters.");
+        if (!gameId || !answer || !playerId) {
+            const errorObject = constructErrorResponse("Request requires 'gameId', 'answer' and 'userId' parameters.");
             socket.emit(EVENTS.ANSWER_QUESTION, errorObject);
             return;
         }
