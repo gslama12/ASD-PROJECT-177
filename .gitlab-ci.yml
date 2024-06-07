@@ -4,6 +4,9 @@ stages:
 
 image: node:latest
 
+variables:
+  projectDirectory: quizcraft 
+
 cache:
   paths:
     - ${projectDirectory}/client/node_modules/
@@ -13,9 +16,10 @@ build-job:
   script:
     - npm -v #debug purposes
     - cd "${projectDirectory}/server" && npm i && npm start
+    - cd "../../"
     - pwd
     - cd "${projectDirectory}/client" && npm i && npm run build
-
+    - cd "../../"
   artifacts:
     paths:
       - "${projectDirectory}/client/dist/"
