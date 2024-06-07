@@ -25,7 +25,7 @@ add_ip_whitelist:
       --digest -X POST \
       --header "Content-Type: application/json" \
       --header "Accept: application/vnd.atlas.2023-02-01+json" \
-      -d '{ \"ipAddress\": \"$CI_IP\", \"comment\": \"CI IP address\" }' \
+      -d '{ \"cidrBlock\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }' \
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
 
 cache:
