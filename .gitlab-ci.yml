@@ -4,6 +4,9 @@ stages:
 
 image: node:latest
 
+cache:
+  paths:
+    - ${projectDirectory}/client/node_modules/
 
 build-job:
   stage: build
