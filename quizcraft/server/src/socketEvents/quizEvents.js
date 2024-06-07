@@ -107,14 +107,21 @@ module.exports = (socket, io) => {
 
         // You are the final player to make an answer, emit roundResults to all players of the game.
         // TODO For multiplayer, need to use socket rooms
-        const gameData = quizObject.evaluateAnswers(); // sending all game info, not only answer results
+        let gameData = quizObject.evaluateAnswers(); // sending all game info, not only answer results
 
         // Check if the game is complete
         if (gameData.gameInfo.gameComplete) {
-            // If the game is complete, save the game stats and emit the 'game-complete' event
-            const gameStatsData = await quizObject.saveGameStats();
-            socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameStatsData));
-            const completeGameData = { ...gameData, questionAnswerHistory: quizObject.getQuestionAnswerHistory()};
+            // If the game is complete, emit the 'game-complete' event. Note that game stats are already saved
+            // in TriviaQuiz.#questionComplete() by calling quizObject.evaluateAnswers().
+            socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameData));
+        } else {
+            // If game not complete, get next question
+            const question = await quizObject.getNextQuestion();
+            if (!question) {
+                // Couldn't get next question. Don't send error message, client needs to check if "question"
+                // property exists and if not, call <EVENTS.GET_NEXT_QUESTION>
+            }
+            gameData = quizObject.getAllGameData(); // get gameData with new question
         }
 
         socket.emit(EVENTS.ANSWER_QUESTION, constructDataResponse(gameData));
