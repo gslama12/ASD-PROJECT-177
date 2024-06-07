@@ -78,9 +78,9 @@ function Profile() {
                 <p> HIER KÖNNTE IHR PROFIL STEHEN... </p>
             </div>
             <div className="button-container">
-                <Button variant="secondary" className="custom-profile-button"> Edit Profile </Button>
-                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change Password </Button>
-                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </Button>
+                <Button variant="secondary" className="custom-profile-button"> Edit Profile </Button> {/* TODO: Implement functionality for the button (edit profile details) */}
+                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change Password </Button> {/* TODO: Connect DB (password) with this button */}
+                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </Button> {/* TODO: Connect DB (user/profile) with this button */}
             </div>
             <Modal show={showModal} onHide={handleCloseModal} centered>
                 <Modal.Header closeButton>
