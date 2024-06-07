@@ -1,6 +1,5 @@
 stages:
   - build
-  - lint
   - cleanup
 
 image: node:latest
@@ -46,20 +45,14 @@ build-job:
       - "${projectDirectory}/client/dist/"
 
 
-eslint:
-  stage: lint
+remove_ip_whitelist:
+  stage: cleanup
   script:
-    - cd "${projectDirectory}/client" && npm run lint
-
-
-# remove_ip_whitelist:
-  # stage: cleanup
-  # script:
-  #   - export CI_IP=$(curl -s https://api.ipify.org)
-  #   - echo $CI_IP
-  #   - |
-  #     curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
-  #       --digest -X DELETE \
-  #       -H "Content-Type: application/json" \
-  #       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP/32"
+    - export CI_IP=$(curl -s https://api.ipify.org)
+    - echo $CI_IP
+    - |
+      curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
+        --digest -X DELETE \
+        -H "Content-Type: application/json" \
+        "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP/32"
 
