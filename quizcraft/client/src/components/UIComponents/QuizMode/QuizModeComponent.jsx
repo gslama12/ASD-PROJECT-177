@@ -13,6 +13,22 @@ function QuizModeComponent({ socket }) {
     const [gameId, setGameId] = useState(null);
     const navigate = useNavigate();
 
+    function updateAnswerButtonClass(answer) {
+        const buttonClassName = "answer-button";
+        // TODO fix these checks to set the color correctly
+        if (isAnswered && answer === correctAnswer) {
+            console.log("I am here");
+            return `${buttonClassName} correct`;
+        }
+        if (isAnswered && selectedAnswer === answer && answer !== correctAnswer) {
+            return `${buttonClassName} wrong`;
+        }
+        if (selectedAnswer === answer) {
+            return `${buttonClassName} selected`;
+        }
+        return buttonClassName;
+    }
+
     useEffect(() => {
         socket.emit("quiz-new-single-player-game", { gameMode: "multiple" });
 
@@ -27,10 +43,14 @@ function QuizModeComponent({ socket }) {
 
         socket.on("quiz-answer-question", (response) => {
             if (response.data) {
-                const { correctAnswer, isCorrect, question, gameComplete } = response.data;
+                const question = response.data.question;
+                const gameComplete = response.data.gameInfo.gameComplete;
+                const correctAnswer = question.correctAnswer;
+                const isCorrectAnswer = response.data.players[0].isCorrectAnswer; // TODO should access via playerId
+
                 setCorrectAnswer(correctAnswer);
                 setIsAnswered(true);
-                setFeedback(isCorrect ? "Correct!" : "Wrong!");
+                setFeedback(isCorrectAnswer ? "Correct!" : "Wrong!");
                 if (gameComplete) {
                     navigate("/quizfinished");
                 } else {
@@ -62,9 +82,7 @@ function QuizModeComponent({ socket }) {
                         {answers.map((answer, index) => (
                             <button
                                 key={index}
-                                className={`answer-button ${selectedAnswer === answer ? 'selected' : ''} 
-                                            ${isAnswered && answer === correctAnswer ? 'correct' : ''} 
-                                            ${isAnswered && selectedAnswer === answer && answer !== correctAnswer ? 'wrong' : ''}`}
+                                className={updateAnswerButtonClass(answer)}
                                 onClick={() => handleAnswerClick(answer)}
                                 disabled={isAnswered}
                             >
