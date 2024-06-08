@@ -1,0 +1,59 @@
+stages:
+  - build
+  - cleanup
+
+image: node:latest
+
+variables:
+  projectDirectory: quizcraft 
+  ATLAS_PUBLIC_KEY: ${{ secrets.ATLAS_PUBLIC_KEY }}
+  ATLAS_PRIVATE_KEY: ${{ secrets.ATLAS_PRIVATE_KEY }}
+  ATLAS_PROJECT_ID: ${{ secrets.ATLAS_PROJECT_ID }}
+  ATLAS_API_URL: "https://cloud.mongodb.com/api/atlas/v2"
+  
+before_script:
+  - apt-get update && apt-get install -y jq curl
+
+add_ip_whitelist:
+  stage: build
+  script:
+    - export CI_IP=$(curl -s https://api.ipify.org)
+    - echo $CI_IP
+    - |
+      curl -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
+      --digest -X POST \
+      --header "Accept: application/vnd.atlas.2024-05-30+json" \
+      --header "Content-Type: application/json" \
+      -d '\[{ \"ipAddress\": \"$CI_IP/32\", \"comment\": \"CI IP address\" }\]' \
+      "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList"
+
+cache:
+  paths:
+    - ${projectDirectory}/client/node_modules/
+
+build-job:
+  stage: build
+  script:
+    - npm -v #debug purposes
+    - cd "${projectDirectory}/server" && npm i && npm run build --if-present
+    - cd "../../"
+    - pwd
+    - cd "${projectDirectory}/client" && npm i && npm run build
+    - cd "../../"
+  artifacts:
+    paths:
+      - "${projectDirectory}/client/dist/"
+
+
+remove_ip_whitelist:
+  stage: cleanup
+  script:
+    - export CI_IP=$(curl -s https://api.ipify.org)
+    - echo $CI_IP
+    - |
+      curl -s -u $ATLAS_PUBLIC_KEY:$ATLAS_PRIVATE_KEY \
+      --digest -X DELETE \
+      --header "Content-Type: application/json" \
+      --header "Accept: application/vnd.atlas.2023-01-01+json" \
+      "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
+
