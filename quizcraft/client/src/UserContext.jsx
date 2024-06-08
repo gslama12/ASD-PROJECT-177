@@ -3,17 +3,21 @@ import {getLocalStorageUser, setLocalStorageUser} from "./utils/LocalStorageHelp
 
 const UserContext = createContext(undefined);
 
+// Note: Used fields: "username" and "_id"
 export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
         const savedUser = getLocalStorageUser();
-        return savedUser ? JSON.parse(savedUser) : null;
+        return savedUser ? savedUser : null;
     });
 
     useEffect(() => {
         if (user) {
-            setLocalStorageUser(user);
+            const userLocalStorage = getLocalStorageUser();
+            if (!userLocalStorage?.id || user._id) {
+                setLocalStorageUser(user);
+            }
         }
         // Do we ever want to remove user data? Only if the user logs out?
         // else {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../../../styles/QuizModeComponentStyle.css";
 import he from 'he';
 import {getLocalStorageUser} from "../../../utils/LocalStorageHelper.js";
+import {useUser} from "../../../UserContext.jsx";
 
 function QuizModeComponent({ socket }) {
     const [question, setQuestion] = useState(null);
@@ -13,6 +14,7 @@ function QuizModeComponent({ socket }) {
     const [correctAnswer, setCorrectAnswer] = useState(null);
     const [gameId, setGameId] = useState(null);
     const navigate = useNavigate();
+    const {user} = useUser();
 
     function updateAnswerButtonClass(answer) {
         const buttonClassName = "answer-button";
@@ -31,7 +33,7 @@ function QuizModeComponent({ socket }) {
     }
 
     useEffect(() => {
-        socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: getLocalStorageUser().id});
+        socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id});
 
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
@@ -70,7 +72,7 @@ function QuizModeComponent({ socket }) {
     const handleAnswerClick = (answer) => {
         if (isAnswered) return;
         setSelectedAnswer(answer);
-        socket.emit("quiz-answer-question", { gameId, answer, userId:getLocalStorageUser().id });
+        socket.emit("quiz-answer-question", { gameId, answer, userId: user._id });
     };
 
     return (

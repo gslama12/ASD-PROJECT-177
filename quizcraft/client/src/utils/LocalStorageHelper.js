@@ -15,5 +15,6 @@ export function setLocalStorageUser(user) {
 
 
 export function getLocalStorageUser() {
-    return localStorage.getItem(LOCAL_STORAGE_KEYS.USER);
+    const userObject = localStorage.getItem(LOCAL_STORAGE_KEYS.USER);
+    return JSON.parse(userObject);
 }
