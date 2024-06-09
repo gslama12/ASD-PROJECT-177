@@ -279,9 +279,10 @@ class TriviaQuiz {
 
 
 async function triviaQuizFactory(gameMode, category, difficulty, playerIds) {
-    const quizSettings = new TriviaQuestionSettings(gameMode, category, difficulty);
-    // TODO ensure this works with new constructor
-    const triviaQuiz = new TriviaQuiz(null, quizSettings);
+    // Calling with undefined twice to work with new TriviaQuiz constructor.
+    // questionGenerator will be set to singleton class instance
+    // questionSettings is set via initGameSettings.
+    const triviaQuiz = new TriviaQuiz(undefined, undefined);
 
     const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty);
     if (!initSettingsSuccess) {

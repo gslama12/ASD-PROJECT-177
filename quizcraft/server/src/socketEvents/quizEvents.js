@@ -2,9 +2,12 @@ const getTriviaApiOptions = require("../triviaQuiz/triviaQuizOptions");
 const triviaQuizManager = require("../triviaQuiz/triviaQuizManager");
 const {constructErrorResponse, constructDataResponse} = require("./messageHelper");
 const { getGameStats, getUserGames} = require("../controllers/gameStatsController");
+const TriviaQuestionSettings = require("../triviaQuiz/triviaQuestionSettings");
 
 const EVENTS = {
     NEW_SINGLE_PLAYER_GAME: "quiz-new-single-player-game",
+    JOIN_MULTIPLAYER_QUEUE: "quiz-join-multiplayer-queue",
+    NEW_MULTIPLAYER_GAME: "quiz-new-multiplayer-game",
     GET_NEXT_QUESTION: "quiz-get-next-question",
     ANSWER_QUESTION: "quiz-answer-question",
     GET_GAME_OPTIONS: "quiz-get-game-options",
@@ -17,13 +20,22 @@ const EVENTS = {
 
 // TODO Authorization for roomId
 module.exports = (socket, io) => {
-    // ----------------------
+
+    /*
+    Creates a new single player game.
+     */
     socket.on(EVENTS.NEW_SINGLE_PLAYER_GAME, async (body) => {
         // Technically, all question settings are optional.
         const gameMode = body?.gameMode;
         const category = body?.category;
         const difficulty = body?.difficulty;
         const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
+
+        if (!gameMode || gameMode !== "multiple" || gameMode !== "boolean") {
+            const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
+            socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, errorObject);
+            return;
+        }
 
         if (!playerId) {
             const errorObject = constructErrorResponse("Need 'usedId' parameter.");
@@ -53,7 +65,64 @@ module.exports = (socket, io) => {
     });
 
 
-    // ----------------------
+    /*
+    1) Call multiplayer queue event and check if other players with *same* settings are waiting.
+    1a) If nobody is waiting, you are first: Create a new UUID roomId and send it to client.
+    Server stores roomId with game settings in "queue object" (userId doesn't need to be stored?).
+    1b) If someone is waiting, you are second or later: Use the UUID stored from 1a) and send it to client.
+    2) You and matching player join the same socket room! Use roomId to communicate within multiplayer game.
+    Note that joining the room doesn't start the multiplayer game.
+     */
+    socket.on(EVENTS.JOIN_MULTIPLAYER_QUEUE, async (body) => {
+        const gameMode = body?.gameMode;
+        const category = body?.category;
+        const difficulty = body?.difficulty;
+        const playerId = body?.userId;
+
+        if (!gameMode || (gameMode !== "multiple" && gameMode !== "boolean")) {
+            const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
+            socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, errorObject);
+            return;
+        }
+
+        if (!playerId) {
+            const errorObject = constructErrorResponse("Need 'usedId' parameter.");
+            socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, errorObject);
+            return;
+        }
+
+        const gameSettings = new TriviaQuestionSettings(gameMode, category, difficulty, undefined, undefined);
+        let roomId = triviaQuizManager.findMatchingPlayerInQueue(gameSettings, playerId);
+
+        if (!roomId) {
+            // You are the first player in the queue with your gameSettings -> Add new entry
+            console.log(`First to join multiplayer queue with gameSettings ${gameSettings}`);
+            roomId = triviaQuizManager.insertRoomQueueElement(gameSettings, playerId);
+        } else {
+            console.log(`Found matching player in queue with gameSettings ${gameSettings}`);
+        }
+
+        // You receive a response with a roomId which you send in future events so the server can emit to that room.
+        socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, constructDataResponse({"roomId": roomId}));
+        // Join room
+        socket.join(roomId);
+    });
+
+
+    /*
+    Preliminary: You called JOIN_MULTIPLAYER_QUEUE and have received a roomId.
+    1) Once both players joined, a new TriviaQuiz object is created with the queue settings.
+    2) Queue object is deleted.
+    3) Play as usual, with the difference that responses aren't sent immediately, but only if last player made an answer.
+     */
+    socket.on(EVENTS.NEW_MULTIPLAYER_GAME, async (body) => {
+        // TODO
+        const errorObject = constructErrorResponse("Event not implemented.");
+        socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
+    })
+
+
+    // Note: this event is typically not used. You get next question from <EVENTS.ANSWER_QUESTION>
     socket.on(EVENTS.GET_NEXT_QUESTION, async (body) => {
         // TODO how to handle to support multiplayer? Wait until all players clicked "next question" before you do anything? (similar to answer question event)
         const gameId = body?.gameId;
@@ -83,7 +152,7 @@ module.exports = (socket, io) => {
     });
 
 
-    // ----------------------
+    // TODO Comment with explanations
     socket.on(EVENTS.ANSWER_QUESTION, async (body) => {
 
         const gameId = body?.gameId;
@@ -145,14 +214,14 @@ module.exports = (socket, io) => {
     });
 
 
-    // ----------------------
+    // // TODO Comment with explanations
     socket.on(EVENTS.GET_GAME_OPTIONS, async () => {
         const categoryOptions = await getTriviaApiOptions();
         socket.emit(EVENTS.GET_GAME_OPTIONS, constructDataResponse(categoryOptions));
     });
 
 
-    // ----------------------
+    // // TODO Comment with explanations
     socket.on(EVENTS.GET_GAME_INFO, async (body) => {
         const gameId = body?.gameId;
 

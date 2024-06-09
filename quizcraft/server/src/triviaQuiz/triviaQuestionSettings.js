@@ -2,6 +2,13 @@ class TriviaQuestionSettings {
     MAX_QUESTION_LIMIT = 50;
     DEFAULT_NUM_QUESTIONS = 5;
 
+    /**
+     * @param quizMode {String}
+     * @param category {String | undefined}
+     * @param difficulty {String | undefined}
+     * @param apiSessionToken {String | undefined} Undefined if used as TriviaQuizQueueElement (hacky)
+     * @param questionsPerRequest {number | undefined} Undefined if used as TriviaQuizQueueElement (hacky)
+     */
     constructor(quizMode, category, difficulty, apiSessionToken, questionsPerRequest) {
         this.quizMode = quizMode;
         this.category = category;
