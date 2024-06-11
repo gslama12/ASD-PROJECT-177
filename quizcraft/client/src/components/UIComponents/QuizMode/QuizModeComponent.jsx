@@ -57,8 +57,8 @@ function QuizModeComponent({ socket }) {
                     navigate("/quizfinished");
                 } else {
                     setTimeout(() => {
-                        setQuestion(question.question);
-                        setAnswers(question.answers);
+                        setQuestion(he.decode(question.question));
+                        setAnswers(question.answers); //not sure to decode here too, throws bug but works
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");
