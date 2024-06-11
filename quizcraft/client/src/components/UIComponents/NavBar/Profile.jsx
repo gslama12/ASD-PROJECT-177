@@ -3,17 +3,47 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import '../../../styles/Profile.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Profile() {
-    const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-
     const [profile, setProfile] = useState({
         name: "Max Mustermann",
         age: 22,
         job: "Student",
         email: "max.mustermann@gmail.com"
     });
+
+    // const [username, setUsername] = useState("");
+    // const [password, setPassword] = useState("");
+
+    /*const validateNewPassword = (password) => {
+        const minLength = 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|\-<>_´=§/+]/.test(password);
+        return (
+            password.length >= minLength &&
+            hasUpperCase &&
+            hasLowerCase &&
+            hasNumber &&
+            hasSpecialChar
+        );
+    };
+
+        if (!password) {
+            errors.password = "Password cannot be empty";
+        }
+        if (!confirmPassword) {
+            errors.confirmPassword = "Confirm password cannot be empty";
+        }
+        if (password && confirmPassword && password !== confirmPassword) {
+            errors.password = "Passwords do not match";
+            errors.confirmPassword = "Passwords do not match";
+        }
+        if (password && !validatePassword(password)) {
+            errors.password = "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character";
+        }*/
 
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -23,6 +53,7 @@ function Profile() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
     const handleEditProfile = () => {
         setShowEditProfileModal(true);
@@ -56,6 +87,9 @@ function Profile() {
     const handleConfirmDelete = () => {
         setShowModal(false);
         setShowSuccessModal(true);
+
+        // socket.emit("delete-user-from-db", { username });
+
         setTimeout(() => {
             setShowSuccessModal(false);
             window.location.href = "/login";
@@ -101,7 +135,7 @@ function Profile() {
             </div>
             <div className="profile-container">
                 <p> Name: {profile.name} </p>
-                <p> Age: {profile.age} Years </p>
+                <p> Age: {profile.age} </p>
                 <p> Job: {profile.job} </p>
                 <p> E-Mail: {profile.email} </p>
             </div>

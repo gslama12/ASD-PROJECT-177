@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser, authenticateUser, forgotPassword, getActiveUserInfo} = require("./controllers/userController");
+const {addUser, authenticateUser, forgotPassword, getActiveUserInfo, deleteUser} = require("./controllers/userController");
 
 
 const app = express();
@@ -52,6 +52,11 @@ io.on('connection', (socket) => {
     const result = await getActiveUserInfo(data.userId);
     socket.emit("active-user-info-response", result);
   });
+
+  socket.on("delete-user-from-db", async (data) => {
+    const result = await deleteUser(data.username);
+    socket.emit("user-deleted-response", result);
+  })
 
   require("./socketEvents/quizEvents")(socket, io);
 })
