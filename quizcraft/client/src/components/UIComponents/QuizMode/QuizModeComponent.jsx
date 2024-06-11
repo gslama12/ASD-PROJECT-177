@@ -15,17 +15,19 @@ function QuizModeComponent({ socket }) {
 
     function updateAnswerButtonClass(answer) {
         const buttonClassName = "answer-button";
-        // TODO fix these checks to set the color correctly
         if (isAnswered && answer === correctAnswer) {
-            console.log("I am here");
+            console.log('Condition 1:', answer === correctAnswer); // for debugging
             return `${buttonClassName} correct`;
         }
         if (isAnswered && selectedAnswer === answer && answer !== correctAnswer) {
+            console.log("Condition: wrong"); // Debugging log return
             return `${buttonClassName} wrong`;
         }
         if (selectedAnswer === answer) {
+            console.log("Condition: selected"); // Debugging log return
             return `${buttonClassName} selected`;
         }
+        console.log("Condition: default"); // Debugging log
         return buttonClassName;
     }
 
