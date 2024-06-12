@@ -3,9 +3,12 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import profileIcon from '../../../assets/profile_icon.png';
 import '../Profile/ProfileStyles.css';
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../../UserContext";
+import "../../../styles/QuizFinishedComponentStyle.css";
 
 function QuizFinished({socket}) {
     const navigate = useNavigate();
+    const { user } = useUser();
 
     useEffect(() => {
         //socket.emit('quiz-get-game-info', gameId);
@@ -22,7 +25,7 @@ function QuizFinished({socket}) {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.ItemText className="dropdown-username">{username}</Dropdown.ItemText>
+                            <Dropdown.ItemText className="dropdown-username">{user ? user.username : "Guest"}</Dropdown.ItemText>
                             <Dropdown.Divider />
                             <Dropdown.Item href="/profile">Profile</Dropdown.Item>
                             <Dropdown.Divider />
@@ -33,6 +36,10 @@ function QuizFinished({socket}) {
             </div>
             <div className="quiz-finished-container">
                 <h1 className="centered-header">Quiz Finished</h1>
+                {/* Displaying stats */}
+                <h3>{`Congratulations ${user ? user.username : "Guest"}!!!`}</h3>
+                <h2>{`Correct Answers: `}</h2>
+                <h2>{`Wrong Answers: `}</h2>
                 {/* Additional content can be added here */}
             </div>
         </>
