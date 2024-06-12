@@ -43,7 +43,10 @@ function TriviaModeComponent({ socket }) {
                 setIsAnswered(true);
                 setFeedback(isCorrectAnswer ? "Correct!" : "Wrong!");
                 if (gameComplete) {
-                    navigate("/quizfinished");
+                    setTimeout(() => {
+                        setButtonColors(Array(answers.length).fill(''));  // reset colors
+                        navigate("/quizfinished");
+                    }, 2000); // wait 2 seconds before redirect
                 } else {
                     setTimeout(() => {
                         setButtonColors(Array(answers.length).fill(''));  // reset colors

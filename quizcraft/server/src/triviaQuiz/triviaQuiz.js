@@ -246,10 +246,32 @@ class TriviaQuiz {
      */
     async saveGameStats() {
         try {
+            // Set default values for difficulty and category if they don't exist TODO: HACK
+            const gameMode = this.questionSettings.difficulty || 'NOT_SPECIFIED';
+            const difficulty = this.questionSettings.difficulty || 'NOT_SPECIFIED';
+            const category = this.questionSettings.category || 'NOT_SPECIFIED';
+
+
+            console.log("- - - STATS REPORT: - - -");
+                console.log('quizId:', this.quizId);
+                console.log('questionGenerator:', this.questionGenerator);
+                console.log('questionSettings:', this.questionSettings);
+                console.log('fetchedQuestions:', this.fetchedQuestions);
+                console.log('activeQuestion:', this.activeQuestion);
+                console.log('players:', this.players);
+                console.log('gameComplete:', this.gameComplete);
+                console.log('numOfRounds:', this.numOfRounds);
+                console.log('currentRound:', this.currentRound);
+                console.log('correctAnswers:', this.correctAnswers);
+                console.log('wrongAnswers:', this.wrongAnswers);
+                console.log('questionAnswerHistory:', this.questionAnswerHistory);
+            console.log("- - - - - -");
+
+
             const gameData = new Game({
-                gameMode: this.questionSettings.gameMode,
-                difficulty: this.questionSettings.difficulty,
-                category: this.questionSettings.category,
+                gameMode: gameMode,
+                difficulty: difficulty,
+                category: category,
                 numOfRounds: this.numOfRounds
             });
             const savedGame = await gameData.save();
@@ -260,10 +282,14 @@ class TriviaQuiz {
                 const gameStats = new GameStats({
                     gameId: savedGame._id,
                     playerId: player.id,
-                    questionsAnsweredCorrectly: this.correctAnswers,
+                    questionsAnsweredCorrect: this.correctAnswers,
                     totalQuestions: this.numOfRounds,
-                    questionsAnsweredWrongly: this.wrongAnswers
+                    questionsAnsweredWrong: this.wrongAnswers
                 });
+
+                console.log("GAME STATS");
+                console.log(gameStats);
+
                 await gameStats.save();
                 gameStatsData.push(gameStats);
             }
