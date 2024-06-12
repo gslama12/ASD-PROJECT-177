@@ -11,25 +11,10 @@ function QuizModeComponent({ socket }) {
     const [feedback, setFeedback] = useState("");
     const [correctAnswer, setCorrectAnswer] = useState(null);
     const [gameId, setGameId] = useState(null);
+    const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
     const navigate = useNavigate();
+    const [buttonColors, setButtonColors] = useState(Array(answers.length).fill(''));
 
-    function updateAnswerButtonClass(answer) {
-        const buttonClassName = "answer-button";
-        if (isAnswered && answer === correctAnswer) {
-            console.log('Condition 1:', answer === correctAnswer); // for debugging
-            return `${buttonClassName} correct`;
-        }
-        if (isAnswered && selectedAnswer === answer && answer !== correctAnswer) {
-            console.log("Condition: wrong"); // Debugging log return
-            return `${buttonClassName} wrong`;
-        }
-        if (selectedAnswer === answer) {
-            console.log("Condition: selected"); // Debugging log return
-            return `${buttonClassName} selected`;
-        }
-        console.log("Condition: default"); // Debugging log
-        return buttonClassName;
-    }
 
     useEffect(() => {
         socket.emit("quiz-new-single-player-game", { gameMode: "multiple" });
@@ -40,6 +25,7 @@ function QuizModeComponent({ socket }) {
                 setGameId(gameInfo.gameId);
                 setQuestion(he.decode(question.question));
                 setAnswers(question.answers);
+                setCorrectAnswer(question.correctAnswer);
             }
         });
 
@@ -50,6 +36,7 @@ function QuizModeComponent({ socket }) {
                 const correctAnswer = question.correctAnswer;
                 const isCorrectAnswer = response.data.players[0].isCorrectAnswer; // TODO should access via playerId
 
+                setIsCorrectAnswer(isCorrectAnswer);
                 setCorrectAnswer(correctAnswer);
                 setIsAnswered(true);
                 setFeedback(isCorrectAnswer ? "Correct!" : "Wrong!");
@@ -57,6 +44,7 @@ function QuizModeComponent({ socket }) {
                     navigate("/quizfinished");
                 } else {
                     setTimeout(() => {
+                        setButtonColors(Array(answers.length).fill(''));  // reset colors
                         setQuestion(he.decode(question.question));
                         setAnswers(question.answers); //not sure to decode here too, throws bug but works
                         setSelectedAnswer(null);
@@ -68,32 +56,50 @@ function QuizModeComponent({ socket }) {
         });
     }, [socket, navigate]);
 
-    const handleAnswerClick = (answer) => {
+    const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
         setSelectedAnswer(answer);
+        setIsAnswered(true);
+        updateButtonColors(answer, index);
         socket.emit("quiz-answer-question", { gameId, answer });
+    };
+
+
+    const updateButtonColors = (answer, index) => {
+        const newColors = buttonColors.slice();
+        if (answer === correctAnswer) {
+            newColors[index] = 'green';
+        } else {
+            newColors[index] = 'red';
+            const correctIndex = answers.indexOf(correctAnswer);
+            if (correctIndex !== -1) {
+                newColors[correctIndex] = 'green';
+            }
+        }
+        setButtonColors(newColors);
     };
 
     return (
         <div className="quiz-mode-container">
             <h1>Quiz Mode</h1>
             {question && (
-                <>
-                    <h2>{question}</h2>
+                <div className={"main-container"}>
+                    <div className={"question-container"}>
+                        <h2>{question}</h2>
+                    </div>
                     <div className="answers-container">
                         {answers.map((answer, index) => (
                             <button
                                 key={index}
-                                className={updateAnswerButtonClass(answer)}
-                                onClick={() => handleAnswerClick(answer)}
+                                onClick={() => handleAnswerClick(answer, index)}
                                 disabled={isAnswered}
-                            >
+                                style={{ backgroundColor: buttonColors[index] }}>
                                 {answer}
                             </button>
                         ))}
                     </div>
-                    {feedback && <div className="feedback-message">{feedback}</div>}
-                </>
+{/*                    {feedback && <div className="feedback-message">{feedback}</div>}*/}
+                </div>
             )}
         </div>
     );
