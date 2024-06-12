@@ -91,6 +91,10 @@ async function getActiveUserInfo(userId) {
     }
 }
 
+async function getActiveUserId(userId) {
+    //TODO
+}
+
 module.exports = {
     addUser,
     authenticateUser,

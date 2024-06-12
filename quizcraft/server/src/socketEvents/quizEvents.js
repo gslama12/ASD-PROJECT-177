@@ -2,6 +2,8 @@ const getTriviaApiOptions = require("../triviaQuiz/triviaQuizOptions");
 const triviaQuizManager = require("../triviaQuiz/triviaQuizManager");
 const {constructErrorResponse, constructDataResponse} = require("./messageHelper");
 const { getGameStats, getUserGames} = require("../controllers/gameStatsController");
+const mongoose = require("mongoose");
+
 
 const EVENTS = {
     NEW_SINGLE_PLAYER_GAME: "quiz-new-single-player-game",
@@ -14,17 +16,20 @@ const EVENTS = {
     GET_USER_GAMES: "quiz-get-user-games"
 }
 
+const playerId = new mongoose.Types.ObjectId();  // TODO: player IDs not implemented yet
 
 // TODO Authorization for roomId
 module.exports = (socket, io) => {
+    // ----------------------
     socket.on(EVENTS.NEW_SINGLE_PLAYER_GAME, async (body) => {
         // Technically, all question settings are optional.
         const gameMode = body?.gameMode;
         const category = body?.category;
         const difficulty = body?.difficulty;
-        // TODO verify client input
 
-        const playerId ="PlayerId";
+        //const playerId ="PlayerId";
+
+
         const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty, playerId)
 
         if (quizObject === undefined) {
@@ -46,6 +51,7 @@ module.exports = (socket, io) => {
     });
 
 
+    // ----------------------
     socket.on(EVENTS.GET_NEXT_QUESTION, async (body) => {
         // TODO how to handle to support multiplayer? Wait until all players clicked "next question" before you do anything? (similar to answer question event)
         const gameId = body?.gameId;
@@ -75,8 +81,9 @@ module.exports = (socket, io) => {
     });
 
 
+    // ----------------------
     socket.on(EVENTS.ANSWER_QUESTION, async (body) => {
-        const playerId = "PlayerId";
+        //const playerId = "PlayerId";
 
         const gameId = body?.gameId;
         const answer = body?.answer;
@@ -107,26 +114,43 @@ module.exports = (socket, io) => {
 
         // You are the final player to make an answer, emit roundResults to all players of the game.
         // TODO For multiplayer, need to use socket rooms
-        const gameData = quizObject.evaluateAnswers(); // sending all game info, not only answer results
+        let gameData = quizObject.evaluateAnswers(); // sending all game info, not only answer results
 
         // Check if the game is complete
         if (gameData.gameInfo.gameComplete) {
-            // If the game is complete, save the game stats and emit the 'game-complete' event
-            const gameStatsData = await quizObject.saveGameStats();
-            socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameStatsData));
-            const completeGameData = { ...gameData, questionAnswerHistory: quizObject.getQuestionAnswerHistory()};
+            // If the game is complete, emit the 'game-complete' event. Note that game stats are already saved
+            // in TriviaQuiz.#questionComplete() by calling quizObject.evaluateAnswers().
+            socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameData));
+        } else {
+            // If game not complete, get next question
+            const question = await quizObject.getNextQuestion();
+            if (!question) {
+                // No question. Client needs to call GET_NEXT_QUESTION event?!
+            }
+
+            // to preserve question answer details
+            const playerDataBackup = gameData["players"];
+            gameData = quizObject.getAllGameData(); // get gameData with new question
+
+            // add new score to the backup
+            for (let playerIndex = 0; playerIndex < gameData["players"].length; playerIndex++) {
+                playerDataBackup[playerIndex]["score"] = gameData["players"][playerIndex]["score"];
+            }
+            gameData["players"] = playerDataBackup;
         }
 
         socket.emit(EVENTS.ANSWER_QUESTION, constructDataResponse(gameData));
     });
 
 
+    // ----------------------
     socket.on(EVENTS.GET_GAME_OPTIONS, async () => {
         const categoryOptions = await getTriviaApiOptions();
         socket.emit(EVENTS.GET_GAME_OPTIONS, constructDataResponse(categoryOptions));
     });
 
 
+    // ----------------------
     socket.on(EVENTS.GET_GAME_INFO, async (body) => {
         const gameId = body?.gameId;
 
