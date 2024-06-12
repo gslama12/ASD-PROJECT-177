@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../../UserContext";
 import "../../../styles/LoginComponentStyle.css";
 
 function LoginComponent({ socket }) {
     const navigate = useNavigate();
-    const { setUser } = useUser();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -39,6 +37,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleLoginClick = () => {
+        setFeedbackMessage("")
+        setAlertMessage("")
         const errors = {};
         if (!username) {
             errors.username = "Username cannot be empty";
@@ -56,6 +56,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleSignUpClick = () => {
+        setAlertMessage("");
+        setFeedbackMessage("");
         const errors = {};
         if (!username) {
             errors.username = "Username cannot be empty";
@@ -88,6 +90,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleForgotPasswordClick = () => {
+        setAlertMessage("");
+        setFeedbackMessage("");
         if (resetButtonText === "LOG IN") {
             setForgotPasswordMode(false);
             setIsLogin(true);
@@ -110,7 +114,7 @@ function LoginComponent({ socket }) {
         setFeedbackMessage("Sending reset email...");
         socket.emit("forgot-password", { email });
         setCanResend(false);
-        setTimeout(() => setCanResend(true), 60000); // 1 minute
+        setTimeout(() => setCanResend(true), 10000);
     };
 
     const handleResendEmailClick = () => {
@@ -121,13 +125,12 @@ function LoginComponent({ socket }) {
         setFeedbackMessage("Resending reset email...");
         socket.emit("forgot-password", { email });
         setCanResend(false);
-        setTimeout(() => setCanResend(true), 60000); // 1 minute
+        setTimeout(() => setCanResend(true), 10000);
     };
 
     useEffect(() => {
         socket.on("user-authenticated-response", (response) => {
             if (response.success) {
-                setUser(response.user);
                 navigate("/home");
             } else {
                 setAlertMessage(response.message);
@@ -137,7 +140,6 @@ function LoginComponent({ socket }) {
 
         socket.on("user-added-response", (response) => {
             if (response.success) {
-                setUser(response.user);
                 navigate("/home");
             } else {
                 setAlertMessage(response.message);
@@ -146,8 +148,8 @@ function LoginComponent({ socket }) {
         });
 
         socket.on("forgot-password-response", (response) => {
-            setAlertMessage(response.message);
-            setFeedbackMessage("");
+            setAlertMessage("");
+            setFeedbackMessage(response.message);
             if (response.success) {
                 setResetButtonText("LOG IN");
             }
@@ -158,7 +160,7 @@ function LoginComponent({ socket }) {
             socket.off("user-added-response");
             socket.off("forgot-password-response");
         };
-    }, [navigate, socket, setUser]);
+    }, [navigate, socket]);
 
     const switchMode = () => {
         setIsLogin(!isLogin);
@@ -170,7 +172,14 @@ function LoginComponent({ socket }) {
         setForgotPasswordMode(false);
         setAlertMessage("");
         setFeedbackMessage("");
+        setResetButtonText("RESET PASSWORD")
     };
+
+    const handleForgotPasswordLinkClick = () => {
+        setForgotPasswordMode(true);
+        setAlertMessage("");
+        setFeedbackMessage("");
+    }
 
     return (
         <div className="loginContainer">
@@ -259,7 +268,7 @@ function LoginComponent({ socket }) {
                         )}
                         {isLogin && (
                             <div className="forgotPassword">
-                                <a href="#" onClick={() => setForgotPasswordMode(true)}>Forgot password?</a>
+                                <a href="#" onClick={handleForgotPasswordLinkClick}>Forgot password?</a>
                             </div>
                         )}
                     </>
