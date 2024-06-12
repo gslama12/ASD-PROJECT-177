@@ -26,7 +26,7 @@ function TriviaModeComponent({ socket }) {
                 const { gameInfo, question } = response.data;
                 setGameId(gameInfo.gameId);
                 setQuestion(he.decode(question.question));
-                setAnswers(question.answers);
+                setAnswers(shuffleArray(question.answers));
                 setCorrectAnswer(question.correctAnswer);
             }
         });
@@ -51,7 +51,7 @@ function TriviaModeComponent({ socket }) {
                     setTimeout(() => {
                         setButtonColors(Array(answers.length).fill(''));  // reset colors
                         setQuestion(he.decode(question.question));
-                        setAnswers(question.answers); //not sure to decode here too, throws bug but works
+                        setAnswers(shuffleArray(question.answers)); //not sure to decode here too, throws bug but works
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");
@@ -101,7 +101,7 @@ function TriviaModeComponent({ socket }) {
                         <h2>{question}</h2>
                     </div>
                     <div className="answers-container">
-                        {shuffleArray(answers).map((answer, index) => (
+                        {answers.map((answer, index) => (
                             <button
                                 key={index}
                                 onClick={() => handleAnswerClick(answer, index)}

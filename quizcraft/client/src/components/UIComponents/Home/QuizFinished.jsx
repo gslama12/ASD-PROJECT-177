@@ -1,9 +1,17 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import profileIcon from '../../../assets/profile_icon.png';
 import '../Profile/ProfileStyles.css';
+import { useNavigate } from "react-router-dom";
 
-function QuizFinished({ username }) {
+function QuizFinished({socket}) {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        //socket.emit('quiz-get-game-info', gameId);
+    }, [socket, navigate]); // Empty dependency array to run the effect only once on mount
+
+
     return (
         <>
             <div className="top-bar">
