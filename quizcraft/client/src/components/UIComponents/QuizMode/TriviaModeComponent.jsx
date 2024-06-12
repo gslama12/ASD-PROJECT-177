@@ -45,8 +45,8 @@ function TriviaModeComponent({ socket }) {
                 if (gameComplete) {
                     setTimeout(() => {
                         setButtonColors(Array(answers.length).fill(''));  // reset colors
-                        navigate("/quizfinished");
-                    }, 2000); // wait 2 seconds before redirect
+                        navigate("/quizfinished", { state: {gameId: response.data.gameInfo.gameId}});
+                    }, 200); // wait 2 seconds before redirect
                 } else {
                     setTimeout(() => {
                         setButtonColors(Array(answers.length).fill(''));  // reset colors
@@ -55,7 +55,7 @@ function TriviaModeComponent({ socket }) {
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");
-                    }, 2000); // wait 2 seconds before showing the next question
+                    }, 200); // wait 2 seconds before showing the next question
                 }
             }
         });

@@ -43,7 +43,7 @@ function QuizModeComponent({ socket }) {
                 if (gameComplete) {
                     setTimeout(() => {
                         setButtonColors(Array(answers.length).fill(''));  // reset colors
-                        navigate("/quizfinished");
+                        navigate("/quizfinished", { gameId: gameId });
                     }, 2000); // wait 2 seconds before redirect
 
                 } else {

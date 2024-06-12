@@ -252,20 +252,20 @@ class TriviaQuiz {
             const category = this.questionSettings.category || 'NOT_SPECIFIED';
 
 
-            console.log("- - - STATS REPORT: - - -");
-                console.log('quizId:', this.quizId);
-                console.log('questionGenerator:', this.questionGenerator);
-                console.log('questionSettings:', this.questionSettings);
-                console.log('fetchedQuestions:', this.fetchedQuestions);
-                console.log('activeQuestion:', this.activeQuestion);
-                console.log('players:', this.players);
-                console.log('gameComplete:', this.gameComplete);
-                console.log('numOfRounds:', this.numOfRounds);
-                console.log('currentRound:', this.currentRound);
-                console.log('correctAnswers:', this.correctAnswers);
-                console.log('wrongAnswers:', this.wrongAnswers);
-                console.log('questionAnswerHistory:', this.questionAnswerHistory);
-            console.log("- - - - - -");
+            // console.log("- - - STATS REPORT: - - -");
+            //     console.log('quizId:', this.quizId);
+            //     console.log('questionGenerator:', this.questionGenerator);
+            //     console.log('questionSettings:', this.questionSettings);
+            //     console.log('fetchedQuestions:', this.fetchedQuestions);
+            //     console.log('activeQuestion:', this.activeQuestion);
+            //     console.log('players:', this.players);
+            //     console.log('gameComplete:', this.gameComplete);
+            //     console.log('numOfRounds:', this.numOfRounds);
+            //     console.log('currentRound:', this.currentRound);
+            //     console.log('correctAnswers:', this.correctAnswers);
+            //     console.log('wrongAnswers:', this.wrongAnswers);
+            //     console.log('questionAnswerHistory:', this.questionAnswerHistory);
+            // console.log("- - - - - -");
 
 
             const gameData = new Game({
@@ -287,8 +287,8 @@ class TriviaQuiz {
                     questionsAnsweredWrong: this.wrongAnswers
                 });
 
-                console.log("GAME STATS");
-                console.log(gameStats);
+                // console.log("GAME STATS");
+                // console.log(gameStats);
 
                 await gameStats.save();
                 gameStatsData.push(gameStats);
