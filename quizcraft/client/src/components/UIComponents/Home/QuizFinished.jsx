@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import profileIcon from '../../../assets/profile_icon.png';
 import '../Profile/ProfileStyles.css';
@@ -36,10 +37,26 @@ function QuizFinished({socket}) {
             </div>
             <div className="quiz-finished-container">
                 <h1 className="centered-header">Quiz Finished</h1>
-                {/* Displaying stats */}
-                <h3>{`Congratulations ${user ? user.username : "Guest"}!!!`}</h3>
-                <h2>{`Correct Answers: `}</h2>
-                <h2>{`Wrong Answers: `}</h2>
+                <div className="quiz-congrats-container">
+                    {/* Profile icon */}
+                    <img src={profileIcon} alt="Profile" className="congrats-profile-icon"/>
+                    {/* Congrats message */}
+                    <h3>{`Congratulations ${user ? user.username : "Guest"}!!!`}</h3>
+                </div>
+
+                {/* Quiz stats */}
+                <div className="quiz-stats-container">
+                    <h2>{`Correct Answers: `}</h2>
+                    <h2>{`Wrong Answers: `}</h2>
+                </div>
+
+                {/* Buttons */}
+                <div className="quiz-buttons-container">
+                    <Link to="/quizmode" className="start-host-button">Play Quiz Mode Again</Link>
+                    <Link to="/triviamode" className="start-host-button">Play Trivia Mode Again</Link>
+                    <Link to="/home" className="start-host-button">Back To Home</Link>
+                </div>
+
                 {/* Additional content can be added here */}
             </div>
         </>

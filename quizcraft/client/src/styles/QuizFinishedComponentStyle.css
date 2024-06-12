@@ -28,3 +28,35 @@
     margin: 0;
     background-color: rgba(115, 115, 115, 0.29);
 }
+
+.congrats-profile-icon {
+    width: 70px;
+    height: 70px;
+    margin-right: 20px;
+}
+
+.quiz-congrats-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.quiz-stats-container {
+    margin-bottom: 20px;
+}
+
+.quiz-buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.quiz-button {
+    padding: 10px 20px;
+    border-radius: 3px;
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+}
