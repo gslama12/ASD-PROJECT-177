@@ -3,6 +3,8 @@ const triviaQuizManager = require("../triviaQuiz/triviaQuizManager");
 const {constructErrorResponse, constructDataResponse} = require("./messageHelper");
 const { getGameStats, getUserGames} = require("../controllers/gameStatsController");
 const TriviaQuestionSettings = require("../triviaQuiz/triviaQuestionSettings");
+const mongoose = require("mongoose");
+
 
 const EVENTS = {
     NEW_SINGLE_PLAYER_GAME: "quiz-new-single-player-game",
@@ -17,6 +19,7 @@ const EVENTS = {
     GET_USER_GAMES: "quiz-get-user-games"
 }
 
+// const playerId = new mongoose.Types.ObjectId();  // TODO: player IDs not implemented yet
 
 // TODO Authorization for roomId
 module.exports = (socket, io) => {

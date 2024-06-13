@@ -39,6 +39,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleLoginClick = () => {
+        setFeedbackMessage("")
+        setAlertMessage("")
         const errors = {};
         if (!username) {
             errors.username = "Username cannot be empty";
@@ -56,6 +58,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleSignUpClick = () => {
+        setAlertMessage("");
+        setFeedbackMessage("");
         const errors = {};
         if (!username) {
             errors.username = "Username cannot be empty";
@@ -88,6 +92,8 @@ function LoginComponent({ socket }) {
     };
 
     const handleForgotPasswordClick = () => {
+        setAlertMessage("");
+        setFeedbackMessage("");
         if (resetButtonText === "LOG IN") {
             setForgotPasswordMode(false);
             setIsLogin(true);
@@ -110,7 +116,7 @@ function LoginComponent({ socket }) {
         setFeedbackMessage("Sending reset email...");
         socket.emit("forgot-password", { email });
         setCanResend(false);
-        setTimeout(() => setCanResend(true), 60000); // 1 minute
+        setTimeout(() => setCanResend(true), 10000);
     };
 
     const handleResendEmailClick = () => {
@@ -121,7 +127,7 @@ function LoginComponent({ socket }) {
         setFeedbackMessage("Resending reset email...");
         socket.emit("forgot-password", { email });
         setCanResend(false);
-        setTimeout(() => setCanResend(true), 60000); // 1 minute
+        setTimeout(() => setCanResend(true), 10000);
     };
 
     useEffect(() => {
@@ -146,8 +152,8 @@ function LoginComponent({ socket }) {
         });
 
         socket.on("forgot-password-response", (response) => {
-            setAlertMessage(response.message);
-            setFeedbackMessage("");
+            setAlertMessage("");
+            setFeedbackMessage(response.message);
             if (response.success) {
                 setResetButtonText("LOG IN");
             }
@@ -170,7 +176,14 @@ function LoginComponent({ socket }) {
         setForgotPasswordMode(false);
         setAlertMessage("");
         setFeedbackMessage("");
+        setResetButtonText("RESET PASSWORD")
     };
+
+    const handleForgotPasswordLinkClick = () => {
+        setForgotPasswordMode(true);
+        setAlertMessage("");
+        setFeedbackMessage("");
+    }
 
     return (
         <div className="loginContainer">
@@ -259,7 +272,7 @@ function LoginComponent({ socket }) {
                         )}
                         {isLogin && (
                             <div className="forgotPassword">
-                                <a href="#" onClick={() => setForgotPasswordMode(true)}>Forgot password?</a>
+                                <a href="#" onClick={handleForgotPasswordLinkClick}>Forgot password?</a>
                             </div>
                         )}
                     </>
