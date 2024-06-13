@@ -19,7 +19,8 @@ const EVENTS = {
     GET_USER_GAMES: "quiz-get-user-games"
 }
 
-// const playerId = new mongoose.Types.ObjectId();  // TODO: player IDs not implemented yet
+// TODO: player IDs not implemented yet. Note: Is it possible to make socket-ids persistent?
+// const playerId = new mongoose.Types.ObjectId();
 
 // TODO Authorization for roomId
 module.exports = (socket, io) => {
@@ -34,7 +35,7 @@ module.exports = (socket, io) => {
         const difficulty = body?.difficulty;
         const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
 
-        if (!gameMode || gameMode !== "multiple" || gameMode !== "boolean") {
+        if (!gameMode || (gameMode !== "multiple" && gameMode !== "boolean")) {
             const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
             socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, errorObject);
             return;
@@ -64,6 +65,7 @@ module.exports = (socket, io) => {
         }
 
         const gameData = quizObject.getAllGameData(); // sending all game info, not only question
+        console.log(`Created single player game for userId '${playerId}'.`)
         socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, constructDataResponse(gameData));
     });
 
