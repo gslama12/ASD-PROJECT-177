@@ -24,9 +24,40 @@ class TriviaQuizManager {
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
     async createSinglePlayerGame(gameMode, category, difficulty, playerId) {
+        return await this.createQuizObject(gameMode, category, difficulty, [playerId])
+    }
+
+    /**
+     * Creates a multiplayer game using the configuration defined in queueElement.
+     * @param queueElement {TriviaQuizQueueElement}
+     * @param roomId {String}
+     * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
+     */
+    async createMultiplayerGame(queueElement, roomId) {
+        if (!queueElement || !queueElement?.gameSettings) {
+            console.warn("queueElement or queueElement.gameSettings are undefined.")
+            return undefined;
+        }
+
+        const gameMode = queueElement.gameSettings.quizMode;
+        const category = queueElement.gameSettings.category;
+        const difficulty = queueElement.gameSettings.difficulty;
+        const playerIds = queueElement.playerIds;
+
+        const quizObject =  await this.createQuizObject(gameMode, category, difficulty, playerIds);
+        if (!quizObject) {
+            return undefined;
+        }
+
+        this.deleteRoomQueueElement(roomId);
+        return quizObject;
+    }
+
+    async createQuizObject(gameMode, category, difficulty, playerIds){
         try {
-            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, [playerId])
+            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, playerIds);
             if (triviaQuiz === undefined) {
+                console.error("Couldn't create quiz.")
                 return undefined;
             }
 
@@ -92,10 +123,15 @@ class TriviaQuizManager {
     }
 
     /**
+     * Remove queue element after the multiplayer game was added.
      * @param roomId {String}
      */
     deleteRoomQueueElement(roomId) {
-        this.roomQueue.delete(roomId);
+        if(!this.roomQueue.delete(roomId)) {
+            console.error(`Tried to remove roomId '${roomId}' from the queue, but it isn't a key of queue.`);
+        } else {
+            console.info(`Deleted roomId '${roomId}' from the queue.`);
+        }
     }
 
     /**
@@ -112,14 +148,46 @@ class TriviaQuizManager {
             }
 
             if (queueElement.isEqualGameSettings(gameSettings)) {
-                const roomId = queueElement.roomId;
+                const wasPlayerAdded = queueElement.addPlayerId(playerId);
+                if (!wasPlayerAdded) {
+                    return undefined;
+                }
+
                 // Update map
-                queueElement.addPlayerId(playerId);
+                const roomId = queueElement.roomId;
                 this.roomQueue.set(roomId, queueElement);
                 return roomId;
             }
         }
         return undefined;
+    }
+
+    /**
+     * @param roomId {String}
+     * @return {undefined|TriviaQuizQueueElement}
+     */
+    getQueueElement(roomId) {
+        const queueElement = this.roomQueue.get(roomId);
+        if (!queueElement) {
+            console.warn(`roomId ${roomId} doesn't exist`);
+            return undefined;
+        }
+        return queueElement;
+    }
+
+
+    /**
+     *
+     * @param queueElement
+     * @param playerId
+     * @return {boolean}
+     */
+    joinMultiplayerGame(queueElement, playerId) {
+        if (!queueElement) {
+            return false;
+        }
+
+        return queueElement.addPlayerReadyToStartGame(playerId);
     }
 }
 

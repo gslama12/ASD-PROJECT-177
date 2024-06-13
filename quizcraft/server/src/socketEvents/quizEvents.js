@@ -65,7 +65,7 @@ module.exports = (socket, io) => {
         }
 
         const gameData = quizObject.getAllGameData(); // sending all game info, not only question
-        console.log(`Created single player game for userId '${playerId}'.`)
+        console.info(`Created single player game for userId '${playerId}'.`)
         socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, constructDataResponse(gameData));
     });
 
@@ -79,6 +79,7 @@ module.exports = (socket, io) => {
     Note that joining the room doesn't start the multiplayer game.
      */
     socket.on(EVENTS.JOIN_MULTIPLAYER_QUEUE, async (body) => {
+        // TODO Technically, the same player can join queues multiple times
         const gameMode = body?.gameMode;
         const category = body?.category;
         const difficulty = body?.difficulty;
@@ -101,16 +102,19 @@ module.exports = (socket, io) => {
 
         if (!roomId) {
             // You are the first player in the queue with your gameSettings -> Add new entry
-            console.log(`First to join multiplayer queue with gameSettings ${gameSettings}`);
+            console.info(`First to join multiplayer queue with gameSettings ${gameSettings}`);
             roomId = triviaQuizManager.insertRoomQueueElement(gameSettings, playerId);
         } else {
-            console.log(`Found matching player in queue with gameSettings ${gameSettings}`);
+            console.info(`Found matching player in queue with gameSettings ${gameSettings}`);
         }
+
+        // Join room
+        // TODO Edge case: What happens if player refreshes their browser? -> Need new event to join roomId and call it from client-side.
+        //  Also, how to handle TriviaQuizManager.roomQueue in such a case?
+        socket.join(roomId);
 
         // You receive a response with a roomId which you send in future events so the server can emit to that room.
         socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, constructDataResponse({"roomId": roomId}));
-        // Join room
-        socket.join(roomId);
     });
 
 
@@ -121,9 +125,54 @@ module.exports = (socket, io) => {
     3) Play as usual, with the difference that responses aren't sent immediately, but only if last player made an answer.
      */
     socket.on(EVENTS.NEW_MULTIPLAYER_GAME, async (body) => {
-        // TODO
-        const errorObject = constructErrorResponse("Event not implemented.");
-        socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
+        const playerId = body?.userId;
+        const roomId = body?.roomId;
+
+        if (!playerId || !roomId) {
+            const errorObject = constructErrorResponse("Need playerId and roomId parameters.");
+            socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
+            return;
+        }
+
+        const queueElement = triviaQuizManager.getQueueElement(roomId);
+        if (!queueElement) {
+            const errorObject = constructErrorResponse(`No queue entry with roomId ${roomId} exists.`);
+            socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
+            return;
+        }
+
+        // Inform queue you are ready to start game
+        if (!triviaQuizManager.joinMultiplayerGame(queueElement, playerId)) {
+            const errorObject = constructErrorResponse("Couldn't join a new multiplayer game.");
+            socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
+            return;
+        }
+
+        // If you are not the last player, wait for other players to be ready to start the game
+        if(!queueElement.canStartGame()) {
+            console.log(`playerId ${playerId} is waiting for other players to start multiplayer game (roomId ${roomId})`);
+            return;
+        }
+
+        // You are the last player to join, create multiplayer game and inform all players of the room
+        const quizObject = await triviaQuizManager.createMultiplayerGame(queueElement, roomId)
+        if (quizObject === undefined) {
+            const errorObject = constructErrorResponse("Couldn't create new multiplayer game.");
+            socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
+            return;
+        }
+
+        // Send initial question to client upon creating a new game
+        const question = await quizObject.getNextQuestion();
+        if (!question) {
+            const errorObject = constructErrorResponse("Couldn't retrieve initial multiplayer question.");
+            socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
+            return;
+        }
+
+        const gameData = quizObject.getAllGameData(); // sending all game info, not only question
+        console.info(`Created multiplayer game for userIds '${queueElement.playerIds.join(", ")}'.`)
+        io.to(roomId).emit(EVENTS.NEW_MULTIPLAYER_GAME, constructDataResponse(gameData));
     })
 
 
@@ -163,6 +212,8 @@ module.exports = (socket, io) => {
         const gameId = body?.gameId;
         const answer = body?.answer;
         const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
+        const roomId = body?.roomId; // only used if multiplayer
+        let isMultiplayerGame = false;
 
         if (!gameId || !answer || !playerId) {
             const errorObject = constructErrorResponse("Request requires 'gameId', 'answer' and 'userId' parameters.");
@@ -177,6 +228,20 @@ module.exports = (socket, io) => {
             return;
         }
 
+        if (quizObject.players.length > 1) {
+            isMultiplayerGame = true;
+            if (!roomId) {
+                const errorObject = constructErrorResponse(`Trying to answer a multiplayer game without roomId parameter.`);
+                socket.emit(EVENTS.ANSWER_QUESTION, errorObject);
+                return;
+            }
+            if (!io.sockets.adapter.rooms.get(roomId)) {
+                const errorObject = constructErrorResponse(`roomId ${roomId} doesn't exist.`);
+                socket.emit(EVENTS.ANSWER_QUESTION, errorObject);
+                return;
+            }
+        }
+
         if(!quizObject.setPlayerAnswer(playerId, answer)) {
             const errorObject = constructErrorResponse(`Couldn't answer for gameId ${gameId} and playerId ${playerId}.`);
             socket.emit(EVENTS.ANSWER_QUESTION, errorObject);
@@ -185,23 +250,27 @@ module.exports = (socket, io) => {
 
         if (!quizObject.allPlayersAnswered()) {
             // You need to wait for other players to make an answer
+            console.info(`playerId ${playerId} is waiting for other players to answer a question in multiplayer game (roomId ${roomId})`);
             return;
         }
 
         // You are the final player to make an answer, emit roundResults to all players of the game.
-        // TODO For multiplayer, need to use socket rooms
         let gameData = quizObject.evaluateAnswers(); // sending all game info, not only answer results
 
         // Check if the game is complete
         if (gameData.gameInfo.gameComplete) {
             // If the game is complete, emit the 'game-complete' event. Note that game stats are already saved
             // in TriviaQuiz.#questionComplete() by calling quizObject.evaluateAnswers().
-            socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameData));
+            if (isMultiplayerGame) {
+                io.to(roomId).emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameData));
+            } else {
+                socket.emit(EVENTS.GAME_COMPLETE, constructDataResponse(gameData));
+            }
         } else {
             // If game not complete, get next question
             const question = await quizObject.getNextQuestion();
             if (!question) {
-                // No question. Client needs to call GET_NEXT_QUESTION event?!
+                // No question. Client needs to call GET_NEXT_QUESTION event?! (What about multiplayer)
             }
 
             // to preserve question answer details
@@ -215,18 +284,22 @@ module.exports = (socket, io) => {
             gameData["players"] = playerDataBackup;
         }
 
-        socket.emit(EVENTS.ANSWER_QUESTION, constructDataResponse(gameData));
+        if (isMultiplayerGame) {
+            io.to(roomId).emit(EVENTS.ANSWER_QUESTION, constructDataResponse(gameData));
+        } else {
+            socket.emit(EVENTS.ANSWER_QUESTION, constructDataResponse(gameData));
+        }
     });
 
 
-    // // TODO Comment with explanations
+    // TODO Comment with explanations
     socket.on(EVENTS.GET_GAME_OPTIONS, async () => {
         const categoryOptions = await getTriviaApiOptions();
         socket.emit(EVENTS.GET_GAME_OPTIONS, constructDataResponse(categoryOptions));
     });
 
 
-    // // TODO Comment with explanations
+    // TODO Comment with explanations
     socket.on(EVENTS.GET_GAME_INFO, async (body) => {
         const gameId = body?.gameId;
 
