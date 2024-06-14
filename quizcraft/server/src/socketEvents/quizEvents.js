@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const EVENTS = {
     NEW_SINGLE_PLAYER_GAME: "quiz-new-single-player-game",
     JOIN_MULTIPLAYER_QUEUE: "quiz-join-multiplayer-queue",
+    MULTIPLAYER_QUEUE_READY: "quiz-multiplayer-queue-ready", // To notify clients that queue is ready
     NEW_MULTIPLAYER_GAME: "quiz-new-multiplayer-game",
     GET_NEXT_QUESTION: "quiz-get-next-question",
     ANSWER_QUESTION: "quiz-answer-question",
@@ -16,7 +17,7 @@ const EVENTS = {
     GET_GAME_INFO: "quiz-get-game-info",
     GAME_COMPLETE: "quiz-game-complete", // For serving stats to client.
     GET_GAME_STATS: "quiz-get-game-stats",
-    GET_USER_GAMES: "quiz-get-user-games"
+    GET_USER_GAMES: "quiz-get-user-games",
 }
 
 // TODO: player IDs not implemented yet. Note: Is it possible to make socket-ids persistent?
@@ -79,7 +80,7 @@ module.exports = (socket, io) => {
     Note that joining the room doesn't start the multiplayer game.
      */
     socket.on(EVENTS.JOIN_MULTIPLAYER_QUEUE, async (body) => {
-        // TODO Technically, the same player can join queues multiple times
+        // TODO Technically, the same player can join multiple queues
         const gameMode = body?.gameMode;
         const category = body?.category;
         const difficulty = body?.difficulty;
@@ -102,19 +103,31 @@ module.exports = (socket, io) => {
 
         if (!roomId) {
             // You are the first player in the queue with your gameSettings -> Add new entry
+            // Wait for other player to join queue before calling
             console.info(`First to join multiplayer queue with gameSettings ${gameSettings}`);
             roomId = triviaQuizManager.insertRoomQueueElement(gameSettings, playerId);
+            socket.join(roomId);
+            socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, constructDataResponse({"roomId": roomId}));
+            return;
         } else {
             console.info(`Found matching player in queue with gameSettings ${gameSettings}`);
         }
+
+        const queueElement = triviaQuizManager.getQueueElement(roomId);
+        if (!queueElement.isRoomFull()) {
+            socket.join(roomId);
+            socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, constructDataResponse({"roomId": roomId}));
+            return;
+        }
+
 
         // Join room
         // TODO Edge case: What happens if player refreshes their browser? -> Need new event to join roomId and call it from client-side.
         //  Also, how to handle TriviaQuizManager.roomQueue in such a case?
         socket.join(roomId);
-
-        // You receive a response with a roomId which you send in future events so the server can emit to that room.
         socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, constructDataResponse({"roomId": roomId}));
+
+        io.to(roomId).emit(EVENTS.MULTIPLAYER_QUEUE_READY);
     });
 
 

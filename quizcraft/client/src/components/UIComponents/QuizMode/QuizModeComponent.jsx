@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/QuizModeComponentStyle.css";
 import he from 'he';
-import {getLocalStorageUser} from "../../../utils/LocalStorageHelper.js";
 import {useUser} from "../../../UserContext.jsx";
 
 function QuizModeComponent({ socket }) {
@@ -68,7 +67,6 @@ function QuizModeComponent({ socket }) {
         setSelectedAnswer(answer);
         setIsAnswered(true);
         updateButtonColors(answer, index);
-        // socket.emit("quiz-answer-question", { gameId, answer });
         socket.emit("quiz-answer-question", { gameId, answer, userId: user._id });
     };
 

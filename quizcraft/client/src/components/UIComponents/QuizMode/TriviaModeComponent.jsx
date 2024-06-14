@@ -4,6 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/QuizModeComponentStyle.css";
 import he from 'he';
+import MultiplayerSelector from "./GameOptions/SelectMultiplayerComponent.jsx";
+import {useUser} from "../../../UserContext.jsx";
+import {getLocalStorageRoomId, setLocalStorageRoomId} from "../../../utils/LocalStorageHelper.js";
 
 function TriviaModeComponent({ socket }) {
     const [question, setQuestion] = useState(null);
@@ -15,19 +18,49 @@ function TriviaModeComponent({ socket }) {
     const [gameId, setGameId] = useState(null);
     const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
     const navigate = useNavigate();
+    const {user} = useUser();
     const [buttonColors, setButtonColors] = useState(Array(answers.length).fill(''));
+    const [showMultiplayerSelector, setShowMultiplayerSelector] = useState(true);
+    const [isMultiplayer, setIsMultiplayer] = useState(null);
 
+
+    function setQuestionData(response) {
+        const { gameInfo, question } = response.data;
+        setGameId(gameInfo.gameId);
+        setQuestion(he.decode(question.question));
+        setAnswers(shuffleArray(question.answers));
+        setCorrectAnswer(question.correctAnswer);
+    }
 
     useEffect(() => {
-        socket.emit("quiz-new-single-player-game", { gameMode: "multiple" });
-
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
-                const { gameInfo, question } = response.data;
-                setGameId(gameInfo.gameId);
-                setQuestion(he.decode(question.question));
-                setAnswers(shuffleArray(question.answers));
-                setCorrectAnswer(question.correctAnswer);
+                setQuestionData(response)
+            }
+        });
+
+        socket.on("quiz-join-multiplayer-queue", (response) => {
+            console.log(`in quiz-join-multiplayer-queue.`);
+            if (response?.data?.roomId) {
+                setLocalStorageRoomId(response.data.roomId)
+            } else {
+                console.error(`response '${response}' or roomId '${response?.data?.roomId}' are undefined.`)
+            }
+        });
+
+        socket.on("quiz-multiplayer-queue-ready", () => {
+            const roomId = getLocalStorageRoomId();
+            if (!user._id || !roomId) {
+                console.error(`userId '${user._id}' or roomId '${roomId}' are undefined.`);
+                return;
+            }
+            const requestBody = {"userId": user._id, "roomId": roomId};
+            socket.emit("quiz-new-multiplayer-game", requestBody);
+        });
+
+        socket.on("quiz-new-multiplayer-game", (response) => {
+            if (response.data) {
+                setQuestionData(response)
             }
         });
 
@@ -36,7 +69,7 @@ function TriviaModeComponent({ socket }) {
                 const question = response.data.question;
                 const gameComplete = response.data.gameInfo.gameComplete;
                 const correctAnswer = question.correctAnswer;
-                const isCorrectAnswer = response.data.players[0].isCorrectAnswer; // TODO should access via playerId
+                const isCorrectAnswer = getIsPlayerAnswerCorrect(response);
 
                 setIsCorrectAnswer(isCorrectAnswer);
                 setCorrectAnswer(correctAnswer);
@@ -46,7 +79,7 @@ function TriviaModeComponent({ socket }) {
                     setTimeout(() => {
                         setButtonColors(Array(answers.length).fill(''));  // reset colors
                         navigate("/quizfinished", { state: {gameId: response.data.gameInfo.gameId}});
-                    }, 200); // wait 2 seconds before redirect
+                    }, 2000); // wait 2 seconds before redirect
                 } else {
                     setTimeout(() => {
                         setButtonColors(Array(answers.length).fill(''));  // reset colors
@@ -55,18 +88,57 @@ function TriviaModeComponent({ socket }) {
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");
-                    }, 200); // wait 2 seconds before showing the next question
+                    }, 2000); // wait 2 seconds before showing the next question
                 }
             }
         });
     }, [socket, navigate]);
+
+    const getIsPlayerAnswerCorrect = (response) => {
+        const playerId = user._id;
+        for (const player of response.data.players) {
+            if (player.id === playerId) {
+                return player.isCorrectAnswer;
+            }
+        }
+        return undefined;
+    }
+
+    const selectMultiplayer = (mode) => {
+        if (mode === "singlePlayer") {
+            setIsMultiplayer(false);
+            console.log("Starting single player game");
+            socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id});
+        } else if (mode === "multiplayer") {
+            setIsMultiplayer(true);
+            console.log(`User '${user._id}' is joining multiplayer queue.`);
+            socket.emit("quiz-join-multiplayer-queue", { gameMode: "multiple", userId: user._id});
+        } else {
+            console.error(`Invalid mode selected: '${mode}'`);
+            return;
+        }
+
+        setShowMultiplayerSelector(false);
+    };
+
 
     const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
         setSelectedAnswer(answer);
         setIsAnswered(true);
         updateButtonColors(answer, index);
-        socket.emit("quiz-answer-question", { gameId, answer });
+
+        const requestBody = { gameId, answer, userId: user._id }
+        if (isMultiplayer) {
+            const roomId = getLocalStorageRoomId();
+            if (!roomId) {
+                console.error("Trying to answer question in multiplayer game but no roomId was found.");
+                return;
+            }
+            requestBody["roomId"] = roomId;
+        }
+
+        socket.emit("quiz-answer-question", requestBody);
     };
 
 
@@ -94,7 +166,15 @@ function TriviaModeComponent({ socket }) {
 
     return (
         <div className="quiz-mode-container">
+
             <h1>Trivia Mode</h1>
+            {showMultiplayerSelector && (
+                <div>
+                    <h2>Select Mode</h2>
+                    <MultiplayerSelector onSelect={selectMultiplayer}/>
+                </div>
+            )}
+
             {question && (
                 <div className={"main-container"}>
                     <div className={"question-container"}>
@@ -106,12 +186,12 @@ function TriviaModeComponent({ socket }) {
                                 key={index}
                                 onClick={() => handleAnswerClick(answer, index)}
                                 disabled={isAnswered}
-                                style={{ backgroundColor: buttonColors[index] }}>
+                                style={{backgroundColor: buttonColors[index]}}>
                                 {answer}
                             </button>
                         ))}
                     </div>
-{/*                    {feedback && <div className="feedback-message">{feedback}</div>}*/}
+                    {/*                    {feedback && <div className="feedback-message">{feedback}</div>}*/}
                 </div>
             )}
         </div>
@@ -119,16 +199,6 @@ function TriviaModeComponent({ socket }) {
 }
 
 export default TriviaModeComponent;
-
-
-
-
-
-
-
-
-
-
 
 
 /*  OLD CODE
