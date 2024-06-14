@@ -613,7 +613,7 @@ Displays all game information about a game. This includes current and total roun
 ### quiz-game-complete
 This event is triggered when the game completes. It emits the final game statistics to all players involved in the game. The event is internally triggered within the `ANSWER_QUESTION` event.
 
-**Response:**
+**Response:** (outdated information)
 ```json
 {
   "gameStats": {
@@ -738,7 +738,7 @@ This event retrieves the statistics of a specific game by its game ID from the D
 }
 ```
 
-**Response:**
+**Response:** (outdated information)
 ```json
 {
   "gameId": "unique_game_id",
@@ -766,7 +766,7 @@ This event is used to fetch all games played by a specific user fro mthe db. It 
 }
 ```
 
-**Response:**
+**Response:** (potentially outdated information)
 ```json
 {
   "games": [
