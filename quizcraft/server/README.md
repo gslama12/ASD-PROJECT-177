@@ -241,7 +241,7 @@ the response simultaneously.
 }
 ```
 
-
+---
 
 #### `quiz-answer-question`
 
@@ -421,7 +421,6 @@ Sends an answer to a question. Only works if there is an active question.
     }
 }
 ```
-
 
 ---
 
