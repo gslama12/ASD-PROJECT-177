@@ -22,6 +22,8 @@ function Profile() {
                             <Dropdown.Divider />
                             <Dropdown.Item href="/profile">Profile</Dropdown.Item>
                             <Dropdown.Divider />
+                            <Dropdown.Item href="/stats">Stats</Dropdown.Item>
+                            <Dropdown.Divider />
                             <Dropdown.Item href="/login">Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>

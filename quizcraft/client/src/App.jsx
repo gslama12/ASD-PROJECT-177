@@ -12,6 +12,7 @@ import ChallengeModeComponent from "./components/UIComponents/QuizMode/Challenge
 import "../src/styles/LoginComponentStyle.css";
 import "./components/UIComponents/GenericStyles/CenteredHeader.css";
 import quizMeImage from '../src/assets/quiz_me.png';
+import StatsPage from "./components/UIComponents/StatsComponent/StatsPage.jsx";
 
 const WEBSOCKET_URL = "http://localhost:3001";
 
@@ -37,6 +38,7 @@ function App() {
                 <Route path='/quizmode' element={<QuizModeComponent socket={socket} />} />
                 <Route path='/triviamode' element={<TriviaModeComponent socket={socket} />} />
                 <Route path='/challengemode' element={<ChallengeModeComponent socket={socket} />} />
+                <Route path='/stats' element={<StatsPage socket={socket} />} />
             </Routes>
         </UserProvider>
     );
