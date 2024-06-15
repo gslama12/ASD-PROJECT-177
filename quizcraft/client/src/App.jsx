@@ -9,6 +9,7 @@ import QuizFinished from "./components/UIComponents/Home/QuizFinished.jsx";
 import QuizModeComponent from "./components/UIComponents/QuizMode/QuizModeComponent.jsx";
 import TriviaModeComponent from "./components/UIComponents/QuizMode/TriviaModeComponent.jsx";
 import ChallengeModeComponent from "./components/UIComponents/QuizMode/ChallengeModeComponent.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "../src/styles/LoginComponentStyle.css";
 import "./components/UIComponents/GenericStyles/CenteredHeader.css";
 import quizMeImage from '../src/assets/quiz_me.png';
@@ -30,13 +31,13 @@ function App() {
         <UserProvider>
             <Routes>
                 <Route path='/' element={<Navigate to="/login" />} />
-                <Route path='/home' element={<HomeComponent socket={socket} />} />
                 <Route path='/login' element={<LoginPage socket={socket} />} />
-                <Route path='/profile' element={<Profile />} />
-                <Route path='/quizfinished' element={<QuizFinished socket={socket} />} />
-                <Route path='/quizmode' element={<QuizModeComponent socket={socket} />} />
-                <Route path='/triviamode' element={<TriviaModeComponent socket={socket} />} />
-                <Route path='/challengemode' element={<ChallengeModeComponent socket={socket} />} />
+                <Route path='/home' element={<ProtectedRoute><HomeComponent socket={socket} /></ProtectedRoute>} />
+                <Route path='/profile' element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path='/quizfinished' element={<ProtectedRoute><QuizFinished socket={socket} /></ProtectedRoute>} />
+                <Route path='/quizmode' element={<ProtectedRoute><QuizModeComponent socket={socket} /></ProtectedRoute>} />
+                <Route path='/triviamode' element={<ProtectedRoute><TriviaModeComponent socket={socket} /></ProtectedRoute>} />
+                <Route path='/challengemode' element={<ProtectedRoute><ChallengeModeComponent socket={socket} /></ProtectedRoute>} />
             </Routes>
         </UserProvider>
     );
