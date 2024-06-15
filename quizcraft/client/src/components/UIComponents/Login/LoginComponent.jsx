@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../../UserContext";
 import "../../../styles/LoginComponentStyle.css";
 
 function LoginComponent({ socket }) {
     const navigate = useNavigate();
+    const { setUser } = useUser();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -131,6 +133,7 @@ function LoginComponent({ socket }) {
     useEffect(() => {
         socket.on("user-authenticated-response", (response) => {
             if (response.success) {
+                setUser(response.user);
                 navigate("/home");
             } else {
                 setAlertMessage(response.message);
@@ -140,6 +143,7 @@ function LoginComponent({ socket }) {
 
         socket.on("user-added-response", (response) => {
             if (response.success) {
+                setUser(response.user);
                 navigate("/home");
             } else {
                 setAlertMessage(response.message);
@@ -160,7 +164,7 @@ function LoginComponent({ socket }) {
             socket.off("user-added-response");
             socket.off("forgot-password-response");
         };
-    }, [navigate, socket]);
+    }, [navigate, socket, setUser]);
 
     const switchMode = () => {
         setIsLogin(!isLogin);

@@ -15,7 +15,7 @@ class TriviaQuiz {
 
         this.fetchedQuestions = undefined;
         this.activeQuestion = undefined;
-        this.players = undefined // Can be fully implemented once actual playerIds are passed.
+        this.players = undefined;
 
         this.gameComplete = false;
         this.numOfRounds = 10;
@@ -81,6 +81,12 @@ class TriviaQuiz {
         return this.activeQuestion;
     }
 
+    /**
+     * Sets player answer for a game.
+     * @param playerId {String}
+     * @param answer {String}
+     * @return {boolean}
+     */
     setPlayerAnswer(playerId, answer) {
         if (!answer || !this.activeQuestion || this.gameComplete) {
             return false;
@@ -92,10 +98,19 @@ class TriviaQuiz {
             return false;
         }
 
+        if (player.hasPlayerAnswered()) {
+            console.warn(`playerId ${playerId} already answered in quizId ${this.quizId}.`);
+            return false;
+        }
+
         player.setAnswer(answer);
         return true;
     }
 
+    /**
+     * @param playerId {String}
+     * @return {TriviaQuizPlayer | undefined}
+     */
     getQuizPlayer(playerId) {
         return this.players.find(player => player.id === playerId);
     }
@@ -305,9 +320,10 @@ class TriviaQuiz {
 
 
 async function triviaQuizFactory(gameMode, category, difficulty, playerIds) {
-    const quizSettings = new TriviaQuestionSettings(gameMode, category, difficulty);
-    // TODO ensure this works with new constructor
-    const triviaQuiz = new TriviaQuiz(null, quizSettings);
+    // Calling with undefined twice to work with new TriviaQuiz constructor.
+    // questionGenerator will be set to singleton class instance
+    // questionSettings is set via initGameSettings.
+    const triviaQuiz = new TriviaQuiz(undefined, undefined);
 
     const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty);
     if (!initSettingsSuccess) {
