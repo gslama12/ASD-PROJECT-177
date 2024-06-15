@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import { UserProvider, useUser } from "./UserContext";
 import LoginComponent from "./components/UIComponents/Login/LoginComponent.jsx";
@@ -44,7 +44,15 @@ function App() {
 }
 
 function LoginPage({ socket }) {
-    const { setUser } = useUser();
+    const { user, setUser } = useUser();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/home');
+        }
+    }, [user, navigate]);
+
     return (
         <div className="loginPageContainer">
             <div className="quoteContainer">
