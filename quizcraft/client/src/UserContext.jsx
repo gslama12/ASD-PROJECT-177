@@ -9,20 +9,24 @@ export const useUser = () => useContext(UserContext);
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
         const savedUser = getLocalStorageUser();
-        return savedUser ? savedUser : null;
+        if (savedUser) {
+            // Check if the user id is stored as .id or ._id and normalize it to ._id
+            if (savedUser.id && !savedUser._id) {
+                savedUser._id = savedUser.id;
+                delete savedUser.id;
+            }
+            return savedUser;
+        }
+        return null;
     });
 
     useEffect(() => {
         if (user) {
             const userLocalStorage = getLocalStorageUser();
-            if (!userLocalStorage?.id || user._id) {
+            if (!userLocalStorage?._id || user._id) {
                 setLocalStorageUser(user);
             }
         }
-        // Do we ever want to remove user data? Only if the user logs out?
-        // else {
-        //     localStorage.removeItem('user');
-        // }
     }, [user]);
 
     return (

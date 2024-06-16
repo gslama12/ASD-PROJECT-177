@@ -2,32 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from "../../../UserContext";
 import "../../../styles/HomeComponentStyle.css";
-import Dropdown from 'react-bootstrap/Dropdown';
-import profileIcon from '../../../assets/profile_icon.png';
 
 function HomeComponent({ socket }) {
     const { user } = useUser();
     return (
         <>
-            <div className="top-bar">
-                <div className="profile-icon-container">
-                    <Dropdown>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic" className="profile-dropdown-toggle">
-                            <img src={profileIcon} alt="Profile" className="profile-icon" />
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            <Dropdown.ItemText className="dropdown-username">{user ? user.username : "Guest"}</Dropdown.ItemText>
-                            <Dropdown.Divider />
-                            <Dropdown.Item href="/home">Home</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item href="/login">Logout</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>
-            </div>
             <div className="home-container">
                 <div className="mode-cards-container">
                     <div className="mode-card quiz-card">

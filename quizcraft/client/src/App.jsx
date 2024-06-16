@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import { UserProvider, useUser } from "./UserContext";
 import LoginComponent from "./components/UIComponents/Login/LoginComponent.jsx";
@@ -10,6 +10,7 @@ import QuizModeComponent from "./components/UIComponents/QuizMode/QuizModeCompon
 import TriviaModeComponent from "./components/UIComponents/QuizMode/TriviaModeComponent.jsx";
 import ChallengeModeComponent from "./components/UIComponents/QuizMode/ChallengeModeComponent.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Header from "./components/UIComponents/GenericStyles/Header";
 import "../src/styles/LoginComponentStyle.css";
 import "./components/UIComponents/GenericStyles/CenteredHeader.css";
 import quizMeImage from '../src/assets/quiz_me.png';
@@ -18,6 +19,7 @@ const WEBSOCKET_URL = "http://localhost:3001";
 
 function App() {
     const [socket, setSocket] = useState(null);
+    const location = useLocation();
 
     useEffect(() => {
         const newSocket = io(WEBSOCKET_URL);
@@ -27,8 +29,12 @@ function App() {
 
     if (!socket) return <div>Loading...</div>;
 
+    // if the header should be shown based on the current path
+    const showHeader = !['/login', '/quizmode', '/triviamode', '/challengemode'].includes(location.pathname);
+
     return (
         <UserProvider>
+            {showHeader && <Header />} {/* Conditionally render Header */}
             <Routes>
                 <Route path='/' element={<Navigate to="/login" />} />
                 <Route path='/login' element={<LoginPage socket={socket} />} />
