@@ -2,10 +2,16 @@ import React from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import profileIcon from '../../../assets/profile_icon.png';
 import { useUser } from '../../../UserContext';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Header() {
-    const { user } = useUser();
+    const { user, setUser } = useUser();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        setUser(null); // Clear the user context
+        navigate('/login'); // Redirect to login page
+    };
 
     // Warning!: href causes page reload, then the connection drops and a now socket is created. Use Link instead!
 
@@ -24,7 +30,7 @@ function Header() {
                         <Dropdown.Divider />
                         <Dropdown.Item as={Link} to="/profile">Profile</Dropdown.Item>
                         <Dropdown.Divider />
-                        <Dropdown.Item as={Link} to="/login">Logout</Dropdown.Item>
+                        <Dropdown.Item as="button" onClick={handleLogout}>Logout</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </div>
