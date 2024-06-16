@@ -28,10 +28,6 @@ function HomeComponent({ socket }) {
                         </Link>
                     </div>
                 </div>
-                <div className="start-host-container">
-                    <input type="text" className="host-input" placeholder="./trivialquiz/#sessionid/#playerid" />
-                    <button className="start-host-button">Start Host</button>
-                </div>
             </div>
         </>
     );
