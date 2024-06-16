@@ -2,9 +2,12 @@ import React from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import profileIcon from '../../../assets/profile_icon.png';
 import { useUser } from '../../../UserContext';
+import { Link } from 'react-router-dom';
 
 function Header() {
     const { user } = useUser();
+
+    // Warning!: href causes page reload, then the connection drops and a now socket is created. Use Link instead!
 
     return (
         <div className="top-bar">
@@ -17,11 +20,11 @@ function Header() {
                     <Dropdown.Menu>
                         <Dropdown.ItemText className="dropdown-username">{user ? user.username : "Guest"}</Dropdown.ItemText>
                         <Dropdown.Divider />
-                        <Dropdown.Item href="/home">Home</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/home">Home</Dropdown.Item>
                         <Dropdown.Divider />
-                        <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/profile">Profile</Dropdown.Item>
                         <Dropdown.Divider />
-                        <Dropdown.Item href="/login">Logout</Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/login">Logout</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </div>

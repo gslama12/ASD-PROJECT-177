@@ -10,7 +10,7 @@ import QuizModeComponent from "./components/UIComponents/QuizMode/QuizModeCompon
 import TriviaModeComponent from "./components/UIComponents/QuizMode/TriviaModeComponent.jsx";
 import ChallengeModeComponent from "./components/UIComponents/QuizMode/ChallengeModeComponent.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Header from "./components/UIComponents/GenericStyles/Header"; // Import the Header component
+import Header from "./components/UIComponents/GenericStyles/Header";
 import "../src/styles/LoginComponentStyle.css";
 import "./components/UIComponents/GenericStyles/CenteredHeader.css";
 import quizMeImage from '../src/assets/quiz_me.png';
@@ -29,12 +29,12 @@ function App() {
 
     if (!socket) return <div>Loading...</div>;
 
-    // Determine if the header should be shown based on the current path
+    // if the header should be shown based on the current path
     const showHeader = !['/login', '/quizmode', '/triviamode', '/challengemode'].includes(location.pathname);
 
     return (
         <UserProvider>
-            {showHeader && <Header />} {/* Conditionally render the Header */}
+            {showHeader && <Header />} {/* Conditionally render Header */}
             <Routes>
                 <Route path='/' element={<Navigate to="/login" />} />
                 <Route path='/login' element={<LoginPage socket={socket} />} />
