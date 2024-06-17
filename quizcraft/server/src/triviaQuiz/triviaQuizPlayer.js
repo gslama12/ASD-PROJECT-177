@@ -25,6 +25,10 @@ class TriviaQuizPlayer {
         return this.score;
     }
 
+    hasPlayerAnswered() {
+        return this.answer !== undefined;
+    }
+
 }
 
 module.exports = TriviaQuizPlayer;

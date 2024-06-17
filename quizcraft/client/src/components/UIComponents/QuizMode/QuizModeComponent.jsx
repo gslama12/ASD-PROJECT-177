@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/QuizModeComponentStyle.css";
 import he from 'he';
+import {useUser} from "../../../UserContext.jsx";
 
 function QuizModeComponent({ socket }) {
     const [question, setQuestion] = useState(null);
@@ -13,11 +14,12 @@ function QuizModeComponent({ socket }) {
     const [gameId, setGameId] = useState(null);
     const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
     const navigate = useNavigate();
+    const {user} = useUser();
     const [buttonColors, setButtonColors] = useState(Array(answers.length).fill(''));
 
 
     useEffect(() => {
-        socket.emit("quiz-new-single-player-game", { gameMode: "multiple" });
+        socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id});
 
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
@@ -65,7 +67,7 @@ function QuizModeComponent({ socket }) {
         setSelectedAnswer(answer);
         setIsAnswered(true);
         updateButtonColors(answer, index);
-        socket.emit("quiz-answer-question", { gameId, answer });
+        socket.emit("quiz-answer-question", { gameId, answer, userId: user._id });
     };
 
 
