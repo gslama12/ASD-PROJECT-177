@@ -45,7 +45,7 @@ function App() {
                 <Route path='/quizmode' element={<ProtectedRoute><QuizModeComponent socket={socket} /></ProtectedRoute>} />
                 <Route path='/triviamode' element={<ProtectedRoute><TriviaModeComponent socket={socket} /></ProtectedRoute>} />
                 <Route path='/challengemode' element={<ProtectedRoute><ChallengeModeComponent socket={socket} /></ProtectedRoute>} />
-                <Route path='/stats' element={<StatsPage socket={socket} />} />
+                <Route path='/stats' element={<ProtectedRoute><StatsPage socket={socket} /></ProtectedRoute>} />
             </Routes>
         </UserProvider>
     );

@@ -87,3 +87,42 @@
     background-color: #f8d7da;
     border-color: #f5c6cb;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-content {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .stats-header {
+        font-size: 2em; /* Smaller font size for mobile */
+    }
+
+    .game-result {
+        font-size: 0.9em; /* Smaller text for game results on mobile */
+    }
+
+    .game-history {
+        max-height: 50vh; /* Adjust to ensure it fits on mobile screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-content {
+        width: 80%;
+        padding: 5px;
+    }
+
+    .stats-header {
+        font-size: 1.5em; /* Smaller font size for smaller screens */
+    }
+
+    .game-result {
+        font-size: 0.8em; /* Smaller text for game results on small screens */
+    }
+
+    .game-history {
+        max-height: 40vh; /* Adjust to ensure it fits on small screens */
+    }
+}

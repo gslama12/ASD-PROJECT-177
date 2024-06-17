@@ -30,6 +30,8 @@ function Header() {
                         <Dropdown.Divider />
                         <Dropdown.Item as={Link} to="/profile">Profile</Dropdown.Item>
                         <Dropdown.Divider />
+                        <Dropdown.Item as={Link} to="/stats">Statistics</Dropdown.Item>
+                        <Dropdown.Divider />
                         <Dropdown.Item as="button" onClick={handleLogout}>Logout</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
