@@ -46,10 +46,10 @@ io.on('connection', (socket) => {
     socket.emit("user-added-response", result);
   })
 
-  /* socket.on("delete-user-from-db", async (data) => {
+  socket.on("delete-user-from-db", async (data) => {
     const result = await deleteUser(data.username);
     socket.emit("user-deleted-response", result);
-  }) */
+  })
 
   socket.on("authenticate-user", async (data) => {
     const result = await authenticateUser(data.username, data.password);

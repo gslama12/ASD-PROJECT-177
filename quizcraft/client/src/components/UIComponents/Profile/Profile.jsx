@@ -9,10 +9,11 @@ import { useNavigate, Link } from 'react-router-dom';
 function Profile({ socket }) {
     const { user, setUser } = useUser();
     const navigate = useNavigate();
+    const [username, setUsername] = useState("");
 
     const [profile, setProfile] = useState({
-        name: user.username,
-        id: user._id,
+        name: "",
+        id: "",
         email: "_not found_"
     });
 
@@ -25,6 +26,17 @@ function Profile({ socket }) {
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setUsername(user.username);
+            setProfile({
+                name: username,
+                id: user._id,
+                email: user.email || "_not found_"
+            });
+        }
+    }, [user, username]);
 
     const handleEditProfile = () => {
         setShowEditProfileModal(true);
@@ -61,13 +73,11 @@ function Profile({ socket }) {
 
         // socket.emit("delete-user-from-db", { username });
 
-        /*setTimeout(() => {
+        setTimeout(() => {
             setShowSuccessModal(false);
             setUser(null);
             navigate('/login');
-        }, 2000);*/
-        setUser(null);
-        navigate('/login');
+        }, 2000);
     };
 
     const handleCloseSuccessModal = () => {
