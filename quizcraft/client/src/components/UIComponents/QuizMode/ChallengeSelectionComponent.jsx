@@ -23,7 +23,7 @@ function ChallengeSelectionComponent() {
     return (
         <div className="challenge-selection-container">
             <h1>Select Your Challenge</h1>
-            <div className="mode-cards-container">
+            <div className="challenge-mode-cards-container">
                 {challenges.map((challenge, index) => (
                     <div key={index} className="mode-card-container">
                         <div className={`mode-card ${challenge.className}`} onClick={() => handleChallengeClick(challenge)}>

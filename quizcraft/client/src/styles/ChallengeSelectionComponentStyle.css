@@ -15,9 +15,9 @@
     font-family: Arial, sans-serif;
 }
 
-.mode-cards-container {
+.challenge-mode-cards-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
 }
 
@@ -45,11 +45,11 @@
 }
 
 .time-attack-card {
-    background-color: #ffeb3b;
+    background-color: lightskyblue;
 }
 
 .lives-challenge-card {
-    background-color: #f28b82;
+    background-color: lightgreen;
 }
 
 .time-control, .lives-control {
@@ -70,21 +70,19 @@
 }
 
 .lives-control button.selected {
-    background-color: #4CAF50;
+    background-color: lightslategray;
     color: white;
     border: 1px solid #ccc;
 }
 
 .lives-control button:hover {
-    background-color: #4CAF50;
+    background-color: lightslategray;
     color: white;
-    border: 1px solid #ccc;
 }
 
 .time-control button:hover {
-    background-color: #4CAF50;
+    background-color: lightslategray;
     color: white;
-    border: 1px solid #ccc;
 }
 
 .control-container {

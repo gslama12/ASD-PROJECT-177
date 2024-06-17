@@ -1,6 +1,4 @@
 import React from 'react';
-import Dropdown from 'react-bootstrap/Dropdown';
-import profileIcon from '../../../assets/profile_icon.png';
 import './ProfileStyles.css';
 import { useUser } from "../../../UserContext";
 
