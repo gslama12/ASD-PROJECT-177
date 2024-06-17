@@ -15,7 +15,7 @@ class TriviaQuiz {
 
         this.fetchedQuestions = undefined;
         this.activeQuestion = undefined;
-        this.players = undefined // Can be fully implemented once actual playerIds are passed.
+        this.players = undefined;
 
         this.gameComplete = false;
         this.numOfRounds = 10;
@@ -81,6 +81,12 @@ class TriviaQuiz {
         return this.activeQuestion;
     }
 
+    /**
+     * Sets player answer for a game.
+     * @param playerId {String}
+     * @param answer {String}
+     * @return {boolean}
+     */
     setPlayerAnswer(playerId, answer) {
         if (!answer || !this.activeQuestion || this.gameComplete) {
             return false;
@@ -92,10 +98,19 @@ class TriviaQuiz {
             return false;
         }
 
+        if (player.hasPlayerAnswered()) {
+            console.warn(`playerId ${playerId} already answered in quizId ${this.quizId}.`);
+            return false;
+        }
+
         player.setAnswer(answer);
         return true;
     }
 
+    /**
+     * @param playerId {String}
+     * @return {TriviaQuizPlayer | undefined}
+     */
     getQuizPlayer(playerId) {
         return this.players.find(player => player.id === playerId);
     }
@@ -123,7 +138,7 @@ class TriviaQuiz {
             this.questionAnswerHistory.push({
                 question: this.activeQuestion,
                 playerId: player.id,
-                answer: playerAnswer,
+                answer: player.answer,
                 isCorrect: isCorrectAnswer
             });
 
@@ -246,10 +261,32 @@ class TriviaQuiz {
      */
     async saveGameStats() {
         try {
+            // Set default values for difficulty and category if they don't exist TODO: HACK
+            const gameMode = this.questionSettings.difficulty || 'NOT_SPECIFIED';
+            const difficulty = this.questionSettings.difficulty || 'NOT_SPECIFIED';
+            const category = this.questionSettings.category || 'NOT_SPECIFIED';
+
+
+            // console.log("- - - STATS REPORT: - - -");
+            //     console.log('quizId:', this.quizId);
+            //     console.log('questionGenerator:', this.questionGenerator);
+            //     console.log('questionSettings:', this.questionSettings);
+            //     console.log('fetchedQuestions:', this.fetchedQuestions);
+            //     console.log('activeQuestion:', this.activeQuestion);
+            //     console.log('players:', this.players);
+            //     console.log('gameComplete:', this.gameComplete);
+            //     console.log('numOfRounds:', this.numOfRounds);
+            //     console.log('currentRound:', this.currentRound);
+            //     console.log('correctAnswers:', this.correctAnswers);
+            //     console.log('wrongAnswers:', this.wrongAnswers);
+            //     console.log('questionAnswerHistory:', this.questionAnswerHistory);
+            // console.log("- - - - - -");
+
+
             const gameData = new Game({
-                gameMode: this.questionSettings.gameMode,
-                difficulty: this.questionSettings.difficulty,
-                category: this.questionSettings.category,
+                gameMode: gameMode,
+                difficulty: difficulty,
+                category: category,
                 numOfRounds: this.numOfRounds
             });
             const savedGame = await gameData.save();
@@ -260,10 +297,14 @@ class TriviaQuiz {
                 const gameStats = new GameStats({
                     gameId: savedGame._id,
                     playerId: player.id,
-                    questionsAnsweredCorrectly: this.correctAnswers,
+                    questionsAnsweredCorrect: this.correctAnswers,
                     totalQuestions: this.numOfRounds,
-                    questionsAnsweredWrongly: this.wrongAnswers
+                    questionsAnsweredWrong: this.wrongAnswers
                 });
+
+                // console.log("GAME STATS");
+                // console.log(gameStats);
+
                 await gameStats.save();
                 gameStatsData.push(gameStats);
             }
@@ -279,7 +320,10 @@ class TriviaQuiz {
 
 
 async function triviaQuizFactory(gameMode, category, difficulty, playerIds) {
-    const triviaQuiz = new TriviaQuiz(gameMode, category, difficulty);
+    // Calling with undefined twice to work with new TriviaQuiz constructor.
+    // questionGenerator will be set to singleton class instance
+    // questionSettings is set via initGameSettings.
+    const triviaQuiz = new TriviaQuiz(undefined, undefined);
 
     const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty);
     if (!initSettingsSuccess) {

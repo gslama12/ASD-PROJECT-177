@@ -91,27 +91,13 @@ async function getActiveUserInfo(userId) {
     }
 }
 
-// Function to delete an existing user
-async function deleteUser(username) {
-    try {
-        // Check if user exists
-        let existingUser = await User.findOne({ username });
-        if (!existingUser) {
-            return { success: false, message: "User does not exist!" };
-        }
-        await existingUser.deleteOne();
-        console.log('User deleted successfully:', username);
-        return { success: true };
-    } catch (error) {
-        console.error('Error deleting user:', error.message);
-        return { success: false, message: error.message };
-    }
+async function getActiveUserId(userId) {
+    //TODO
 }
 
 module.exports = {
     addUser,
     authenticateUser,
     forgotPassword,
-    getActiveUserInfo,
-    deleteUser
+    getActiveUserInfo
 };

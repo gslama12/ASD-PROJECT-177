@@ -3,7 +3,8 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser, authenticateUser, forgotPassword, getActiveUserInfo, deleteUser} = require("./controllers/userController");
+const {addUser, authenticateUser, forgotPassword, getActiveUserInfo} = require("./controllers/userController");
+const {constructDataResponse, constructErrorResponse} = require("./socketEvents/messageHelper");
 
 
 const app = express();
@@ -26,6 +27,10 @@ const io = new Server(server, {
   },
 });
 
+
+// USER MANAGEMENT
+let clientUserMapping = {}  // map socket ID to user Id
+
 server.listen(PORT, () => {
   console.log(`Socket.io server is listening on ${PORT}.`);
 });
@@ -35,11 +40,17 @@ io.on('connection', (socket) => {
 
   socket.on("add-user-to-db", async (data) => {
     const result = await addUser(data.username, data.email, data.password);
+    if (result.success) {
+      clientUserMapping[socket.id] = result.user._id;
+    }
     socket.emit("user-added-response", result);
   })
 
   socket.on("authenticate-user", async (data) => {
     const result = await authenticateUser(data.username, data.password);
+    if (result.success) {
+      clientUserMapping[socket.id] = result.user._id;
+    }
     socket.emit("user-authenticated-response", result);
   });
 
@@ -48,15 +59,22 @@ io.on('connection', (socket) => {
     socket.emit("forgot-password-response", result);
   });
 
-  socket.on("get-active-user-info", async (data) => {
-    const result = await getActiveUserInfo(data.userId);
-    socket.emit("active-user-info-response", result);
-  });
+  // unused:
+  // socket.on("get-active-user-info", async () => {
+  //   const result = await getActiveUserInfo(clientUserMapping[socket.id]);
+  //   if (result.success) {
+  //     socket.emit("get-active-user-info", constructDataResponse(result));
+  //   }
+  //   else {
+  //     socket.emit("get-active-user-info", constructErrorResponse("Could not find current user"));
+  //   }
+  // });
 
-  socket.on("delete-user-from-db", async (data) => {
-    const result = await deleteUser(data.username);
-    socket.emit("user-deleted-response", result);
-  })
+  socket.on('disconnect', () => {
+    delete clientUserMapping[socket.id];
+    console.log(`User disconnected ${socket.id}`);
+  });
 
   require("./socketEvents/quizEvents")(socket, io);
 })
+

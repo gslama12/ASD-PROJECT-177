@@ -1,46 +1,36 @@
-import NavBar from "../NavBar/NavBar.jsx";
-import Card from 'react-bootstrap/Card';
-import '../GenericStyles/CenteredHeader.css';
-import multipleChoiceImage from '../../../assets/mc.png';
-import trueFalseImage from '../../../assets/true_false.png';
+import React from 'react';
 import { Link } from 'react-router-dom';
-
+import { useUser } from "../../../UserContext";
+import "../../../styles/HomeComponentStyle.css";
 
 function HomeComponent({ socket }) {
+    const { user } = useUser();
     return (
         <>
-            <NavBar />
-            <br></br>
-            <br></br>
-            <h1 className="centered-header">Choose your Game-Mode</h1>
-            <br></br>
-            <br></br>
-            <div className="d-flex justify-content-around">
-                <Card style={{ width: '36rem' }}>
-                    <Link to="/quizfinished">  {/* TODO: change Link to redirect to quiz mode */}
-                        <Card.Img variant="top" src={multipleChoiceImage} />
-                    </Link>
-                    <Card.Body>
-                        <Card.Title><h3>Multiple Choice</h3></Card.Title>
-                        <Card.Text>
-                            Choose the correct answer from a list of options
-                        </Card.Text>
-                    </Card.Body>
-                </Card>
-                <Card style={{ width: '36rem' }}>
-                    <Link to="/quizfinished">  {/* TODO: change Link to redirect to quiz mode */}
-                        <Card.Img variant="top" src={trueFalseImage} />
-                    </Link>
-                    <Card.Body>
-                        <Card.Title><h3>True or False</h3></Card.Title>
-                        <Card.Text>
-                            Choose whether a statement is true or false
-                        </Card.Text>
-                    </Card.Body>
-                </Card>
+            <div className="home-container">
+                <div className="mode-cards-container">
+                    <div className="mode-card quiz-card">
+                        <Link to="/quizmode" className="mode-link">
+                            <h2>Quiz</h2>
+                            <p>Try your knowledge in various topics!</p>
+                        </Link>
+                    </div>
+                    <div className="mode-card trivia-card">
+                        <Link to="/triviamode" className="mode-link">
+                            <h2>Trivia</h2>
+                            <p>Go full on trivia mode and reach highscores!</p>
+                        </Link>
+                    </div>
+                    <div className="mode-card challenges-card">
+                        <Link to="/challengemode" className="mode-link">
+                            <h2>Challenges</h2>
+                            <p>Test your skills with our weekly challenges!</p>
+                        </Link>
+                    </div>
+                </div>
             </div>
         </>
-    )
+    );
 }
 
 export default HomeComponent;
