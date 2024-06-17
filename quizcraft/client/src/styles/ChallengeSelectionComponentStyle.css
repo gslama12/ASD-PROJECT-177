@@ -1,0 +1,95 @@
+.challenge-selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(circle at 50% 0, rgba(255, 50, 0, .5), rgba(255, 50, 0, 0) 70.71%),
+    radial-gradient(circle at 6.7% 75%, rgba(0, 50, 255, .5), rgba(0, 50, 255, 0) 70.71%),
+    radial-gradient(circle at 93.3% 75%, rgba(0, 255, 50, .5), rgba(0, 255, 50, 0) 70.71%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    padding: 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.mode-cards-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mode-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.mode-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    width: 300px;
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.mode-card:hover {
+    transform: scale(1.05);
+}
+
+.time-attack-card {
+    background-color: #ffeb3b;
+}
+
+.lives-challenge-card {
+    background-color: #f28b82;
+}
+
+.time-control, .lives-control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.time-control button, .lives-control button {
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 5px;
+    padding: 7px;
+    border-radius: 25px;
+    border: none;
+}
+
+.lives-control button.selected {
+    background-color: #4CAF50;
+    color: white;
+    border: 1px solid #ccc;
+}
+
+.lives-control button:hover {
+    background-color: #4CAF50;
+    color: white;
+    border: 1px solid #ccc;
+}
+
+.time-control button:hover {
+    background-color: #4CAF50;
+    color: white;
+    border: 1px solid #ccc;
+}
+
+.control-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
