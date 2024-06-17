@@ -31,6 +31,23 @@ async function addUser(username, email, password) {
     }
 }
 
+/*// Function to delete an existing user
+async function deleteUser(username) {
+    try {
+        // Check if user exists
+        let existingUser = await User.findOne({ username });
+        if (!existingUser) {
+            return { success: false, message: "User does not exist!" };
+        }
+        await existingUser.deleteOne();
+        console.log('User deleted successfully:', username);
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting user:', error.message);
+        return { success: false, message: error.message };
+    }
+}*/
+
 // Function to authenticate a user (login)
 async function authenticateUser(username, password) {
     try {
@@ -97,6 +114,7 @@ async function getActiveUserId(userId) {
 
 module.exports = {
     addUser,
+    // deleteUser,
     authenticateUser,
     forgotPassword,
     getActiveUserInfo

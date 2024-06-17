@@ -39,7 +39,7 @@ function App() {
                 <Route path='/' element={<Navigate to="/login" />} />
                 <Route path='/login' element={<LoginPage socket={socket} />} />
                 <Route path='/home' element={<ProtectedRoute><HomeComponent socket={socket} /></ProtectedRoute>} />
-                <Route path='/profile' element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path='/profile' element={<ProtectedRoute><Profile socket={socket} /></ProtectedRoute>} />
                 <Route path='/quizfinished' element={<ProtectedRoute><QuizFinished socket={socket} /></ProtectedRoute>} />
                 <Route path='/quizmode' element={<ProtectedRoute><QuizModeComponent socket={socket} /></ProtectedRoute>} />
                 <Route path='/triviamode' element={<ProtectedRoute><TriviaModeComponent socket={socket} /></ProtectedRoute>} />
