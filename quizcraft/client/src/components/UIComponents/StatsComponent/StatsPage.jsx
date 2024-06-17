@@ -6,11 +6,11 @@ const mockStats = [
     {
         questionsAnsweredCorrect: 7,
         questionsAnsweredWrong: 3,
-        gameMode: "multiple",
+        gameMode: "standard",
         difficulty: "easy",
         category: "Science",
         numOfRounds: 10,
-        createdAt: new Date()
+        createdAt: new Date(),
     },
     {
         questionsAnsweredCorrect: 5,
@@ -19,7 +19,7 @@ const mockStats = [
         difficulty: "medium",
         category: "General Knowledge",
         numOfRounds: 10,
-        createdAt: new Date()
+        createdAt: new Date(),
     },
 ];
 
@@ -41,9 +41,9 @@ const StatsPage = ({ socket }) => {
                     console.log("Found Game data to display");
                     const userGames = response.data.userGames.map(game => ({
                         ...game,
-                        gameMode: game.gameId.gameMode === 'NOT_SPECIFIED' ? 'Trivia' : game.gameId.gameMode,
-                        difficulty: game.gameId.difficulty === 'NOT_SPECIFIED' ? 'Trivia' : game.gameId.difficulty,
-                        category: game.gameId.category === 'NOT_SPECIFIED' ? 'Trivia' : game.gameId.category,
+                        gameMode: game.gameId.gameMode,
+                        difficulty: game.gameId.difficulty,
+                        category: game.gameId.category,
                         numOfRounds: game.gameId.numOfRounds,
                         createdAt: game.gameId.createdAt,
                     }));
@@ -78,10 +78,18 @@ const StatsPage = ({ socket }) => {
         return <div>No stats available.</div>;
     }
 
-    const totalGames = stats.length;
-    const totalWins = stats.filter(game => game.questionsAnsweredCorrect > game.questionsAnsweredWrong).length;
-    const totalLosses = totalGames - totalWins;
-    const winRatio = totalGames ? ((totalWins / totalGames) * 100).toFixed(2) : 0;
+    const singlePlayerStats = stats.filter(game => game.type === 'standard');
+    const multiplayerStats = stats.filter(game => game.type === 'multiple');
+
+    const totalSinglePlayerGames = singlePlayerStats.length;
+    const totalCorrectAnswers = singlePlayerStats.reduce((sum, game) => sum + game.questionsAnsweredCorrect, 0);
+    const totalWrongAnswers = singlePlayerStats.reduce((sum, game) => sum + game.questionsAnsweredWrong, 0);
+    const correctWrongRatio = totalCorrectAnswers + totalWrongAnswers ? ((totalCorrectAnswers / (totalCorrectAnswers + totalWrongAnswers)) * 100).toFixed(2) : 0;
+
+    const totalMultiplayerGames = multiplayerStats.length;
+    const totalWins = multiplayerStats.filter(game => game.questionsAnsweredCorrect > game.questionsAnsweredWrong).length;
+    const totalLosses = totalMultiplayerGames - totalWins;
+    const winLossRatio = totalMultiplayerGames ? ((totalWins / totalMultiplayerGames) * 100).toFixed(2) : 0;
 
     console.log("Rendering stats");
 
@@ -90,11 +98,21 @@ const StatsPage = ({ socket }) => {
             <div className="stats-page">
                 <h1 className="stats-header">Your Statistics</h1>
                 <div className="stats-content">
-                    <div className="stats-summary">
-                        <p>Played Games: {totalGames}</p>
-                        <p>Won Games: {totalWins}</p>
-                        <p>Lost Games: {totalLosses}</p>
-                        <p>Win Ratio: {winRatio}%</p>
+                    <div className="stats-summary-container">
+                        <div className="stats-summary">
+                            <h2>Single-Player</h2>
+                            <p>Played Games: {totalSinglePlayerGames}</p>
+                            <p>Correct Answers: {totalCorrectAnswers}</p>
+                            <p>Wrong Answers: {totalWrongAnswers}</p>
+                            <p>Ratio: {correctWrongRatio}%</p>
+                        </div>
+                        <div className="stats-summary">
+                            <h2>Multiplayer</h2>
+                            <p>Played Games: {totalMultiplayerGames}</p>
+                            <p>Won Games: {totalWins}</p>
+                            <p>Lost Games: {totalLosses}</p>
+                            <p>Win/Loss Ratio: {winLossRatio}%</p>
+                        </div>
                     </div>
                     <h2 className="history-header">History of Last 10 Games</h2>
                     <div className="game-history">
@@ -106,7 +124,9 @@ const StatsPage = ({ socket }) => {
                                 <p>Difficulty: {game.difficulty}</p>
                                 <p>Questions Correct: {game.questionsAnsweredCorrect}</p>
                                 <p>Questions Wrong: {game.questionsAnsweredWrong}</p>
-                                <p>Result: {game.questionsAnsweredCorrect > game.questionsAnsweredWrong ? 'Win' : 'Lose'}</p>
+                                {game.type === 'multiplayer' && (
+                                    <p>Result: {game.questionsAnsweredCorrect > game.questionsAnsweredWrong ? 'Win' : 'Lose'}</p>
+                                )}
                             </div>
                         ))}
                     </div>

@@ -13,47 +13,31 @@
     padding-top: 1em;
 }
 
-.top-bar {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px;
-}
-
-.profile-icon-container {
-    position: relative;
-}
-
-.profile-dropdown-toggle {
-    background: none;
-    border: none;
-}
-
-.profile-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-
 .stats-content {
     width: 80%;
     max-width: 800px;
-    max-height: 80%; /* Adjust this value to leave some space at the bottom */
+    max-height: 80%;
     background: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 10px;
     color: black;
-    overflow: hidden; /* To prevent content from overflowing */
+    overflow: hidden;
 }
 
 .stats-header {
     text-align: center;
-    font-size: 3em; /* Adjust this value to make the header bigger or smaller */
+    font-size: 3em;
     padding-bottom: 1em;
 }
 
-.stats-summary {
+.stats-summary-container {
+    display: flex;
+    justify-content: space-around;
     margin-bottom: 20px;
+}
+
+.stats-summary {
+    width: 45%;
 }
 
 .history-header {
@@ -64,7 +48,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-height: 700px; /* Adjust this value as needed */
+    max-height: 700px;
     overflow-y: auto;
 }
 
@@ -88,7 +72,6 @@
     border-color: #f5c6cb;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .stats-content {
         width: 90%;
@@ -96,15 +79,20 @@
     }
 
     .stats-header {
-        font-size: 2em; /* Smaller font size for mobile */
+        font-size: 2em;
+    }
+
+    .stats-summary {
+        width: 100%;
+        margin-bottom: 20px;
     }
 
     .game-result {
-        font-size: 0.9em; /* Smaller text for game results on mobile */
+        font-size: 0.9em;
     }
 
     .game-history {
-        max-height: 50vh; /* Adjust to ensure it fits on mobile screens */
+        max-height: 50vh;
     }
 }
 
@@ -115,14 +103,14 @@
     }
 
     .stats-header {
-        font-size: 1.5em; /* Smaller font size for smaller screens */
+        font-size: 1.5em;
     }
 
     .game-result {
-        font-size: 0.8em; /* Smaller text for game results on small screens */
+        font-size: 0.8em;
     }
 
     .game-history {
-        max-height: 40vh; /* Adjust to ensure it fits on small screens */
+        max-height: 40vh;
     }
 }
