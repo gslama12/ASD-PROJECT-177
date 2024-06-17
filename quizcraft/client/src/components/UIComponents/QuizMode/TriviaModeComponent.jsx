@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/QuizModeComponentStyle.css";
 import he from 'he';
-import MultiplayerSelector from "./GameOptions/SelectMultiplayerComponent.jsx";
+import TriviaSelector from "./TriviaSelector.jsx";
 import {useUser} from "../../../UserContext.jsx";
 import {getLocalStorageRoomId, setLocalStorageRoomId} from "../../../utils/LocalStorageHelper.js";
 
@@ -20,7 +20,7 @@ function TriviaModeComponent({ socket }) {
     const navigate = useNavigate();
     const {user} = useUser();
     const [buttonColors, setButtonColors] = useState(Array(answers.length).fill(''));
-    const [showMultiplayerSelector, setShowMultiplayerSelector] = useState(true);
+    const [showTriviaSelector, setShowTriviaSelector] = useState(true);
     const [isMultiplayer, setIsMultiplayer] = useState(null);
 
 
@@ -118,7 +118,7 @@ function TriviaModeComponent({ socket }) {
             return;
         }
 
-        setShowMultiplayerSelector(false);
+        setShowTriviaSelector(false);
     };
 
 
@@ -168,10 +168,9 @@ function TriviaModeComponent({ socket }) {
         <div className="quiz-mode-container">
 
             <h1>Trivia Mode</h1>
-            {showMultiplayerSelector && (
+            {showTriviaSelector && (
                 <div>
-                    <h2>Select Mode</h2>
-                    <MultiplayerSelector onSelect={selectMultiplayer}/>
+                    <TriviaSelector onSelect={selectMultiplayer}/>
                 </div>
             )}
 
