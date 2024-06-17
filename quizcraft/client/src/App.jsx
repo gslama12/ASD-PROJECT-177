@@ -15,6 +15,7 @@ import "../src/styles/LoginComponentStyle.css";
 import "./components/UIComponents/GenericStyles/CenteredHeader.css";
 import quizMeImage from '../src/assets/quiz_me.png';
 import StatsPage from "./components/UIComponents/StatsComponent/StatsPage.jsx";
+import ChallengeSelectionComponent from "./components/UIComponents/QuizMode/ChallengeSelectionComponent.jsx";
 
 const WEBSOCKET_URL = "http://localhost:3001";
 
@@ -44,7 +45,8 @@ function App() {
                 <Route path='/quizfinished' element={<ProtectedRoute><QuizFinished socket={socket} /></ProtectedRoute>} />
                 <Route path='/quizmode' element={<ProtectedRoute><QuizModeComponent socket={socket} /></ProtectedRoute>} />
                 <Route path='/triviamode' element={<ProtectedRoute><TriviaModeComponent socket={socket} /></ProtectedRoute>} />
-                <Route path='/challengemode' element={<ProtectedRoute><ChallengeModeComponent socket={socket} /></ProtectedRoute>} />
+                <Route path='/challengemode' element={<ProtectedRoute><ChallengeSelectionComponent socket={socket} /></ProtectedRoute>} />
+                <Route path="/challenge/:challengeType" element={<ProtectedRoute><ChallengeModeComponent socket={socket}/></ProtectedRoute>} />
                 <Route path='/stats' element={<ProtectedRoute><StatsPage socket={socket} /></ProtectedRoute>} />
             </Routes>
         </UserProvider>

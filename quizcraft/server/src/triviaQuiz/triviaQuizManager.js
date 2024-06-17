@@ -23,17 +23,18 @@ class TriviaQuizManager {
      * @param playerId {String}
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
-    async createSinglePlayerGame(gameMode, category, difficulty, playerId) {
-        return await this.createQuizObject(gameMode, category, difficulty, [playerId])
+    async createSinglePlayerGame(gameMode, category, difficulty, playerId, rounds) {
+        return await this.createQuizObject(gameMode, category, difficulty, [playerId], rounds)
     }
 
     /**
      * Creates a multiplayer game using the configuration defined in queueElement.
      * @param queueElement {TriviaQuizQueueElement}
      * @param roomId {String}
+     * @param rounds
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
-    async createMultiplayerGame(queueElement, roomId) {
+    async createMultiplayerGame(queueElement, roomId, rounds) {
         if (!queueElement || !queueElement?.gameSettings) {
             console.warn("queueElement or queueElement.gameSettings are undefined.")
             return undefined;
@@ -44,7 +45,7 @@ class TriviaQuizManager {
         const difficulty = queueElement.gameSettings.difficulty;
         const playerIds = queueElement.playerIds;
 
-        const quizObject =  await this.createQuizObject(gameMode, category, difficulty, playerIds);
+        const quizObject =  await this.createQuizObject(gameMode, category, difficulty, playerIds, rounds);
         if (!quizObject) {
             return undefined;
         }
@@ -53,9 +54,9 @@ class TriviaQuizManager {
         return quizObject;
     }
 
-    async createQuizObject(gameMode, category, difficulty, playerIds){
+    async createQuizObject(gameMode, category, difficulty, playerIds, rounds){
         try {
-            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, playerIds);
+            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds);
             if (triviaQuiz === undefined) {
                 console.error("Couldn't create quiz.")
                 return undefined;
