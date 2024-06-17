@@ -1,20 +1,20 @@
-import Header from "../GenericStyles/Header.jsx";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import '../../../styles/Profile.css';
 import { useState, useEffect } from "react";
+import { useUser } from '../../../UserContext';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Profile({ socket }) {
-    const [profile, setProfile] = useState({
-        name: "Max Mustermann",
-        age: 22,
-        job: "Student",
-        email: "max.mustermann@gmail.com"
-    });
+    const { user, setUser } = useUser();
+    const navigate = useNavigate();
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [profile, setProfile] = useState({
+        name: user.username,
+        id: user._id,
+        email: "_not found_"
+    });
 
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -61,10 +61,13 @@ function Profile({ socket }) {
 
         // socket.emit("delete-user-from-db", { username });
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             setShowSuccessModal(false);
-            window.location.href = "/login";
-        }, 2000);
+            setUser(null);
+            navigate('/login');
+        }, 2000);*/
+        setUser(null);
+        navigate('/login');
     };
 
     const handleCloseSuccessModal = () => {
@@ -120,21 +123,18 @@ function Profile({ socket }) {
     };
 
     return (
-        <div className="profile">
-            <Header />
-            <div className="header-container">
-                <h1> Profile </h1>
-            </div>
+        <div className="profile-page">
             <div className="profile-container">
-                <p> Name: {profile.name} </p>
-                <p> Age: {profile.age} </p>
-                <p> Job: {profile.job} </p>
+                <h1> Profile </h1>
+                <p> Username: {profile.name} </p>
+                <p> ID: {profile.id} </p>
                 <p> E-Mail: {profile.email} </p>
-            </div>
-            <div className="button-container">
-                <Button variant="secondary" className="custom-profile-button" onClick={handleEditProfile}> Edit Profile </Button>
-                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change Password </Button>
-                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </Button>
+                <Button variant="secondary" className="custom-profile-button" onClick={handleEditProfile}> Edit
+                    Profile </Button>
+                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change
+                    Password </Button>
+                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete
+                    Profile </Button>
             </div>
             <Modal show={showEditProfileModal} onHide={handleCloseEditProfileModal} centered>
                 <Modal.Header closeButton>
@@ -148,26 +148,6 @@ function Profile({ socket }) {
                                 type="text"
                                 name="name"
                                 value={profile.name}
-                                onChange={handleProfileChange}
-                            />
-                            <br/>
-                        </Form.Group>
-                        <Form.Group controlId="formAge">
-                            <Form.Label>Age</Form.Label>
-                            <Form.Control
-                                type="number"
-                                name="age"
-                                value={profile.age}
-                                onChange={handleProfileChange}
-                            />
-                            <br/>
-                        </Form.Group>
-                        <Form.Group controlId="formJob">
-                            <Form.Label>Job</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="job"
-                                value={profile.job}
                                 onChange={handleProfileChange}
                             />
                             <br/>
@@ -226,7 +206,7 @@ function Profile({ socket }) {
                                 value={oldPassword}
                                 onChange={(e) => setOldPassword(e.target.value)}
                             />
-                            <br />
+                            <br/>
                         </Form.Group>
                         <Form.Group controlId="formNewPassword">
                             <Form.Label>New Password</Form.Label>
@@ -236,7 +216,7 @@ function Profile({ socket }) {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                             />
-                            <br />
+                            <br/>
                         </Form.Group>
                         <Form.Group controlId="formConfirmNewPassword">
                             <Form.Label>Confirm New Password</Form.Label>

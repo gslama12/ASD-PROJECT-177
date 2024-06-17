@@ -1,22 +1,10 @@
-.header-container {
-    text-align: center;
-    margin: 50px auto;
-}
+.profile-page {
 
-.header-container h1 {
-    font-size: 3em;
 }
 
 .profile-container {
     font-size: 1em;
     text-align: center;
-}
-
-.button-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 25px;
 }
 
 .custom-password-button {
