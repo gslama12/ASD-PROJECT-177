@@ -22,6 +22,7 @@ function TriviaModeComponent({ socket }) {
     const [buttonColors, setButtonColors] = useState(Array(answers.length).fill(''));
     const [showTriviaSelector, setShowTriviaSelector] = useState(true);
     const [isMultiplayer, setIsMultiplayer] = useState(null);
+    const [numRounds, setNumRounds] = useState(null);
 
     function setQuestionData(response) {
         const { gameInfo, question } = response.data;
@@ -31,6 +32,15 @@ function TriviaModeComponent({ socket }) {
         setCorrectAnswer(question.correctAnswer);
     }
 
+    // HACK: Save numRounds to localStorage whenever it changes
+    useEffect(() => {
+        if (numRounds !== null) {
+            localStorage.setItem("numRounds", numRounds.toString());
+        }
+    }, [numRounds]);
+
+
+
     useEffect(() => {
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
@@ -39,7 +49,6 @@ function TriviaModeComponent({ socket }) {
         });
 
         socket.on("quiz-join-multiplayer-queue", (response) => {
-            console.log(`in quiz-join-multiplayer-queue.`);
             if (response?.data?.roomId) {
                 setLocalStorageRoomId(response.data.roomId)
             } else {
@@ -53,7 +62,7 @@ function TriviaModeComponent({ socket }) {
                 console.error(`userId '${user._id}' or roomId '${roomId}' are undefined.`);
                 return;
             }
-            const requestBody = {"userId": user._id, "roomId": roomId};
+            const requestBody = {"userId": user._id, "roomId": roomId, "rounds": localStorage.getItem('numRounds')};
             socket.emit("quiz-new-multiplayer-game", requestBody);
         });
 
@@ -104,6 +113,7 @@ function TriviaModeComponent({ socket }) {
     }
 
     const setSettings = (settings) => {
+        setNumRounds(settings.rounds);
         if (settings.mode === "single-player") {
             setIsMultiplayer(false);
             console.log("Starting single player game");
@@ -111,7 +121,7 @@ function TriviaModeComponent({ socket }) {
         } else if (settings.mode === "multi-player") {
             setIsMultiplayer(true);
             console.log(`User '${user._id}' is joining multiplayer queue.`);
-            socket.emit("quiz-join-multiplayer-queue", { gameMode: "multiple", userId: user._id});
+            socket.emit("quiz-join-multiplayer-queue", { gameMode: "multiple", userId: user._id, rounds: settings.rounds});
         } else {
             console.error(`Invalid mode selected: '${settings.mode}'`);
             return;

@@ -31,9 +31,10 @@ class TriviaQuizManager {
      * Creates a multiplayer game using the configuration defined in queueElement.
      * @param queueElement {TriviaQuizQueueElement}
      * @param roomId {String}
+     * @param rounds
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
-    async createMultiplayerGame(queueElement, roomId) {
+    async createMultiplayerGame(queueElement, roomId, rounds) {
         if (!queueElement || !queueElement?.gameSettings) {
             console.warn("queueElement or queueElement.gameSettings are undefined.")
             return undefined;
@@ -44,7 +45,7 @@ class TriviaQuizManager {
         const difficulty = queueElement.gameSettings.difficulty;
         const playerIds = queueElement.playerIds;
 
-        const quizObject =  await this.createQuizObject(gameMode, category, difficulty, playerIds);
+        const quizObject =  await this.createQuizObject(gameMode, category, difficulty, playerIds, rounds);
         if (!quizObject) {
             return undefined;
         }
