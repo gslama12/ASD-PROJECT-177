@@ -13,10 +13,10 @@ function Profile() {
         email: "max.mustermann@gmail.com"
     });
 
-    // const [username, setUsername] = useState("");
-    // const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
-    /*const validateNewPassword = (password) => {
+    /*const validateProfilePassword = (password) => {
         const minLength = 8;
         const hasUpperCase = /[A-Z]/.test(password);
         const hasLowerCase = /[a-z]/.test(password);
@@ -29,21 +29,7 @@ function Profile() {
             hasNumber &&
             hasSpecialChar
         );
-    };
-
-        if (!password) {
-            errors.password = "Password cannot be empty";
-        }
-        if (!confirmPassword) {
-            errors.confirmPassword = "Confirm password cannot be empty";
-        }
-        if (password && confirmPassword && password !== confirmPassword) {
-            errors.password = "Passwords do not match";
-            errors.confirmPassword = "Passwords do not match";
-        }
-        if (password && !validatePassword(password)) {
-            errors.password = "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character";
-        }*/
+    };*/
 
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
