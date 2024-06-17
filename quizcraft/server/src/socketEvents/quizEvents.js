@@ -35,6 +35,7 @@ module.exports = (socket, io) => {
         const category = body?.category;
         const difficulty = body?.difficulty;
         const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
+        const rounds = body?.rounds;
 
         if (!gameMode || (gameMode !== "multiple" && gameMode !== "boolean")) {
             const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
@@ -48,8 +49,7 @@ module.exports = (socket, io) => {
             return;
         }
 
-
-        const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty, playerId)
+        const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty, playerId, rounds)
 
         if (quizObject === undefined) {
             const errorObject = constructErrorResponse("Couldn't create new game.");

@@ -27,8 +27,9 @@ class TriviaQuiz {
         this.questionAnswerHistory = []; // Tracks player answers for each question in detail.
     }
 
-    async initGameSettings(quizMode, category, difficulty) {
+    async initGameSettings(quizMode, category, difficulty, rounds) {
         // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
+        this.numOfRounds = rounds;
         const questionsPerRequest = this.numOfRounds;
 
         const apiSessionToken = await this.questionGenerator.getSessionToken();
@@ -319,13 +320,13 @@ class TriviaQuiz {
 }
 
 
-async function triviaQuizFactory(gameMode, category, difficulty, playerIds) {
+async function triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds) {
     // Calling with undefined twice to work with new TriviaQuiz constructor.
     // questionGenerator will be set to singleton class instance
     // questionSettings is set via initGameSettings.
     const triviaQuiz = new TriviaQuiz(undefined, undefined);
 
-    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty);
+    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty, rounds);
     if (!initSettingsSuccess) {
         return undefined;
     }

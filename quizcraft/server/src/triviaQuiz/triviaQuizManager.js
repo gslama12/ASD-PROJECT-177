@@ -23,8 +23,8 @@ class TriviaQuizManager {
      * @param playerId {String}
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
-    async createSinglePlayerGame(gameMode, category, difficulty, playerId) {
-        return await this.createQuizObject(gameMode, category, difficulty, [playerId])
+    async createSinglePlayerGame(gameMode, category, difficulty, playerId, rounds) {
+        return await this.createQuizObject(gameMode, category, difficulty, [playerId], rounds)
     }
 
     /**
@@ -53,9 +53,9 @@ class TriviaQuizManager {
         return quizObject;
     }
 
-    async createQuizObject(gameMode, category, difficulty, playerIds){
+    async createQuizObject(gameMode, category, difficulty, playerIds, rounds){
         try {
-            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, playerIds);
+            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds);
             if (triviaQuiz === undefined) {
                 console.error("Couldn't create quiz.")
                 return undefined;
