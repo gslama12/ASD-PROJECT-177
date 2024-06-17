@@ -28,7 +28,11 @@ function ChallengeSelectionComponent() {
                     <div key={index} className="mode-card-container">
                         <div className={`mode-card ${challenge.className}`} onClick={() => handleChallengeClick(challenge)}>
                             <h2>{challenge.name}</h2>
-                            <p>{challenge.description}</p>
+                            <p>
+                                {challenge.name === "Lives Challenge"
+                                    ? `You have ${lives} lives. Answer correctly to stay in the game!`
+                                    : challenge.description}
+                            </p>
                         </div>
                         {challenge.name === "Time Attack" && (
                             <div className="control-container">

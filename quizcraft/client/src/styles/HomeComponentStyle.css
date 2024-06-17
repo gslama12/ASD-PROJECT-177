@@ -117,3 +117,41 @@
     font-weight: bold;
     color: #000;
 }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .home-container {
+        padding: 10px;
+    }
+
+    .mode-cards-container {
+        flex-direction: column;
+    }
+
+    .mode-card {
+        width: 90%;
+        height: auto;
+        margin: 10px 0;
+    }
+
+    .mode-card h2 {
+        font-size: 1.2em;
+    }
+
+    .mode-card p {
+        font-size: 0.9em;
+    }
+
+    .top-bar {
+        padding: 5px 10px;
+    }
+
+    .profile-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .dropdown-username {
+        font-size: 14px;
+    }
+}
