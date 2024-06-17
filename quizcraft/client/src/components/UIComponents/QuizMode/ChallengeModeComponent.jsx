@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../../../styles/ChallengeModeComponentStyle.css";
+import he from 'he';
+import { useUser } from "../../../UserContext.jsx";
 
 function ChallengeModeComponent({ socket }) {
     const { challengeType } = useParams();
@@ -11,77 +13,145 @@ function ChallengeModeComponent({ socket }) {
     const [isAnswered, setIsAnswered] = useState(false);
     const [feedback, setFeedback] = useState("");
     const [correctAnswer, setCorrectAnswer] = useState(null);
+    const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
     const [gameId, setGameId] = useState(null);
+    const [lives, setLives] = useState(3);
     const navigate = useNavigate();
     const [challengeSettings, setChallengeSettings] = useState({});
+    const { user } = useUser();
+    const [buttonColors, setButtonColors] = useState(Array(answers.length).fill(''));
 
     useEffect(() => {
-        const settings = location.state || {};
+        const settings = location.state || { lives: 3 };
         setChallengeSettings(settings);
+        setLives(settings.lives);
 
-        const gameMode = challengeType === 'timeattack' ? 'time-attack' : 'lives-challenge';
-        socket.emit("challenge-new-game", { gameMode, ...settings });
+        const gameMode = challengeType === 'timeattack' ? 'multiple' : 'multiple';
+        socket.emit("quiz-new-single-player-game", { gameMode, userId: user._id });
 
-        socket.on("challenge-new-game", (response) => {
+        socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
                 const { gameInfo, question } = response.data;
                 setGameId(gameInfo.gameId);
-                setQuestion(question);
-                setAnswers(question.answers);
+                setQuestion(he.decode(question.question));
+                setAnswers(shuffleArray(question.answers));
+                setCorrectAnswer(question.correctAnswer);
             }
         });
 
-        socket.on("challenge-answer-question", (response) => {
+        socket.on("quiz-answer-question", (response) => {
             if (response.data) {
-                const { correctAnswer, isCorrect, question, gameComplete } = response.data;
+                const question = response.data.question;
+                const gameComplete = response.data.gameInfo.gameComplete;
+                const correctAnswer = question.correctAnswer;
+                const isCorrectAnswer = getIsPlayerAnswerCorrect(response);
+
+                setIsCorrectAnswer(isCorrectAnswer);
                 setCorrectAnswer(correctAnswer);
                 setIsAnswered(true);
-                setFeedback(isCorrect ? "Correct!" : "Wrong!");
+                setFeedback(isCorrectAnswer ? "Correct!" : "Wrong!");
+
+                if (!isCorrectAnswer) {
+                    setLives(prevLives => prevLives - 1);
+                }
+
                 if (gameComplete) {
-                    navigate("/challengefinished");
+                    setTimeout(() => {
+                        navigate("/quizfinished", { state: { gameId: response.data.gameInfo.gameId } });
+                    }, 2000);
                 } else {
                     setTimeout(() => {
-                        setQuestion(question);
-                        setAnswers(question.answers);
+                        setButtonColors(Array(answers.length).fill(''));  // reset colors
+                        setQuestion(he.decode(question.question));
+                        setAnswers(shuffleArray(question.answers));
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");
-                    }, 2000);
+                    }, 2000); // wait 2 seconds before showing the next question
                 }
             }
         });
 
-    }, [socket, navigate, challengeType, location.state]);
+    }, [socket, navigate, challengeType, location.state, user._id]);
 
-    const handleAnswerClick = (answer) => {
+    useEffect(() => {
+        if (lives <= 0) {
+            setTimeout(() => {
+                navigate("/quizfinished", { state: { gameId } });
+            }, 2000);
+        }
+    }, [lives, navigate, gameId]);
+
+    const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
         setSelectedAnswer(answer);
-        socket.emit("challenge-answer-question", { gameId, answer });
+        setIsAnswered(true);
+        updateButtonColors(answer, index);
+        socket.emit("quiz-answer-question", { gameId, answer, userId: user._id });
     };
+
+    const getIsPlayerAnswerCorrect = (response) => {
+        const playerId = user._id;
+        for (const player of response.data.players) {
+            if (player.id === playerId) {
+                return player.isCorrectAnswer;
+            }
+        }
+        return undefined;
+    }
+
+    const updateButtonColors = (answer, index) => {
+        const newColors = buttonColors.slice();
+        if (answer === correctAnswer) {
+            newColors[index] = 'rgb(58,218,4)';
+        } else {
+            newColors[index] = 'rgba(255, 42, 42, 1)';
+            const correctIndex = answers.indexOf(correctAnswer);
+            if (correctIndex !== -1) {
+                newColors[correctIndex] = 'rgba(119,255,110,0.34)';
+            }
+        }
+        setButtonColors(newColors);
+    };
+
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+        return array;
+    };
+
+    const renderLives = () => {
+        const hearts = [];
+        for (let i = 0; i < lives; i++) {
+            hearts.push(<span key={i} className="heart">❤️</span>);
+        }
+        return hearts;
+    }
 
     return (
         <div className="challenge-mode-container">
             <h1>{challengeType === 'timeattack' ? 'Time Attack' : 'Lives Challenge'}</h1>
-            {challengeType === 'timeattack' && <p>Time: {challengeSettings.time} seconds</p>}
-            {challengeType === 'liveschallenge' && <p>Lives: {challengeSettings.lives}</p>}
+            <p>Lives: {renderLives()}</p>
             {question && (
-                <>
-                    <h2>{question}</h2>
+                <div className={"main-container"}>
+                    <div className={"question-container"}>
+                        <h2>{question}</h2>
+                    </div>
                     <div className="answers-container">
                         {answers.map((answer, index) => (
                             <button
                                 key={index}
-                                className={`answer-button ${selectedAnswer === answer ? 'selected' : ''} 
-                                            ${isAnswered && answer === correctAnswer ? 'correct' : ''} 
-                                            ${isAnswered && selectedAnswer === answer && answer !== correctAnswer ? 'wrong' : ''}`}
-                                onClick={() => handleAnswerClick(answer)}
-                                disabled={isAnswered}>
+                                onClick={() => handleAnswerClick(answer, index)}
+                                disabled={isAnswered}
+                                style={{ backgroundColor: buttonColors[index] }}>
                                 {answer}
                             </button>
                         ))}
                     </div>
-                    {feedback && <div className="feedback-message">{feedback}</div>}
-                </>
+                    {/* feedback && <div className="feedback-message">{feedback}</div> */}
+                </div>
             )}
         </div>
     );
