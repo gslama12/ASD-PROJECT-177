@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../../../styles/ChallengeModeComponentStyle.css";
 
 function ChallengeModeComponent({ socket }) {
+    const { challengeType } = useParams();
+    const location = useLocation();
     const [question, setQuestion] = useState(null);
     const [answers, setAnswers] = useState([]);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -11,9 +13,14 @@ function ChallengeModeComponent({ socket }) {
     const [correctAnswer, setCorrectAnswer] = useState(null);
     const [gameId, setGameId] = useState(null);
     const navigate = useNavigate();
+    const [challengeSettings, setChallengeSettings] = useState({});
 
     useEffect(() => {
-        socket.emit("challenge-new-game", { gameMode: "multiple" });
+        const settings = location.state || {};
+        setChallengeSettings(settings);
+
+        const gameMode = challengeType === 'timeattack' ? 'time-attack' : 'lives-challenge';
+        socket.emit("challenge-new-game", { gameMode, ...settings });
 
         socket.on("challenge-new-game", (response) => {
             if (response.data) {
@@ -26,12 +33,12 @@ function ChallengeModeComponent({ socket }) {
 
         socket.on("challenge-answer-question", (response) => {
             if (response.data) {
-                const { correctAnswer , isCorrect, question, gameComplete } = response.data;
+                const { correctAnswer, isCorrect, question, gameComplete } = response.data;
                 setCorrectAnswer(correctAnswer);
                 setIsAnswered(true);
                 setFeedback(isCorrect ? "Correct!" : "Wrong!");
                 if (gameComplete) {
-                    navigate("./challengefinished");
+                    navigate("/challengefinished");
                 } else {
                     setTimeout(() => {
                         setQuestion(question);
@@ -44,7 +51,7 @@ function ChallengeModeComponent({ socket }) {
             }
         });
 
-    }, [socket, navigate]);
+    }, [socket, navigate, challengeType, location.state]);
 
     const handleAnswerClick = (answer) => {
         if (isAnswered) return;
@@ -54,7 +61,9 @@ function ChallengeModeComponent({ socket }) {
 
     return (
         <div className="challenge-mode-container">
-            <h1>Weekly Challenge</h1>
+            <h1>{challengeType === 'timeattack' ? 'Time Attack' : 'Lives Challenge'}</h1>
+            {challengeType === 'timeattack' && <p>Time: {challengeSettings.time} seconds</p>}
+            {challengeType === 'liveschallenge' && <p>Lives: {challengeSettings.lives}</p>}
             {question && (
                 <>
                     <h2>{question}</h2>
