@@ -156,7 +156,6 @@ class TriviaQuiz {
         this.#questionComplete();
         // needed since "gameComplete" is set in #questionComplete (kinda hacky)
         roundResults["gameInfo"] = this.#getGameInfo();
-
         return roundResults;
     }
 
@@ -251,7 +250,7 @@ class TriviaQuiz {
     }
 
     #updateGameFinished() {
-        if (this.currentRound === this.numOfRounds) {
+        if (this.currentRound === parseInt(this.numOfRounds)) {
             this.gameComplete = true;
         }
     }

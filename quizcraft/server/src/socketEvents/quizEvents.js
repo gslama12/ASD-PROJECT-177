@@ -221,7 +221,6 @@ module.exports = (socket, io) => {
 
     // TODO Comment with explanations
     socket.on(EVENTS.ANSWER_QUESTION, async (body) => {
-
         const gameId = body?.gameId;
         const answer = body?.answer;
         const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
