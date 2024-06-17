@@ -32,6 +32,9 @@ class TriviaQuizQueueElement {
             // Difficulty is not used (?)
             return false;
         }
+        else if (this.gameSettings.questionsPerRequest !== gameSettings?.questionsPerRequest) {
+            return false;
+        }
 
         return true;
     }

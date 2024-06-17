@@ -35,6 +35,7 @@ module.exports = (socket, io) => {
         const category = body?.category;
         const difficulty = body?.difficulty;
         const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
+        const rounds = body?.rounds;
 
         if (!gameMode || (gameMode !== "multiple" && gameMode !== "boolean")) {
             const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
@@ -48,8 +49,7 @@ module.exports = (socket, io) => {
             return;
         }
 
-
-        const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty, playerId)
+        const quizObject = await triviaQuizManager.createSinglePlayerGame(gameMode, category, difficulty, playerId, rounds)
 
         if (quizObject === undefined) {
             const errorObject = constructErrorResponse("Couldn't create new game.");
@@ -85,6 +85,7 @@ module.exports = (socket, io) => {
         const category = body?.category;
         const difficulty = body?.difficulty;
         const playerId = body?.userId;
+        const rounds = body?.rounds;
 
         if (!gameMode || (gameMode !== "multiple" && gameMode !== "boolean")) {
             const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
@@ -98,7 +99,9 @@ module.exports = (socket, io) => {
             return;
         }
 
-        const gameSettings = new TriviaQuestionSettings(gameMode, category, difficulty, undefined, undefined);
+        const gameSettings = new TriviaQuestionSettings(gameMode, category, difficulty, undefined, rounds);
+
+
         let roomId = triviaQuizManager.findMatchingPlayerInQueue(gameSettings, playerId);
 
         if (!roomId) {
@@ -140,6 +143,7 @@ module.exports = (socket, io) => {
     socket.on(EVENTS.NEW_MULTIPLAYER_GAME, async (body) => {
         const playerId = body?.userId;
         const roomId = body?.roomId;
+        const rounds = (body?.rounds) ? body.rounds : 10;  // default num rounds = 10
 
         if (!playerId || !roomId) {
             const errorObject = constructErrorResponse("Need playerId and roomId parameters.");
@@ -168,7 +172,7 @@ module.exports = (socket, io) => {
         }
 
         // You are the last player to join, create multiplayer game and inform all players of the room
-        const quizObject = await triviaQuizManager.createMultiplayerGame(queueElement, roomId)
+        const quizObject = await triviaQuizManager.createMultiplayerGame(queueElement, roomId, rounds)
         if (quizObject === undefined) {
             const errorObject = constructErrorResponse("Couldn't create new multiplayer game.");
             socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);
@@ -221,7 +225,6 @@ module.exports = (socket, io) => {
 
     // TODO Comment with explanations
     socket.on(EVENTS.ANSWER_QUESTION, async (body) => {
-
         const gameId = body?.gameId;
         const answer = body?.answer;
         const playerId = body?.userId; // insecure solution (should use JWT and verify with database)
