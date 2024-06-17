@@ -1,4 +1,4 @@
-import NavBar from './NavBar.jsx';
+import Header from "../GenericStyles/Header.jsx";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -15,21 +15,6 @@ function Profile({ socket }) {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
-    /*const validateProfilePassword = (password) => {
-        const minLength = 8;
-        const hasUpperCase = /[A-Z]/.test(password);
-        const hasLowerCase = /[a-z]/.test(password);
-        const hasNumber = /[0-9]/.test(password);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|\-<>_´=§/+]/.test(password);
-        return (
-            password.length >= minLength &&
-            hasUpperCase &&
-            hasLowerCase &&
-            hasNumber &&
-            hasSpecialChar
-        );
-    };*/
 
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -98,7 +83,28 @@ function Profile({ socket }) {
         setPasswordError('');
     };
 
+    const validateProfilePassword = (password) => {
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        const minLength = password.length >= 8;
+
+        if (!hasUpperCase) return "Password must contain at least one uppercase letter.";
+        if (!hasLowerCase) return "Password must contain at least one lowercase letter.";
+        if (!hasNumber) return "Password must contain at least one number.";
+        if (!hasSpecialChar) return "Password must contain at least one special character.";
+        if (!minLength) return "Password must be at least 8 characters long.";
+
+        return "";
+    };
+
     const handlePasswordSubmit = () => {
+        const passwordValidationError = validateProfilePassword(newPassword);
+        if (passwordValidationError) {
+            setPasswordError(passwordValidationError);
+            return;
+        }
         if (newPassword !== confirmNewPassword) {
             setPasswordError('New passwords do not match!');
             return;
@@ -115,7 +121,7 @@ function Profile({ socket }) {
 
     return (
         <div className="profile">
-            <NavBar />
+            <Header />
             <div className="header-container">
                 <h1> Profile </h1>
             </div>
