@@ -15,7 +15,8 @@ function Profile({ socket }) {
     const [profile, setProfile] = useState({
         name: "",
         id: "",
-        email: ""
+        email: "",
+        password: ""
     });
 
     const [showModal, setShowModal] = useState(false);
@@ -35,10 +36,30 @@ function Profile({ socket }) {
             setProfile({
                 name: username,
                 id: userid,
-                email: user.email || "place.holder@gmail.com"
+                email: user.email || "place.holder@gmail.com",
+                password: user.password || "placeholder#2024"
             });
         }
     }, [user, userid, username]);
+
+    useEffect(() => {
+        socket.on("user-deleted-response", (response) => {
+            if (response.success) {
+                setShowSuccessModal(true);
+                setTimeout(() => {
+                    setShowSuccessModal(false);
+                    setUser(null);
+                    navigate("/login");
+                }, 2000);
+            } else {
+                console.error(response.message || "Error deleting user");
+            }
+        });
+
+        return () => {
+            socket.off("user-deleted-response");
+        };
+    }, [socket, setUser, navigate]);
 
     const handleEditProfile = () => {
         setShowEditProfileModal(true);
@@ -63,6 +84,7 @@ function Profile({ socket }) {
 
     const handleDeleteProfile = () => {
         setShowModal(true);
+        console.log("ich möchte das profil löschen");
     };
 
     const handleCloseModal = () => {
@@ -72,14 +94,8 @@ function Profile({ socket }) {
     const handleConfirmDelete = () => {
         setShowModal(false);
         setShowSuccessModal(true);
-
-        // socket.emit("delete-user-from-db", { username });
-
-        setTimeout(() => {
-            setShowSuccessModal(false);
-            setUser(null);
-            navigate('/login');
-        }, 2000);
+        console.log("das profil wird gelöscht");
+        socket.emit("delete-user-from-db", { username });
     };
 
     const handleCloseSuccessModal = () => {
@@ -142,6 +158,7 @@ function Profile({ socket }) {
                 <p> Username: {profile.name} </p>
                 <p> ID: {profile.id} </p>
                 <p> E-Mail: {profile.email} </p>
+                <p> Password: {profile.password} </p>
                 <Button variant="secondary" className="custom-profile-button" onClick={handleEditProfile}> Edit
                     Profile </Button>
                 <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change

@@ -64,6 +64,19 @@ io.on('connection', (socket) => {
     socket.emit("forgot-password-response", result);
   });
 
+  /*
+  // change password:
+  socket.on("change-password", async (data) => {
+    const result = await changePassword(data);
+    socket.emit("change-password-response", result);
+  });
+
+  // change user data:
+  socket.on("change-user-data", async (data) => {
+    const result = await changeUserData(data);
+    socket.emit("change-user-data-response", result);
+  });*/
+
   // unused:
   // socket.on("get-active-user-info", async () => {
   //   const result = await getActiveUserInfo(clientUserMapping[socket.id]);
