@@ -10,6 +10,7 @@ const gameSchema = new Schema({
     difficulty: { type: String, required: true },
     category: { type: String, required: true },
     numOfRounds: { type: Number, required: true },
+    type: { type: Boolean, required: true },
     createdAt: { type: Date, default: Date.now } // Automatically set to the current date
 });
 

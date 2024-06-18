@@ -8,6 +8,7 @@ const { Game, GameStats } = require('../models/quizModels');
 class TriviaQuiz {
     constructor(questionGenerator, questionSettings) {
         this.quizId = generateRandomUUID();
+        this.type = false; // false = single / true = multiplayer
 
         // dependency injection for testing
         this.questionGenerator = questionGenerator || TriviaQuestionGenerator;
@@ -27,9 +28,10 @@ class TriviaQuiz {
         this.questionAnswerHistory = []; // Tracks player answers for each question in detail.
     }
 
-    async initGameSettings(quizMode, category, difficulty, rounds) {
+    async initGameSettings(quizMode, category, difficulty, rounds, type = false) {
         // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
         this.numOfRounds = rounds;
+        this.type = type;
         const questionsPerRequest = this.numOfRounds;
 
         const apiSessionToken = await this.questionGenerator.getSessionToken();
@@ -287,7 +289,8 @@ class TriviaQuiz {
                 gameMode: gameMode,
                 difficulty: difficulty,
                 category: category,
-                numOfRounds: this.numOfRounds
+                numOfRounds: this.numOfRounds,
+                type: this.type
             });
             const savedGame = await gameData.save();
 
@@ -319,13 +322,13 @@ class TriviaQuiz {
 }
 
 
-async function triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds) {
+async function triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds, type) {
     // Calling with undefined twice to work with new TriviaQuiz constructor.
     // questionGenerator will be set to singleton class instance
     // questionSettings is set via initGameSettings.
     const triviaQuiz = new TriviaQuiz(undefined, undefined);
 
-    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty, rounds);
+    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty, rounds, type);
     if (!initSettingsSuccess) {
         return undefined;
     }

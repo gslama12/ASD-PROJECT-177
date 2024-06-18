@@ -46,6 +46,7 @@ const StatsPage = ({ socket }) => {
                         category: game.gameId.category,
                         numOfRounds: game.gameId.numOfRounds,
                         createdAt: game.gameId.createdAt,
+                        type: game.gameId.type
                     }));
                     console.log("Processed userGames:", userGames);
                     setStats(userGames);
@@ -78,8 +79,8 @@ const StatsPage = ({ socket }) => {
         return <div>No stats available.</div>;
     }
 
-    const singlePlayerStats = stats.filter(game => game.type === 'standard');
-    const multiplayerStats = stats.filter(game => game.type === 'multiple');
+    const singlePlayerStats = stats.filter(game => game.type === false);
+    const multiplayerStats = stats.filter(game => game.type === true);
 
     const totalSinglePlayerGames = singlePlayerStats.length;
     const totalCorrectAnswers = singlePlayerStats.reduce((sum, game) => sum + game.questionsAnsweredCorrect, 0);
@@ -122,9 +123,10 @@ const StatsPage = ({ socket }) => {
                                 <p>Mode: {game.gameMode}</p>
                                 <p>Category: {game.category}</p>
                                 <p>Difficulty: {game.difficulty}</p>
+                                <p>Type: {game.type ? 'Multiplayer' : 'Single-Player'}</p>
                                 <p>Questions Correct: {game.questionsAnsweredCorrect}</p>
                                 <p>Questions Wrong: {game.questionsAnsweredWrong}</p>
-                                {game.type === 'multiplayer' && (
+                                {game.type && (
                                     <p>Result: {game.questionsAnsweredCorrect > game.questionsAnsweredWrong ? 'Win' : 'Lose'}</p>
                                 )}
                             </div>
