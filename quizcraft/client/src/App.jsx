@@ -32,7 +32,7 @@ function App() {
     if (!socket) return <div>Loading...</div>;
 
     // if the header should be shown based on the current path
-    const showHeader = !['/login', '/quizmode', '/triviamode', '/challengemode'].includes(location.pathname);
+    const showHeader = !['/login', '/quizmode', '/triviamode', '/challengemode', '/challenge/liveschallenge', '/challenge/timeattack'].includes(location.pathname);
 
     return (
         <UserProvider>

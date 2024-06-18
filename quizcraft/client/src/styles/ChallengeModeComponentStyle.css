@@ -1,9 +1,5 @@
 .challenge-mode-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     padding: 20px;
-    text-align: center;
     background:
             radial-gradient(circle at 50% 0, rgba(255, 50, 0, .5), rgba(255, 50, 0, 0) 70.71%),
             radial-gradient(circle at 6.7% 75%, rgba(0, 50, 255, .5), rgba(0, 50, 255, 0) 70.71%),
@@ -17,16 +13,26 @@
     position: relative;
 }
 
-.main-container{
+.challenge-lives-container{
+    height: 10%;
     display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
+    justify-content: flex-end;
     align-items: center;
-    outline: 1px solid black;
-    border-radius: 20px;
-    margin: 0;
-    background-color: rgba(115, 115, 115, 0.29);
+}
+
+.challenge-quiz-buttons-container{
+    height: 90%;
+}
+
+.lives-content {
+    outline: black 1px solid;
+    border-radius: 5px;
+    width: 280px;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(81, 81, 81, 0.21);
 }
 
 .question-container{
@@ -61,6 +67,10 @@
     cursor: pointer;
     font-size: x-large;
     text-align: center;
+}
+
+.answers-container > button:hover {
+    transform: scale(102%);
 }
 
 .answer-button-selected {

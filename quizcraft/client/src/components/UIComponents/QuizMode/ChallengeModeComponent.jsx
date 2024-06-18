@@ -132,27 +132,31 @@ function ChallengeModeComponent({ socket }) {
 
     return (
         <div className="challenge-mode-container">
-            <h1>{challengeType === 'timeattack' ? 'Time Attack' : 'Lives Challenge'}</h1>
-            <p>Lives: {renderLives()}</p>
-            {question && (
-                <div className={"main-container"}>
-                    <div className={"question-container"}>
-                        <h2>{question}</h2>
-                    </div>
-                    <div className="answers-container">
-                        {answers.map((answer, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleAnswerClick(answer, index)}
-                                disabled={isAnswered}
-                                style={{ backgroundColor: buttonColors[index] }}>
-                                {answer}
-                            </button>
-                        ))}
-                    </div>
-                    {/* feedback && <div className="feedback-message">{feedback}</div> */}
+            <div className={"challenge-lives-container"}>
+                <div className={"lives-content"}>
+                    Lives: {renderLives()}
                 </div>
-            )}
+            </div>
+            <div className={"challenge-quiz-buttons-container"}>
+                {question && (
+                    <div className={"main-container"}>
+                        <div className={"question-container"}>
+                            <h2>{question}</h2>
+                        </div>
+                        <div className="answers-container">
+                            {answers.map((answer, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleAnswerClick(answer, index)}
+                                    disabled={isAnswered}
+                                    style={{ backgroundColor: buttonColors[index] }}>
+                                    {answer}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
