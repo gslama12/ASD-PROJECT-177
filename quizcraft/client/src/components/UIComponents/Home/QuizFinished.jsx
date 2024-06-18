@@ -20,8 +20,6 @@ function QuizFinished({socket}) {
         socket.emit('quiz-get-game-info', { gameId: state.gameId});
 
         socket.on("quiz-get-game-info", (response) => {
-            console.log("GAME INFO:", response);
-            console.log("USER", user);
             setNumberCorrectAnswers(response.data.gameInfo.correctAnswers);
             setNumberIncorrectAnswers(response.data.gameInfo.wrongAnswers);
             setNumberQuestionsTotal(response.data.gameInfo.numOfRounds);
