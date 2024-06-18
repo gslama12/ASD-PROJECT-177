@@ -62,12 +62,14 @@ function ChallengeModeComponent({ socket }) {
                 if (gameComplete) {
                     navigate("/quizfinished", { state: { gameId: response.data.gameInfo.gameId } });
                 } else {
-                    setButtonColors(Array(answers.length).fill(''));  // reset colors
-                    setQuestion(he.decode(question.question));
-                    setAnswers(shuffleArray(question.answers));
-                    setSelectedAnswer(null);
-                    setIsAnswered(false);
-                    setFeedback("");
+                    setTimeout(() => {
+                        setButtonColors(Array(answers.length).fill(''));  // reset colors
+                        setQuestion(he.decode(question.question));
+                        setAnswers(shuffleArray(question.answers));
+                        setSelectedAnswer(null);
+                        setIsAnswered(false);
+                        setFeedback("");
+                    }, 500); // 1-second delay
                 }
             }
         });
@@ -78,7 +80,7 @@ function ChallengeModeComponent({ socket }) {
         if (lives <= 0) {
             setTimeout(() => {
                 navigate("/quizfinished", { state: { gameId } });
-            }, 2000);
+            }, 500); // Changed from 2000 to 1000
         }
     }, [lives, navigate, gameId]);
 
