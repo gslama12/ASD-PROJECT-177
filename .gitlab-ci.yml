@@ -59,19 +59,41 @@ remove_ip_whitelist:
       --header "Accept: application/vnd.atlas.2023-01-01+json" \
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
 
-deploy-dev-infra:
-  stage: deploy-test
-  variables:
-    CDK_DEPLOY_ACCOUNT: $DEV_ACCOUNT_ID
-    CDK_DEPLOY_REGION: $AWS_DEFAULT_REGION
-  before_script:
-  - npm install -g aws-cdk@latest
-  - cdk --version
+default:
+  image: node:16.16.0
+
+deploy_preview:
+  stage: deploy
+  except:
+    - main
   script:
-  - npx cdk synth
-  - cdk diff
-  - cdk deploy --require-approval never
-deploy-prod-infra:
+    - npm install --global vercel
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt  --token=$VERCEL_TOKEN
+
+deploy_production:
+  stage: deploy
+  only:
+    - main
+  script:
+    - npm install --global vercel
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel build --prod --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+# deploy-dev-infra:
+#   stage: deploy-test
+#   variables:
+#     CDK_DEPLOY_ACCOUNT: $DEV_ACCOUNT_ID
+#     CDK_DEPLOY_REGION: $AWS_DEFAULT_REGION
+#   before_script:
+#   - npm install -g aws-cdk@latest
+#   - cdk --version
+#   script:
+#   - npx cdk synth
+#   - cdk diff
+#   - cdk deploy --require-approval never
+# deploy-prod-infra:
   stage: deploy-prod
   variables:
     CDK_DEPLOY_ACCOUNT: $PROD_ACCOUNT_ID
