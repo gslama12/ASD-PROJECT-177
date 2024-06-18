@@ -75,7 +75,8 @@ io.on('connection', (socket) => {
   socket.on("change-user-data", async (data) => {
     const result = await changeUserData(data);
     socket.emit("change-user-data-response", result);
-  });*/
+  });
+  */
 
   // unused:
   // socket.on("get-active-user-info", async () => {

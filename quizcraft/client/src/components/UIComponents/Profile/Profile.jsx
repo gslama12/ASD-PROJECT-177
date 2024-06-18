@@ -42,9 +42,10 @@ function Profile({ socket }) {
         }
     }, [user, userid, username]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         socket.on("user-deleted-response", (response) => {
             if (response.success) {
+                setUser(response.user);
                 setShowSuccessModal(true);
                 setTimeout(() => {
                     setShowSuccessModal(false);
@@ -59,7 +60,7 @@ function Profile({ socket }) {
         return () => {
             socket.off("user-deleted-response");
         };
-    }, [socket, setUser, navigate]);
+    }, [socket, setUser, navigate]);*/
 
     const handleEditProfile = () => {
         setShowEditProfileModal(true);
@@ -84,7 +85,6 @@ function Profile({ socket }) {
 
     const handleDeleteProfile = () => {
         setShowModal(true);
-        console.log("ich möchte das profil löschen");
     };
 
     const handleCloseModal = () => {
@@ -94,8 +94,13 @@ function Profile({ socket }) {
     const handleConfirmDelete = () => {
         setShowModal(false);
         setShowSuccessModal(true);
-        console.log("das profil wird gelöscht");
-        socket.emit("delete-user-from-db", { username });
+        setTimeout(() => {
+            setShowSuccessModal(false);
+            setUser(null);
+            navigate("/login");
+        }, 2000);
+
+        // socket.emit("delete-user-from-db", { username });
     };
 
     const handleCloseSuccessModal = () => {
@@ -154,11 +159,14 @@ function Profile({ socket }) {
         <div className="profile-page">
             <div className="profile-container">
                 <h1> Profile </h1>
-                <p>Welcome to your profile, {user ? username : "Guest"}!</p>
+                <br></br>
+                <p> Welcome to your profile, {user ? username : "Guest"}! </p>
                 <p> Username: {profile.name} </p>
                 <p> ID: {profile.id} </p>
                 <p> E-Mail: {profile.email} </p>
                 <p> Password: {profile.password} </p>
+                <br></br>
+                <br></br>
                 <Button variant="secondary" className="custom-profile-button" onClick={handleEditProfile}> Edit
                     Profile </Button>
                 <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change
