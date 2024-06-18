@@ -69,7 +69,7 @@ function ChallengeModeComponent({ socket }) {
                         setSelectedAnswer(null);
                         setIsAnswered(false);
                         setFeedback("");
-                    }, 500); // 1-second delay
+                    }, 500);
                 }
             }
         });
@@ -80,18 +80,18 @@ function ChallengeModeComponent({ socket }) {
         if (lives <= 0) {
             setTimeout(() => {
                 navigate("/quizfinished", { state: { gameId } });
-            }, 500); // Changed from 2000 to 1000
+            }, 500);
         }
     }, [lives, navigate, gameId]);
 
     useEffect(() => {
-        if (challengeType === 'timeattack') {
+        if (challengeType === 'timeattack' && question) {
             const timer = setInterval(() => {
                 setTimeLeft(timeLeft => timeLeft - 1);
             }, 1000);
             return () => clearInterval(timer);
         }
-    }, [challengeType]);
+    }, [challengeType, question]);
 
     const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
