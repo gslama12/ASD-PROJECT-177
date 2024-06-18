@@ -194,7 +194,10 @@ async function deleteUserById(userId, password) {
             return { success: false, message: "Password is incorrect" };
         }
 
-        await user.remove();
+        const user1 = await User.findByIdAndDelete(userId);
+        if (!user1) {
+            return { success: false, message: "User not found" };
+        }
         console.log('User deleted successfully:', userId);
         return { success: true, message: "User deleted successfully" };
     } catch (error) {
