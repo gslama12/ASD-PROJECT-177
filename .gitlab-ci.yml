@@ -1,4 +1,9 @@
-image: node:latest
+stages:
+  - build
+  - cleanup
+  - deploy
+default:
+  image: node:latest
 
 variables:
   projectDirectory: quizcraft 
@@ -86,17 +91,17 @@ deploy_production:
 #   - cdk diff
 #   - cdk deploy --require-approval never
 # deploy-prod-infra:
-  stage: deploy-prod
-  variables:
-    CDK_DEPLOY_ACCOUNT: $PROD_ACCOUNT_ID
-    CDK_DEPLOY_REGION: $AWS_DEFAULT_REGION
-  before_script:
-  - npm install -g aws-cdk@latest
-  - cdk --version
-  script:
-  - npx cdk synth
-  - cdk diff
-  - cdk deploy --require-approval never
-  rules:
-  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    when: manual
+  # stage: deploy-prod
+  # variables:
+  #   CDK_DEPLOY_ACCOUNT: $PROD_ACCOUNT_ID
+  #   CDK_DEPLOY_REGION: $AWS_DEFAULT_REGION
+  # before_script:
+  # - npm install -g aws-cdk@latest
+  # - cdk --version
+  # script:
+  # - npx cdk synth
+  # - cdk diff
+  # - cdk deploy --require-approval never
+  # rules:
+  # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #   when: manual
