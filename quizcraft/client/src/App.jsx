@@ -10,9 +10,9 @@ import QuizModeComponent from "./components/UIComponents/QuizMode/QuizModeCompon
 import TriviaModeComponent from "./components/UIComponents/QuizMode/TriviaModeComponent.jsx";
 import ChallengeModeComponent from "./components/UIComponents/QuizMode/ChallengeModeComponent.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Header from "./components/UIComponents/GenericStyles/Header";
+import Header from "./components/UIComponents/Generic/Header";
 import "../src/styles/LoginComponentStyle.css";
-import "./components/UIComponents/GenericStyles/CenteredHeader.css";
+import "./styles/CenteredHeader.css";
 import quizMeImage from '../src/assets/quiz_me.png';
 import StatsPage from "./components/UIComponents/StatsComponent/StatsPage.jsx";
 import ChallengeSelectionComponent from "./components/UIComponents/QuizMode/ChallengeSelectionComponent.jsx";
