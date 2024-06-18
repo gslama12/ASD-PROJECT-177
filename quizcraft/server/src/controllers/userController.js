@@ -97,7 +97,7 @@ async function forgotPassword(email) {
 // This function retrieves the active user's information.
 async function getActiveUserInfo(userId) {
     try {
-        const user = await User.findById(userId, 'username email');
+        const user = await User.findById(userId);
         if (!user) {
             return { success: false, message: "User not found" };
         }

@@ -28,39 +28,39 @@ function Profile({ socket }) {
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+    const maskPassword = (password) => '•'.repeat(password.length);
 
     useEffect(() => {
         if (user) {
-            setUsername(user.username);
-            setUserid(user._id);
+            socket.emit("get-active-user-info", user._id);
             setProfile({
-                name: username,
-                id: userid,
+                name: user.username,
+                id: user._id,
                 email: user.email || "place.holder@gmail.com",
-                password: user.password || "placeholder#2024"
+                password: user.password || "placeholder"
             });
         }
-    }, [user, userid, username]);
+    }, [user, username]);
 
-    /*useEffect(() => {
-        socket.on("user-deleted-response", (response) => {
+    useEffect(() => {
+        socket.on("get-active-user-info-response", (response) => {
             if (response.success) {
-                setUser(response.user);
-                setShowSuccessModal(true);
-                setTimeout(() => {
-                    setShowSuccessModal(false);
-                    setUser(null);
-                    navigate("/login");
-                }, 2000);
+                const userData = response.data;
+                setProfile({
+                    name: userData.username,
+                    id: userData._id,
+                    email: userData.email || "place.holder@gmail.com",
+                    password: user.password || "placeholder"
+                });
             } else {
-                console.error(response.message || "Error deleting user");
+                console.error('Error retrieving user info:', response.message);
             }
         });
 
         return () => {
-            socket.off("user-deleted-response");
+            socket.off("get-active-user-info-response");
         };
-    }, [socket, setUser, navigate]);*/
+    }, [socket, user, username]);
 
     const handleEditProfile = () => {
         setShowEditProfileModal(true);
@@ -160,11 +160,11 @@ function Profile({ socket }) {
             <h1> Profile </h1>
             <div className="profile-content">
                 <br></br>
-                <p> Welcome to your profile, {user ? username : "Guest"}! </p>
+                <p> Welcome to your profile, {user ? profile.username : "Guest"}! </p>
                 <p> Username: {profile.name} </p>
                 <p> ID: {profile.id} </p>
                 <p> E-Mail: {profile.email} </p>
-                <p> Password: {profile.password} </p>
+                <p> Password: {maskPassword(profile.password)} </p>
                 <br></br>
                 <br></br>
                 <Button variant="primary" className="custom-profile-button" onClick={handleEditProfile}> Edit

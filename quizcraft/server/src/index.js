@@ -78,16 +78,17 @@ io.on('connection', (socket) => {
   });
   */
 
-  // unused:
-  // socket.on("get-active-user-info", async () => {
-  //   const result = await getActiveUserInfo(clientUserMapping[socket.id]);
-  //   if (result.success) {
-  //     socket.emit("get-active-user-info", constructDataResponse(result));
-  //   }
-  //   else {
-  //     socket.emit("get-active-user-info", constructErrorResponse("Could not find current user"));
-  //   }
-  // });
+  socket.on("get-active-user-info", async (userId) => {
+     const result = await getActiveUserInfo(userId);
+     if (result.success) {
+       console.log("Fetching current user success");
+       socket.emit("get-active-user-info-response", constructDataResponse(result));
+     }
+     else {
+       console.log("Fetching current user error");
+       socket.emit("get-active-user-response", constructErrorResponse("Could not find current user"));
+     }
+  });
 
   socket.on('disconnect', () => {
     delete clientUserMapping[socket.id];
