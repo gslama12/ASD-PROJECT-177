@@ -52,3 +52,7 @@
     font-size: 18px;
     margin-top: 20px;
 }
+
+.answers-container > button:hover {
+    transform: scale(102%);
+}
