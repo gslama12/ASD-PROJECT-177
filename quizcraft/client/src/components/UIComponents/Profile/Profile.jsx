@@ -167,7 +167,7 @@ function Profile({ socket }) {
                 <p> Password: {profile.password} </p>
                 <br></br>
                 <br></br>
-                <Button variant="secondary" className="custom-profile-button" onClick={handleEditProfile}> Edit
+                <Button variant="primary" className="custom-profile-button" onClick={handleEditProfile}> Edit
                     Profile </Button>
                 <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change
                     Password </Button>
