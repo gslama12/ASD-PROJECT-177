@@ -2,19 +2,20 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import '../../../styles/Profile.css';
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from '../../../UserContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 function Profile({ socket }) {
-    const { user, setUser } = useUser();
+    const {user, setUser} = useUser();
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
+    const [userid, setUserid] = useState("");
 
     const [profile, setProfile] = useState({
         name: "",
         id: "",
-        email: "_not found_"
+        email: ""
     });
 
     const [showModal, setShowModal] = useState(false);
@@ -30,13 +31,14 @@ function Profile({ socket }) {
     useEffect(() => {
         if (user) {
             setUsername(user.username);
+            setUserid(user._id);
             setProfile({
                 name: username,
-                id: user._id,
-                email: user.email || "_not found_"
+                id: userid,
+                email: user.email || "place.holder@gmail.com"
             });
         }
-    }, [user, username]);
+    }, [user, userid, username]);
 
     const handleEditProfile = () => {
         setShowEditProfileModal(true);
@@ -47,7 +49,7 @@ function Profile({ socket }) {
     };
 
     const handleProfileChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setProfile((prevProfile) => ({
             ...prevProfile,
             [name]: value
@@ -136,6 +138,7 @@ function Profile({ socket }) {
         <div className="profile-page">
             <div className="profile-container">
                 <h1> Profile </h1>
+                <p>Welcome to your profile, {user ? username : "Guest"}!</p>
                 <p> Username: {profile.name} </p>
                 <p> ID: {profile.id} </p>
                 <p> E-Mail: {profile.email} </p>
