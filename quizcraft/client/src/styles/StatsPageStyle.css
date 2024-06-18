@@ -1,0 +1,116 @@
+.stats-page {
+    background: radial-gradient(circle at 50% 0, rgba(255, 50, 0, .5), rgba(255, 50, 0, 0) 70.71%),
+    radial-gradient(circle at 6.7% 75%, rgba(0, 50, 255, .5), rgba(0, 50, 255, 0) 70.71%),
+    radial-gradient(circle at 93.3% 75%, rgba(0, 255, 50, .5), rgba(0, 255, 50, 0) 70.71%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    color: black;
+    padding-top: 1em;
+}
+
+.stats-content {
+    width: 80%;
+    max-width: 800px;
+    max-height: 80%;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    color: black;
+    overflow: hidden;
+}
+
+.stats-header {
+    text-align: center;
+    font-size: 3em;
+    padding-bottom: 1em;
+}
+
+.stats-summary-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.stats-summary {
+    width: 45%;
+}
+
+.history-header {
+    text-align: center;
+}
+
+.game-history {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.game-result {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    width: 100%;
+    max-width: 700px;
+    text-align: left;
+    border-radius: 5px;
+}
+
+.game-result.win {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.game-result.loss {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+@media (max-width: 768px) {
+    .stats-content {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .stats-header {
+        font-size: 2em;
+    }
+
+    .stats-summary {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .game-result {
+        font-size: 0.9em;
+    }
+
+    .game-history {
+        max-height: 50vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-content {
+        width: 80%;
+        padding: 5px;
+    }
+
+    .stats-header {
+        font-size: 1.5em;
+    }
+
+    .game-result {
+        font-size: 0.8em;
+    }
+
+    .game-history {
+        max-height: 40vh;
+    }
+}

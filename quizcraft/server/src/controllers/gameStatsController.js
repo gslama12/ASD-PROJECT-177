@@ -7,6 +7,7 @@ const {User} = require("../models/userModel");
 async function getGameStats(gameId) {
     try {
         const gameStats = await GameStats.find({ gameId }).populate('playerId', 'username');
+        console.log("Game Stats '${gameId}': ", gameStats);
         return { success: true, gameStats };
     } catch (err) {
         console.error('Error retrieving game stats:', err);
@@ -24,6 +25,8 @@ async function getUserGames(username) {
             return { success: false, message: 'User not found' };
         }
         const userGames = await GameStats.find({ playerId: user._id }).populate('gameId');
+        console.log("User: ", username);
+        console.log("Games played: ", userGames);
         return { success: true, userGames };
     } catch (err) {
         console.error('Error retrieving user games:', err);

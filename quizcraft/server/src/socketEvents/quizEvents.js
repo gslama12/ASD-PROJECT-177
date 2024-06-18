@@ -57,6 +57,7 @@ module.exports = (socket, io) => {
             return;
         }
 
+
         // Send initial question to client upon creating a new game
         const question = await quizObject.getNextQuestion();
         if (!question) {
