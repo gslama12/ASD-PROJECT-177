@@ -60,18 +60,14 @@ function ChallengeModeComponent({ socket }) {
                 }
 
                 if (gameComplete) {
-                    setTimeout(() => {
-                        navigate("/quizfinished", { state: { gameId: response.data.gameInfo.gameId } });
-                    }, 2000);
+                    navigate("/quizfinished", { state: { gameId: response.data.gameInfo.gameId } });
                 } else {
-                    setTimeout(() => {
-                        setButtonColors(Array(answers.length).fill(''));  // reset colors
-                        setQuestion(he.decode(question.question));
-                        setAnswers(shuffleArray(question.answers));
-                        setSelectedAnswer(null);
-                        setIsAnswered(false);
-                        setFeedback("");
-                    }, 2000); // wait 2 seconds before showing the next question
+                    setButtonColors(Array(answers.length).fill(''));  // reset colors
+                    setQuestion(he.decode(question.question));
+                    setAnswers(shuffleArray(question.answers));
+                    setSelectedAnswer(null);
+                    setIsAnswered(false);
+                    setFeedback("");
                 }
             }
         });
@@ -87,16 +83,13 @@ function ChallengeModeComponent({ socket }) {
     }, [lives, navigate, gameId]);
 
     useEffect(() => {
-        if (challengeType === 'timeattack' && timeLeft > 0) {
-            const timer = setTimeout(() => {
-                setTimeLeft(timeLeft - 1);
+        if (challengeType === 'timeattack') {
+            const timer = setInterval(() => {
+                setTimeLeft(timeLeft => timeLeft - 1);
             }, 1000);
-            return () => clearTimeout(timer);
-        } else if (challengeType === 'timeattack' && timeLeft === 0 && !isAnswered) {
-        } else if ((challengeType === 'timeattack' && timeLeft === 0 && isAnswered) || lives <= 0) {
-            navigate(`/quizfinished`, { state: { gameId } });
+            return () => clearInterval(timer);
         }
-    }, [timeLeft, navigate, gameId, challengeType, isAnswered, lives]);
+    }, [challengeType]);
 
     const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
