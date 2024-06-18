@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
-import profileIcon from '../../../assets/profile_icon.png';
 import '../Profile/ProfileStyles.css';
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../UserContext";
 import "../../../styles/QuizFinishedComponentStyle.css";
+import Header from "../Generic/Header.jsx";
 
 function QuizFinished({socket}) {
     const navigate = useNavigate();
@@ -46,8 +46,10 @@ function QuizFinished({socket}) {
 
     return (
         <div className="page-container">
-            <div className="top-bar">
-                <div className="profile-icon-container">
+            <Header />
+{/*             <div className="top-bar">
+
+               <div className="profile-icon-container">
                     <Dropdown>
                         <Dropdown.Toggle variant="success" id="dropdown-basic" className="profile-dropdown-toggle">
                             <img src={profileIcon} alt="Profile" className="profile-icon" />
@@ -62,7 +64,7 @@ function QuizFinished({socket}) {
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
-            </div>
+            </div>*/}
             <div className="quiz-finished-content">
                 <div className="header">
                     <p>Quiz Overview</p>
