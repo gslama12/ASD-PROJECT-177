@@ -1,7 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-import '../../../styles/Profile.css';
+import '../../../styles/ProfileStyles.css';
 import React, { useState, useEffect } from "react";
 import { useUser } from '../../../UserContext';
 import { useNavigate, Link } from 'react-router-dom';
@@ -156,9 +156,9 @@ function Profile({ socket }) {
     };
 
     return (
-        <div className="profile-page">
-            <div className="profile-container">
-                <h1> Profile </h1>
+        <div className="profile-container">
+            <h1> Profile </h1>
+            <div className="profile-content">
                 <br></br>
                 <p> Welcome to your profile, {user ? username : "Guest"}! </p>
                 <p> Username: {profile.name} </p>

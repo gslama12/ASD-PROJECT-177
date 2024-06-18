@@ -17,6 +17,18 @@
     position: relative;
 }
 
+.profile-content {
+    margin-top: 5em;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80%;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    color: black;
+    overflow: hidden;
+}
+
 .username-display {
     color: white;
     font-size: 18px;
@@ -37,4 +49,34 @@
 
 .dropdown-toggle-custom:after {
     display: none;
+}
+
+.profile-container {
+    font-size: 20px;
+    text-align: center;
+}
+
+.custom-password-button,
+.custom-profile-button,
+.custom-danger-button {
+    width: 200px;
+    height: 50px;
+    display: block;
+    margin: 15px;
+}
+
+.custom-danger-button {
+    width: 200px;
+    height: 50px;
+    background-color: transparent !important;
+    border-color: red !important;
+    color: red !important;
+    transition: background-color 0.5s, color 0.5s !important;
+}
+
+.custom-danger-button:hover {
+    width: 200px;
+    height: 50px;
+    background-color: red !important;
+    color: white !important;
 }

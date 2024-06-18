@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
-import '../Profile/ProfileStyles.css';
+import '../../../styles/ProfileStyles.css';
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../UserContext";
 import "../../../styles/QuizFinishedComponentStyle.css";

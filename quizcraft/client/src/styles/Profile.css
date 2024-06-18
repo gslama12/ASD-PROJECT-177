@@ -1,36 +1,42 @@
-.profile-page {
-    margin-top: 100px;
-}
+
 
 .profile-container {
-    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
     text-align: center;
+    background:
+            radial-gradient(circle at 50% 0, rgba(255, 50, 0, .5), rgba(255, 50, 0, 0) 70.71%),
+            radial-gradient(circle at 6.7% 75%, rgba(0, 50, 255, .5), rgba(0, 50, 255, 0) 70.71%),
+            radial-gradient(circle at 93.3% 75%, rgba(0, 255, 50, .5), rgba(0, 255, 50, 0) 70.71%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    position: relative;
 }
 
-.custom-password-button {
-    width: 200px;
-    height: 50px;
-    margin-bottom: 25px;
+.username-display {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-.custom-profile-button {
-    width: 200px;
-    height: 50px;
-    margin-bottom: 25px;
+.dropdown-container {
+    position: relative;
 }
 
-.custom-danger-button {
-    width: 200px;
-    height: 50px;
-    background-color: transparent !important;
-    border-color: red !important;
-    color: red !important;
-    transition: background-color 0.5s, color 0.5s !important;
+.dropdown-toggle-custom {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
 }
 
-.custom-danger-button:hover {
-    width: 200px;
-    height: 50px;
-    background-color: red !important;
-    color: white !important;
+.dropdown-toggle-custom:after {
+    display: none;
 }
