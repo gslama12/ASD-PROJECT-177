@@ -69,15 +69,15 @@ deploy_preview:
     - vercel build --token=$VERCEL_TOKEN
     - vercel deploy --prebuilt  --token=$VERCEL_TOKEN
 
-deploy_production:
-  stage: deploy
-  only:
-    - main
-  script:
-    - npm install --global vercel
-    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-    - vercel build --prod --token=$VERCEL_TOKEN
-    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+# deploy_production:
+#   stage: deploy
+#   only:
+#     - main
+#   script:
+#     - npm install --global vercel
+#     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+#     - vercel build --prod --token=$VERCEL_TOKEN
+#     - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
 # deploy-dev-infra:
 #   stage: deploy-test
 #   variables:
