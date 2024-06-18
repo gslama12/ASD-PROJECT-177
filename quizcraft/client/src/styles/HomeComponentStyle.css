@@ -18,7 +18,18 @@
     position: relative;
 }
 
+.home-content {
+    height: 70vh;
+    width: 100vw;
+    margin-top: 15vh;
+    margin-bottom: 10vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .mode-cards-container {
+    align-items: center;
     display: flex;
     flex-direction: row;
     justify-content: center;
