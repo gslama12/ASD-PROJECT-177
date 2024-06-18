@@ -4,21 +4,24 @@ import Form from 'react-bootstrap/Form';
 import '../../../styles/ProfileStyles.css';
 import React, { useState, useEffect } from "react";
 import { useUser } from '../../../UserContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Profile({ socket }) {
-    const {user, setUser} = useUser();
+    const { user, setUser } = useUser();
     const navigate = useNavigate();
-    const [username, setUsername] = useState("");
-    const [userid, setUserid] = useState("");
-
     const [profile, setProfile] = useState({
         name: "",
         id: "",
         email: "",
         password: ""
     });
-
+    const [initialProfile, setInitialProfile] = useState({
+        name: "",
+        id: "",
+        email: "",
+        password: ""
+    });
+    const [editingField, setEditingField] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
@@ -27,40 +30,107 @@ function Profile({ socket }) {
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [passwordSuccessMessage, setPasswordSuccessMessage] = useState('');
     const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-    const maskPassword = (password) => '•'.repeat(password.length);
 
     useEffect(() => {
         if (user) {
             socket.emit("get-active-user-info", user._id);
-            setProfile({
+            const initial = {
                 name: user.username,
                 id: user._id,
                 email: user.email || "place.holder@gmail.com",
                 password: user.password || "placeholder"
-            });
+            };
+            setProfile(initial);
+            setInitialProfile(initial);
         }
-    }, [user, username]);
+    }, [user]);
 
     useEffect(() => {
         socket.on("get-active-user-info-response", (response) => {
-            if (response.success) {
-                const userData = response.data;
-                setProfile({
+            console.log('retrieving user info:', response.data.success);
+            if (response.data.success) {
+                const userData = response.data.user;
+                const updatedProfile = {
                     name: userData.username,
                     id: userData._id,
                     email: userData.email || "place.holder@gmail.com",
                     password: user.password || "placeholder"
-                });
+                };
+                setProfile(updatedProfile);
+                setInitialProfile(updatedProfile);
             } else {
-                console.error('Error retrieving user info:', response.message);
+                console.error('Error retrieving user info:', response);
+            }
+        });
+
+        socket.on("update-username-response", (response) => {
+            console.log('updating username:', response);
+            if (response.success) {
+                setProfile((prevProfile) => ({
+                    ...prevProfile,
+                    name: response.user.username
+                }));
+                setUser(response.user);
+            } else {
+                console.error('Error updating username:', response.message);
+            }
+            setEditingField(null);
+        });
+
+        socket.on("update-email-response", (response) => {
+            if (response.success) {
+                setProfile((prevProfile) => ({
+                    ...prevProfile,
+                    email: response.user.email
+                }));
+                setUser(response.user);
+            } else {
+                console.error('Error updating email:', response.message);
+            }
+            setEditingField(null);
+        });
+
+        socket.on("change-password-response", (response) => {
+            console.log("Change Password: ", response);
+            if (response.success) {
+                setShowChangePasswordModal(false);
+                setPasswordSuccessMessage(response.message);
+                setShowPasswordChangeSuccessModal(true);
+            } else {
+                setPasswordError(response.message);
             }
         });
 
         return () => {
             socket.off("get-active-user-info-response");
+            socket.off("update-username-response");
+            socket.off("update-email-response");
+            socket.off("change-password-response");
         };
-    }, [socket, user, username]);
+    }, [socket]);
+
+    const handleFieldClick = (field) => {
+        setEditingField(field);
+    };
+
+    const handleFieldChange = (e) => {
+        const { name, value } = e.target;
+        setProfile((prevProfile) => ({
+            ...prevProfile,
+            [name]: value
+        }));
+    };
+
+    const handleFieldBlur = () => {
+        if (editingField === 'name') {
+            socket.emit("update-username", { userId: profile.id, newUsername: profile.name });
+        } else if (editingField === 'email') {
+            socket.emit("update-email", { userId: profile.id, newEmail: profile.email });
+        }
+        setEditingField(null);
+    };
 
     const handleEditProfile = () => {
         setShowEditProfileModal(true);
@@ -71,7 +141,7 @@ function Profile({ socket }) {
     };
 
     const handleProfileChange = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setProfile((prevProfile) => ({
             ...prevProfile,
             [name]: value
@@ -79,8 +149,13 @@ function Profile({ socket }) {
     };
 
     const handleProfileSubmit = () => {
-        console.log('Profile updated:', profile);
         setShowEditProfileModal(false);
+        if (profile.name !== initialProfile.name) {
+            socket.emit("update-username", { userId: profile.id, newUsername: profile.name });
+        }
+        if (profile.email !== initialProfile.email) {
+            socket.emit("update-email", { userId: profile.id, newEmail: profile.email });
+        }
     };
 
     const handleDeleteProfile = () => {
@@ -117,6 +192,7 @@ function Profile({ socket }) {
         setNewPassword('');
         setConfirmNewPassword('');
         setPasswordError('');
+        setPasswordSuccessMessage('');
     };
 
     const validateProfilePassword = (password) => {
@@ -137,7 +213,9 @@ function Profile({ socket }) {
 
     const handlePasswordSubmit = () => {
         const passwordValidationError = validateProfilePassword(newPassword);
+        console.log("Submit Password");
         if (passwordValidationError) {
+            console.log("Submit Password ERROR");
             setPasswordError(passwordValidationError);
             return;
         }
@@ -145,10 +223,8 @@ function Profile({ socket }) {
             setPasswordError('New passwords do not match!');
             return;
         }
-        console.log('Old Password:', oldPassword);
-        console.log('New Password:', newPassword);
-        setShowChangePasswordModal(false);
-        setShowPasswordChangeSuccessModal(true);
+
+        socket.emit("change-password", { userId: profile.id, oldPassword, newPassword });
     };
 
     const handleClosePasswordChangeSuccessModal = () => {
@@ -159,20 +235,42 @@ function Profile({ socket }) {
         <div className="profile-container">
             <h1> Profile </h1>
             <div className="profile-content">
-                <br></br>
-                <p> Welcome to your profile, {user ? profile.username : "Guest"}! </p>
-                <p> Username: {profile.name} </p>
+                <br />
+                <p> Welcome to your profile, {user ? profile.name : "Guest"}! </p>
+                <p onClick={() => handleFieldClick('name')}>
+                    Username: {editingField === 'name' ? (
+                    <input
+                        type="text"
+                        name="name"
+                        value={profile.name}
+                        onChange={handleFieldChange}
+                        onBlur={handleFieldBlur}
+                        autoFocus
+                    />
+                ) : (
+                    profile.name
+                )}
+                </p>
+                <p onClick={() => handleFieldClick('email')}>
+                    E-Mail: {editingField === 'email' ? (
+                    <input
+                        type="email"
+                        name="email"
+                        value={profile.email}
+                        onChange={handleFieldChange}
+                        onBlur={handleFieldBlur}
+                        autoFocus
+                    />
+                ) : (
+                    profile.email
+                )}
+                </p>
                 <p> ID: {profile.id} </p>
-                <p> E-Mail: {profile.email} </p>
-                <p> Password: {maskPassword(profile.password)} </p>
-                <br></br>
-                <br></br>
-                <Button variant="primary" className="custom-profile-button" onClick={handleEditProfile}> Edit
-                    Profile </Button>
-                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change
-                    Password </Button>
-                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete
-                    Profile </Button>
+                <br />
+                <br />
+                <Button variant="primary" className="custom-profile-button" onClick={handleEditProfile}> Edit Profile </Button>
+                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change Password </ Button>
+                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </ Button>
             </div>
             <Modal show={showEditProfileModal} onHide={handleCloseEditProfileModal} centered>
                 <Modal.Header closeButton>
@@ -188,7 +286,7 @@ function Profile({ socket }) {
                                 value={profile.name}
                                 onChange={handleProfileChange}
                             />
-                            <br/>
+                            <br />
                         </Form.Group>
                         <Form.Group controlId="formEmail">
                             <Form.Label>Email</Form.Label>
@@ -244,7 +342,7 @@ function Profile({ socket }) {
                                 value={oldPassword}
                                 onChange={(e) => setOldPassword(e.target.value)}
                             />
-                            <br/>
+                            <br />
                         </Form.Group>
                         <Form.Group controlId="formNewPassword">
                             <Form.Label>New Password</Form.Label>
@@ -254,7 +352,7 @@ function Profile({ socket }) {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                             />
-                            <br/>
+                            <br />
                         </Form.Group>
                         <Form.Group controlId="formConfirmNewPassword">
                             <Form.Label>Confirm New Password</Form.Label>
@@ -266,6 +364,7 @@ function Profile({ socket }) {
                             />
                         </Form.Group>
                         {passwordError && <p className="text-danger">{passwordError}</p>}
+                        {passwordSuccessMessage && <p className="text-success">{passwordSuccessMessage}</p>}
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>

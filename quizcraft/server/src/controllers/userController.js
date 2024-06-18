@@ -108,6 +108,80 @@ async function getActiveUserInfo(userId) {
     }
 }
 
+// Function to update the username
+async function updateUsername(userId, newUsername) {
+    try {
+        console.log("Username update:", newUsername);
+        let existingUser = await User.findOne({ newUsername });
+        if (existingUser) {
+            return { success: false, message: "Username already exists" };
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return { success: false, message: "User not found" };
+        }
+
+        user.username = newUsername;
+        await user.save();
+        console.log("Username update success");
+        return { success: true, user };
+    } catch (error) {
+        console.error('Error updating username:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+// Function to update the email
+async function updateEmail(userId, newEmail) {
+    try {
+        console.log("Email update:", newEmail);
+        let existingUser = await User.findOne({ email: newEmail });
+        if (existingUser) {
+            return { success: false, message: "Email already exists" };
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return { success: false, message: "User not found" };
+        }
+
+        user.email = newEmail;
+        await user.save();
+        console.log("Email update success");
+        return { success: true, user };
+    } catch (error) {
+        console.error('Error updating email:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+// Function to change the user password
+async function changePassword(userId, oldPassword, newPassword) {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return { success: false, message: "User not found" };
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return { success: false, message: "Old password is incorrect" };
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        console.log("Password change success");
+        return { success: true, message: "Password successfully changed" };
+    } catch (error) {
+        console.error('Error changing password:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+
 async function getActiveUserId(userId) {
     //TODO
 }
@@ -117,5 +191,8 @@ module.exports = {
     deleteUser,
     authenticateUser,
     forgotPassword,
-    getActiveUserInfo
+    getActiveUserInfo,
+    updateEmail,
+    updateUsername,
+    changePassword
 };

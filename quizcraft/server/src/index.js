@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser, authenticateUser, forgotPassword, getActiveUserInfo, deleteUser} = require("./controllers/userController");
+const {addUser, authenticateUser, forgotPassword, getActiveUserInfo, deleteUser, updateUsername, updateEmail, changePassword} = require("./controllers/userController");
 const {constructDataResponse, constructErrorResponse} = require("./socketEvents/messageHelper");
 
 
@@ -64,30 +64,40 @@ io.on('connection', (socket) => {
     socket.emit("forgot-password-response", result);
   });
 
-  /*
-  // change password:
-  socket.on("change-password", async (data) => {
-    const result = await changePassword(data);
-    socket.emit("change-password-response", result);
-  });
-
-  // change user data:
-  socket.on("change-user-data", async (data) => {
-    const result = await changeUserData(data);
-    socket.emit("change-user-data-response", result);
-  });
-  */
-
   socket.on("get-active-user-info", async (userId) => {
      const result = await getActiveUserInfo(userId);
      if (result.success) {
-       console.log("Fetching current user success");
+       console.log("Fetching current user success: ", result);
        socket.emit("get-active-user-info-response", constructDataResponse(result));
      }
      else {
        console.log("Fetching current user error");
        socket.emit("get-active-user-response", constructErrorResponse("Could not find current user"));
      }
+  });
+
+  socket.on("update-username", async (data) => {
+    try {
+      const result = await updateUsername(data.userId, data.newUsername);
+      socket.emit("update-username-response", result);
+    } catch (e) {
+      console.log("Something went wrong!");
+    }
+
+  });
+
+  socket.on("update-email", async (data) => {
+    try {
+      const result = await updateEmail(data.userId, data.newEmail);
+      socket.emit("update-email-response", result);
+    } catch (e) {
+      console.log("Something went wrong!");
+    }
+  });
+
+  socket.on("change-password", async (data) => {
+    const result = await changePassword(data.userId, data.oldPassword, data.newPassword);
+    socket.emit("change-password-response", result);
   });
 
   socket.on('disconnect', () => {
