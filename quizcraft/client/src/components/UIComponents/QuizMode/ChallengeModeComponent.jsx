@@ -16,15 +16,19 @@ function ChallengeModeComponent({ socket }) {
     const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
     const [gameId, setGameId] = useState(null);
     const [lives, setLives] = useState(3);
+    const [timeLeft, setTimeLeft] = useState(60); // default time for time-attack mode
     const navigate = useNavigate();
     const [challengeSettings, setChallengeSettings] = useState({});
     const { user } = useUser();
     const [buttonColors, setButtonColors] = useState(Array(answers.length).fill(''));
 
     useEffect(() => {
-        const settings = location.state || { lives: 3 };
+        const settings = location.state || { lives: 3, time: 60 }; // default values
         setChallengeSettings(settings);
         setLives(settings.lives);
+        if (challengeType === 'timeattack') {
+            setTimeLeft(settings.time || 60); // set time for time-attack mode
+        }
 
         const gameMode = challengeType === 'timeattack' ? 'multiple' : 'multiple';
         socket.emit("quiz-new-single-player-game", { gameMode, userId: user._id });
@@ -82,6 +86,18 @@ function ChallengeModeComponent({ socket }) {
         }
     }, [lives, navigate, gameId]);
 
+    useEffect(() => {
+        if (challengeType === 'timeattack' && timeLeft > 0) {
+            const timer = setTimeout(() => {
+                setTimeLeft(timeLeft - 1);
+            }, 1000);
+            return () => clearTimeout(timer);
+        } else if (challengeType === 'timeattack' && timeLeft === 0 && !isAnswered) {
+        } else if ((challengeType === 'timeattack' && timeLeft === 0 && isAnswered) || lives <= 0) {
+            navigate(`/quizfinished`, { state: { gameId } });
+        }
+    }, [timeLeft, navigate, gameId, challengeType, isAnswered, lives]);
+
     const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
         setSelectedAnswer(answer);
@@ -130,12 +146,23 @@ function ChallengeModeComponent({ socket }) {
         return hearts;
     }
 
+    const renderTimer = () => {
+        return (
+            <div className="lives-content">
+                Time left: {timeLeft} seconds
+            </div>
+        );
+    }
+
     return (
         <div className="challenge-mode-container">
             <div className={"challenge-lives-container"}>
-                <div className={"lives-content"}>
-                    Lives: {renderLives()}
-                </div>
+                {challengeType !== 'timeattack' && (
+                    <div className={"lives-content"}>
+                        Lives: {renderLives()}
+                    </div>
+                )}
+                {challengeType === 'timeattack' && renderTimer()}
             </div>
             <div className={"challenge-quiz-buttons-container"}>
                 {question && (
