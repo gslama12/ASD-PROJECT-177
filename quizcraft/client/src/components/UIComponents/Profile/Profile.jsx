@@ -24,6 +24,8 @@ function Profile({ socket }) {
     const [editingField, setEditingField] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [deletePassword, setDeletePassword] = useState('');
+    const [deleteError, setDeleteError] = useState('');
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [showPasswordChangeSuccessModal, setShowPasswordChangeSuccessModal] = useState(false);
     const [oldPassword, setOldPassword] = useState('');
@@ -103,11 +105,22 @@ function Profile({ socket }) {
             }
         });
 
+        socket.on("delete-user-response", (response) => {
+            console.log("Deleting user: ", response);
+            if (response.success) {
+                setUser(null);
+                navigate("/login");
+            } else {
+                setDeleteError(response.message);
+            }
+        });
+
         return () => {
             socket.off("get-active-user-info-response");
             socket.off("update-username-response");
             socket.off("update-email-response");
             socket.off("change-password-response");
+            socket.off("delete-user-response");
         };
     }, [socket]);
 
@@ -164,18 +177,12 @@ function Profile({ socket }) {
 
     const handleCloseModal = () => {
         setShowModal(false);
+        setDeletePassword('');
+        setDeleteError('');
     };
 
     const handleConfirmDelete = () => {
-        setShowModal(false);
-        setShowSuccessModal(true);
-        setTimeout(() => {
-            setShowSuccessModal(false);
-            setUser(null);
-            navigate("/login");
-        }, 2000);
-
-        // socket.emit("delete-user-from-db", { username });
+        socket.emit("delete-user", { userId: profile.id, password: deletePassword });
     };
 
     const handleCloseSuccessModal = () => {
@@ -312,7 +319,20 @@ function Profile({ socket }) {
                 <Modal.Header closeButton>
                     <Modal.Title>Delete Profile</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Are you sure you want to delete your profile?</Modal.Body>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="formDeletePassword">
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control
+                                type="password"
+                                placeholder="Enter your password to confirm"
+                                value={deletePassword}
+                                onChange={(e) => setDeletePassword(e.target.value)}
+                            />
+                        </Form.Group>
+                        {deleteError && <p className="text-danger">{deleteError}</p>}
+                    </Form>
+                </Modal.Body>
                 <Modal.Footer>
                     <Button variant="outline-danger" onClick={handleCloseModal}>
                         Cancel

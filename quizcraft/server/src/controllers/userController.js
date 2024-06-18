@@ -181,6 +181,27 @@ async function changePassword(userId, oldPassword, newPassword) {
     }
 }
 
+// Function to delete a user by ID
+async function deleteUserById(userId, password) {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return { success: false, message: "User not found" };
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return { success: false, message: "Password is incorrect" };
+        }
+
+        await user.remove();
+        console.log('User deleted successfully:', userId);
+        return { success: true, message: "User deleted successfully" };
+    } catch (error) {
+        console.error('Error deleting user:', error.message);
+        return { success: false, message: error.message };
+    }
+}
 
 async function getActiveUserId(userId) {
     //TODO
@@ -194,5 +215,6 @@ module.exports = {
     getActiveUserInfo,
     updateEmail,
     updateUsername,
-    changePassword
+    changePassword,
+    deleteUserById
 };

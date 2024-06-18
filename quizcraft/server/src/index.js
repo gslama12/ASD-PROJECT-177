@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser, authenticateUser, forgotPassword, getActiveUserInfo, deleteUser, updateUsername, updateEmail, changePassword} = require("./controllers/userController");
+const {addUser, authenticateUser, forgotPassword, getActiveUserInfo, deleteUser, updateUsername, updateEmail, changePassword, deleteUserById} = require("./controllers/userController");
 const {constructDataResponse, constructErrorResponse} = require("./socketEvents/messageHelper");
 
 
@@ -98,6 +98,11 @@ io.on('connection', (socket) => {
   socket.on("change-password", async (data) => {
     const result = await changePassword(data.userId, data.oldPassword, data.newPassword);
     socket.emit("change-password-response", result);
+  });
+
+  socket.on("delete-user", async (data) => {
+    const result = await deleteUserById(data.userId, data.password);
+    socket.emit("delete-user-response", result);
   });
 
   socket.on('disconnect', () => {
