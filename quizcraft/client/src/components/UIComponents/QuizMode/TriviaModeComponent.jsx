@@ -2,7 +2,7 @@
 // COPIED FROM QUIZ MODE COMPONTENT
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../../styles/QuizModeComponentStyle.css";
+import "../../../styles/TriviaModeComponentStyle.css";
 import he from 'he';
 import TriviaSelector from "./TriviaSelector.jsx";
 import {useUser} from "../../../UserContext.jsx";
@@ -173,30 +173,34 @@ function TriviaModeComponent({ socket }) {
     };
 
     return (
-        <div className="quiz-mode-container">
+        <div className={"trivia-mode-main"}>
             {showTriviaSelector && (
-                <div>
+                <div className="trivia-selector">
                     <TriviaSelector onStart={setSettings}/>
                 </div>
             )}
-
-            {question && (
-                <div className={"main-container"}>
-                    <div className={"question-container"}>
-                        <h2>{question}</h2>
-                    </div>
-                    <div className="answers-container">
-                        {answers.map((answer, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleAnswerClick(answer, index)}
-                                disabled={isAnswered}
-                                style={{backgroundColor: buttonColors[index]}}>
-                                {answer}
-                            </button>
-                        ))}
-                    </div>
-                    {/*                    {feedback && <div className="feedback-message">{feedback}</div>}*/}
+            {!showTriviaSelector && (
+                <div className="trivia-mode-container">
+                    {question && (
+                        <div className={"main-container"}>
+                            <div className={"question-container-trivia"}>
+                                {question}
+                            </div>
+                            <div className="answers-container-trivia-parent">
+                                <div className="answers-container-trivia">
+                                    {answers.map((answer, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleAnswerClick(answer, index)}
+                                            disabled={isAnswered}
+                                            style={{backgroundColor: buttonColors[index]}}>
+                                            {answer}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
