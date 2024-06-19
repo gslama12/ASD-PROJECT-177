@@ -102,7 +102,6 @@ const StatsPage = ({ socket }) => {
     return (
         <>
             <div className="stats-page">
-                <h1 className="stats-header">Your Statistics</h1>
                 <div className="stats-content">
                     <div className="stats-summary-container">
                         <div className="stats-summary">
