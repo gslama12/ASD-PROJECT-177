@@ -240,44 +240,49 @@ function Profile({ socket }) {
 
     return (
         <div className="profile-container">
-            <h1> Profile </h1>
             <div className="profile-content">
-                <br />
-                <p> Welcome to your profile, {user ? profile.name : "Guest"}! </p>
-                <p onClick={() => handleFieldClick('name')}>
-                    Username: {editingField === 'name' ? (
-                    <input
-                        type="text"
-                        name="name"
-                        value={profile.name}
-                        onChange={handleFieldChange}
-                        onBlur={handleFieldBlur}
-                        autoFocus
-                    />
-                ) : (
-                    profile.name
-                )}
-                </p>
-                <p onClick={() => handleFieldClick('email')}>
-                    E-Mail: {editingField === 'email' ? (
-                    <input
-                        type="email"
-                        name="email"
-                        value={profile.email}
-                        onChange={handleFieldChange}
-                        onBlur={handleFieldBlur}
-                        autoFocus
-                    />
-                ) : (
-                    profile.email
-                )}
-                </p>
-                <p> ID: {profile.id} </p>
-                <br />
-                <br />
-                <Button variant="primary" className="custom-profile-button" onClick={handleEditProfile}> Edit Profile </Button>
-                <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change Password </ Button>
-                <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete Profile </ Button>
+                <div className={"profile-info-header"}>
+                    Welcome to your profile, {user ? profile.name : "Guest"}!
+                </div>
+                <div className={"profile-info-data"}>
+                    <p onClick={() => handleFieldClick('name')}>
+                        Username: {editingField === 'name' ? (
+                        <input
+                            type="text"
+                            name="name"
+                            value={profile.name}
+                            onChange={handleFieldChange}
+                            onBlur={handleFieldBlur}
+                            autoFocus
+                        />
+                    ) : (
+                        profile.name
+                    )}
+                    </p>
+                    <p onClick={() => handleFieldClick('email')}>
+                        E-Mail: {editingField === 'email' ? (
+                        <input
+                            type="email"
+                            name="email"
+                            value={profile.email}
+                            onChange={handleFieldChange}
+                            onBlur={handleFieldBlur}
+                            autoFocus
+                        />
+                    ) : (
+                        profile.email
+                    )}
+                    </p>
+                    <p> ID: {profile.id} </p>
+                </div>
+                <div className={"profile-info-buttons"}>
+                    <Button variant="primary" className="custom-profile-button" onClick={handleEditProfile}> Edit
+                    Profile </Button>
+                    <Button variant="primary" className="custom-password-button" onClick={handleChangePassword}> Change
+                    Password </ Button>
+                    <Button variant="outline-danger" className="custom-danger-button" onClick={handleDeleteProfile}> Delete
+                    Profile </ Button>
+                </div>
             </div>
             <Modal show={showEditProfileModal} onHide={handleCloseEditProfileModal} centered>
                 <Modal.Header closeButton>

@@ -264,7 +264,7 @@ class TriviaQuiz {
     async saveGameStats() {
         try {
             // Set default values for difficulty and category if they don't exist TODO: HACK
-            const gameMode = this.questionSettings.difficulty || 'NOT_SPECIFIED';
+            const gameMode = this.questionSettings.gameMode || 'NOT_SPECIFIED';
             const difficulty = this.questionSettings.difficulty || 'NOT_SPECIFIED';
             const category = this.questionSettings.category || 'NOT_SPECIFIED';
 
