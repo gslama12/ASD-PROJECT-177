@@ -1,0 +1,82 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    background:
+            radial-gradient(circle at 50% 0, rgba(255, 50, 0, .5), rgba(255, 50, 0, 0) 70.71%),
+            radial-gradient(circle at 6.7% 75%, rgba(0, 50, 255, .5), rgba(0, 50, 255, 0) 70.71%),
+            radial-gradient(circle at 93.3% 75%, rgba(0, 255, 50, .5), rgba(0, 255, 50, 0) 70.71%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    position: relative;
+}
+
+.profile-content {
+    margin-top: 5em;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80%;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    color: black;
+    overflow: hidden;
+}
+
+.username-display {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-toggle-custom {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.dropdown-toggle-custom:after {
+    display: none;
+}
+
+.profile-container {
+    font-size: 20px;
+    text-align: center;
+}
+
+.custom-password-button,
+.custom-profile-button,
+.custom-danger-button {
+    width: 200px;
+    height: 50px;
+    display: block;
+    margin: 15px;
+}
+
+.custom-danger-button {
+    width: 200px;
+    height: 50px;
+    background-color: transparent !important;
+    border-color: red !important;
+    color: red !important;
+    transition: background-color 0.5s, color 0.5s !important;
+}
+
+.custom-danger-button:hover {
+    width: 200px;
+    height: 50px;
+    background-color: red !important;
+    color: white !important;
+}

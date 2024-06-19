@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const connectToDb = require("./connectToDb");
-const {addUser, authenticateUser, forgotPassword, getActiveUserInfo} = require("./controllers/userController");
+const {addUser, authenticateUser, forgotPassword, getActiveUserInfo, deleteUser, updateUsername, updateEmail, changePassword, deleteUserById} = require("./controllers/userController");
 const {constructDataResponse, constructErrorResponse} = require("./socketEvents/messageHelper");
 
 
@@ -46,6 +46,11 @@ io.on('connection', (socket) => {
     socket.emit("user-added-response", result);
   })
 
+  socket.on("delete-user-from-db", async (data) => {
+    const result = await deleteUser(data.username);
+    socket.emit("user-deleted-response", result);
+  })
+
   socket.on("authenticate-user", async (data) => {
     const result = await authenticateUser(data.username, data.password);
     if (result.success) {
@@ -59,16 +64,46 @@ io.on('connection', (socket) => {
     socket.emit("forgot-password-response", result);
   });
 
-  // unused:
-  // socket.on("get-active-user-info", async () => {
-  //   const result = await getActiveUserInfo(clientUserMapping[socket.id]);
-  //   if (result.success) {
-  //     socket.emit("get-active-user-info", constructDataResponse(result));
-  //   }
-  //   else {
-  //     socket.emit("get-active-user-info", constructErrorResponse("Could not find current user"));
-  //   }
-  // });
+  socket.on("get-active-user-info", async (userId) => {
+     const result = await getActiveUserInfo(userId);
+     if (result.success) {
+       console.log("Fetching current user success: ", result);
+       socket.emit("get-active-user-info-response", constructDataResponse(result));
+     }
+     else {
+       console.log("Fetching current user error");
+       socket.emit("get-active-user-response", constructErrorResponse("Could not find current user"));
+     }
+  });
+
+  socket.on("update-username", async (data) => {
+    try {
+      const result = await updateUsername(data.userId, data.newUsername);
+      socket.emit("update-username-response", result);
+    } catch (e) {
+      console.log("Something went wrong!");
+    }
+
+  });
+
+  socket.on("update-email", async (data) => {
+    try {
+      const result = await updateEmail(data.userId, data.newEmail);
+      socket.emit("update-email-response", result);
+    } catch (e) {
+      console.log("Something went wrong!");
+    }
+  });
+
+  socket.on("change-password", async (data) => {
+    const result = await changePassword(data.userId, data.oldPassword, data.newPassword);
+    socket.emit("change-password-response", result);
+  });
+
+  socket.on("delete-user", async (data) => {
+    const result = await deleteUserById(data.userId, data.password);
+    socket.emit("delete-user-response", result);
+  });
 
   socket.on('disconnect', () => {
     delete clientUserMapping[socket.id];
