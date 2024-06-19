@@ -26,9 +26,11 @@ class TriviaQuiz {
         this.wrongAnswers = 0; // For tracking
 
         this.questionAnswerHistory = []; // Tracks player answers for each question in detail.
+        this.startingLives = null;
+        this.startingTime = null;
     }
 
-    async initGameSettings(quizMode, category, difficulty, rounds, type = false) {
+    async initGameSettings(quizMode, category, difficulty, rounds, type = false, challengeType = "", challengeTypeModifier = null) {
         // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
         this.numOfRounds = rounds;
         this.type = type;
@@ -40,8 +42,14 @@ class TriviaQuiz {
         }
 
         this.questionSettings = new TriviaQuestionSettings(
-            quizMode, category, difficulty, apiSessionToken, questionsPerRequest
+            quizMode, category, difficulty, apiSessionToken, questionsPerRequest, challengeType
         );
+
+        if (this.questionSettings.challengeType === 'liveschallenge') {
+            this.startingLives = challengeTypeModifier || 3;
+        } else if (this.questionSettings.challengeType === 'timeattack') {
+            this.startingTime = challengeTypeModifier || 60;
+        }
 
         console.log('Initialized game settings:', this.questionSettings);
 
@@ -142,7 +150,7 @@ class TriviaQuiz {
                 question: this.activeQuestion,
                 playerId: player.id,
                 answer: player.answer,
-                isCorrect: isCorrectAnswer
+                isCorrect: isCorrectAnswer,
             });
 
             // If the player's answer is correct, add the correct answer to the player's details for tracking
@@ -180,13 +188,30 @@ class TriviaQuiz {
     }
 
     #getGameInfo() {
+        let challengeType = "";
+        let challengeTypeModifier = null;
+        if (this.startingLives > 0) {
+            challengeType = "liveschallenge";
+            challengeTypeModifier = this.startingLives;
+        }
+        else if (this.startingTime > 0) {
+            challengeType = "timeattack";
+            challengeTypeModifier = this.startingTime;
+        }
+        else {
+            challengeType = "";
+            challengeTypeModifier = null;
+        }
+
         return {
             "gameId": this.quizId,
             "gameComplete": this.gameComplete,
             "numOfRounds": this.numOfRounds,
             "currentRound": this.currentRound,
             "correctAnswers": this.correctAnswers,
-            "wrongAnswers": this.wrongAnswers
+            "wrongAnswers": this.wrongAnswers,
+            "challengeType": challengeType,
+            "challengeTypeModifier": challengeTypeModifier
         }
     }
 
@@ -264,10 +289,11 @@ class TriviaQuiz {
     async saveGameStats() {
         try {
             // Set default values for difficulty and category if they don't exist TODO: HACK
-            const gameMode = this.questionSettings.difficulty || 'NOT_SPECIFIED';
+            const gameMode = this.questionSettings.gameMode || 'NOT_SPECIFIED';
             const difficulty = this.questionSettings.difficulty || 'NOT_SPECIFIED';
             const category = this.questionSettings.category || 'NOT_SPECIFIED';
-
+            const startingLives = this.questionSettings.challengeType === 'liveschallenge' ? this.startingLives : null;
+            const startingTime = this.questionSettings.challengeType === 'timeattack' ? this.startingTime : null;
 
             // console.log("- - - STATS REPORT: - - -");
             //     console.log('quizId:', this.quizId);
@@ -302,7 +328,9 @@ class TriviaQuiz {
                     playerId: player.id,
                     questionsAnsweredCorrect: this.correctAnswers,
                     totalQuestions: this.numOfRounds,
-                    questionsAnsweredWrong: this.wrongAnswers
+                    questionsAnsweredWrong: this.wrongAnswers,
+                    startingLives: startingLives,
+                    startingTime: startingTime
                 });
 
                 // console.log("GAME STATS");
@@ -322,13 +350,13 @@ class TriviaQuiz {
 }
 
 
-async function triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds, type) {
+async function triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds, type, challengeType = "", challengeTypeModifier = null) {
     // Calling with undefined twice to work with new TriviaQuiz constructor.
     // questionGenerator will be set to singleton class instance
     // questionSettings is set via initGameSettings.
     const triviaQuiz = new TriviaQuiz(undefined, undefined);
 
-    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty, rounds, type);
+    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty, rounds, type, challengeType, challengeTypeModifier);
     if (!initSettingsSuccess) {
         return undefined;
     }

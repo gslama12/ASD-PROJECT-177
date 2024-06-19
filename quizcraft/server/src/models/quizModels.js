@@ -23,7 +23,9 @@ const gameStatsSchema = new Schema({
     playerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     questionsAnsweredCorrect: { type: Number, required: true },
     totalQuestions: { type: Number, required: true },
-    questionsAnsweredWrong: { type: Number, required: true }
+    questionsAnsweredWrong: { type: Number, required: true },
+    startingLives: { type: Number, default: null }, // New field for starting lives
+    startingTime: { type: Number, default: null } // New field for starting time
 });
 
 const Game = mongoose.model('Game', gameSchema);

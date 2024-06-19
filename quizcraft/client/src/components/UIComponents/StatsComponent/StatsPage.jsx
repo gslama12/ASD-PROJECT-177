@@ -11,6 +11,8 @@ const mockStats = [
         category: "Science",
         numOfRounds: 10,
         createdAt: new Date(),
+        startingLives: 3,
+        startingTime: null
     },
     {
         questionsAnsweredCorrect: 5,
@@ -20,6 +22,8 @@ const mockStats = [
         category: "General Knowledge",
         numOfRounds: 10,
         createdAt: new Date(),
+        startingLives: null,
+        startingTime: 60
     },
 ];
 
@@ -46,7 +50,9 @@ const StatsPage = ({ socket }) => {
                         category: game.gameId.category,
                         numOfRounds: game.gameId.numOfRounds,
                         createdAt: game.gameId.createdAt,
-                        type: game.gameId.type
+                        type: game.gameId.type,
+                        startingLives: game.startingLives,
+                        startingTime: game.startingTime
                     }));
                     console.log("Processed userGames:", userGames);
                     setStats(userGames);
@@ -64,7 +70,6 @@ const StatsPage = ({ socket }) => {
                 socket.off('quiz-get-user-games', handleUserGames);
             };
         } else {
-            // Use mock data if no user is logged in
             console.log("No user logged in, using mock stats.");
             setStats(mockStats);
             setLoading(false);
@@ -126,6 +131,12 @@ const StatsPage = ({ socket }) => {
                                 <p>Type: {game.type ? 'Multiplayer' : 'Single-Player'}</p>
                                 <p>Questions Correct: {game.questionsAnsweredCorrect}</p>
                                 <p>Questions Wrong: {game.questionsAnsweredWrong}</p>
+                                {game.startingLives !== null && (
+                                    <p>Starting Lives: {game.startingLives}</p>
+                                )}
+                                {game.startingTime !== null && (
+                                    <p>Starting Time: {game.startingTime} seconds</p>
+                                )}
                                 {game.type && (
                                     <p>Result: {game.questionsAnsweredCorrect > game.questionsAnsweredWrong ? 'Win' : 'Lose'}</p>
                                 )}

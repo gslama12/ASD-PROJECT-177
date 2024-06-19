@@ -10,12 +10,14 @@ function ChallengeModeComponent({ socket }) {
     const [question, setQuestion] = useState(null);
     const [answers, setAnswers] = useState([]);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const [selectedChallengeType, setSelectedChallengeType] = useState(null);
     const [isAnswered, setIsAnswered] = useState(false);
     const [feedback, setFeedback] = useState("");
     const [correctAnswer, setCorrectAnswer] = useState(null);
     const [isCorrectAnswer, setIsCorrectAnswer] = useState(null);
     const [gameId, setGameId] = useState(null);
     const [lives, setLives] = useState(3);
+    const [notDone, setNotDone] = useState(false);
     const [timeLeft, setTimeLeft] = useState(60); // default time for time-attack mode
     const navigate = useNavigate();
     const [challengeSettings, setChallengeSettings] = useState({});
@@ -25,13 +27,19 @@ function ChallengeModeComponent({ socket }) {
     useEffect(() => {
         const settings = location.state || { lives: 3, time: 60 }; // default values
         setChallengeSettings(settings);
-        setLives(settings.lives);
-        if (challengeType === 'timeattack') {
-            setTimeLeft(settings.time || 60); // set time for time-attack mode
+        let challengeTypeModifier = null;
+        if (challengeType === 'liveschallenge' && !notDone) {
+            setLives(settings.lives || 3);
+            challengeTypeModifier = settings.lives || 3;
+            setNotDone(true);
+        } else if (challengeType === 'timeattack' && !notDone) {
+            setTimeLeft(settings.time || 60);
+            challengeTypeModifier = settings.time || 60;
+            setNotDone(true);
         }
-
-        const gameMode = challengeType === 'timeattack' ? 'multiple' : 'multiple';
-        socket.emit("quiz-new-single-player-game", { gameMode, userId: user._id });
+        console.log("Current Lives: ", lives);
+        const gameMode = 'multiple'; // assuming multiple choice is the default game mode
+        socket.emit("quiz-new-single-player-game", { gameMode, userId: user._id, challengeType, challengeTypeModifier});
 
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
@@ -40,6 +48,7 @@ function ChallengeModeComponent({ socket }) {
                 setQuestion(he.decode(question.question));
                 setAnswers(shuffleArray(question.answers));
                 setCorrectAnswer(question.correctAnswer);
+                setSelectedChallengeType(question.challengeType);
             }
         });
 
@@ -55,11 +64,14 @@ function ChallengeModeComponent({ socket }) {
                 setIsAnswered(true);
                 setFeedback(isCorrectAnswer ? "Correct!" : "Wrong!");
 
-                if (!isCorrectAnswer) {
-                    setLives(prevLives => prevLives - 1);
+                if (challengeType === 'liveschallenge' && !isCorrectAnswer) {
+                    setTimeout(() => {
+                        setLives(prevLives => prevLives - 1);
+                    }, 1000);
                 }
 
-                if (gameComplete) {
+                if (gameComplete || (challengeType === 'liveschallenge' && lives <= 0)) {
+                    setLives(lives);
                     navigate("/quizfinished", { state: { gameId: response.data.gameInfo.gameId } });
                 } else {
                     setTimeout(() => {
@@ -74,15 +86,7 @@ function ChallengeModeComponent({ socket }) {
             }
         });
 
-    }, [socket, navigate, challengeType, location.state, user._id]);
-
-    useEffect(() => {
-        if (lives <= 0) {
-            setTimeout(() => {
-                navigate("/quizfinished", { state: { gameId } });
-            }, 500);
-        }
-    }, [lives, navigate, gameId]);
+    }, [socket, navigate, challengeType, location.state, user._id, lives]);
 
     useEffect(() => {
         if (challengeType === 'timeattack' && question) {
@@ -92,6 +96,14 @@ function ChallengeModeComponent({ socket }) {
             return () => clearInterval(timer);
         }
     }, [challengeType, question]);
+
+    useEffect(() => {
+        if (challengeType === 'liveschallenge' && lives <= 0) {
+            setTimeout(() => {
+                navigate("/quizfinished", { state: { gameId } });
+            }, 1000);
+        }
+    }, [lives, navigate, gameId, challengeType]);
 
     const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
@@ -152,7 +164,7 @@ function ChallengeModeComponent({ socket }) {
     return (
         <div className="challenge-mode-container">
             <div className={"challenge-lives-container"}>
-                {challengeType !== 'timeattack' && (
+                {challengeType === 'liveschallenge' && (
                     <div className={"lives-content"}>
                         Lives: {renderLives()}
                     </div>

@@ -23,8 +23,8 @@ class TriviaQuizManager {
      * @param playerId {String}
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
-    async createSinglePlayerGame(gameMode, category, difficulty, playerId, rounds) {
-        return await this.createQuizObject(gameMode, category, difficulty, [playerId], rounds, false)
+    async createSinglePlayerGame(gameMode, category, difficulty, playerId, rounds, challengeType = "", challengeTypeModifier = null) {
+        return await this.createQuizObject(gameMode, category, difficulty, [playerId], rounds, false, challengeType, challengeTypeModifier)
     }
 
     /**
@@ -34,7 +34,7 @@ class TriviaQuizManager {
      * @param rounds
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
-    async createMultiplayerGame(queueElement, roomId, rounds) {
+    async createMultiplayerGame(queueElement, roomId, rounds, challengeType = "", challengeTypeModifier = null) {
         if (!queueElement || !queueElement?.gameSettings) {
             console.warn("queueElement or queueElement.gameSettings are undefined.")
             return undefined;
@@ -45,7 +45,7 @@ class TriviaQuizManager {
         const difficulty = queueElement.gameSettings.difficulty;
         const playerIds = queueElement.playerIds;
 
-        const quizObject =  await this.createQuizObject(gameMode, category, difficulty, playerIds, rounds, true);
+        const quizObject =  await this.createQuizObject(gameMode, category, difficulty, playerIds, rounds, true, challengeType, challengeTypeModifier);
         if (!quizObject) {
             return undefined;
         }
@@ -54,9 +54,10 @@ class TriviaQuizManager {
         return quizObject;
     }
 
-    async createQuizObject(gameMode, category, difficulty, playerIds, rounds, type){
+    async createQuizObject(gameMode, category, difficulty, playerIds, rounds, type, challengeType = "", challengeTypeModifier = null){
         try {
-            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds, type);
+            console.log("createQuizObject: ", challengeTypeModifier);
+            const triviaQuiz = await triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds, type, challengeType, challengeTypeModifier);
             if (triviaQuiz === undefined) {
                 console.error("Couldn't create quiz.")
                 return undefined;

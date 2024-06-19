@@ -9,11 +9,12 @@ class TriviaQuestionSettings {
      * @param apiSessionToken {String | undefined} Undefined if used as TriviaQuizQueueElement (hacky)
      * @param questionsPerRequest {number | undefined} Undefined if used as TriviaQuizQueueElement (hacky)
      */
-    constructor(quizMode, category, difficulty, apiSessionToken, questionsPerRequest) {
+    constructor(quizMode, category, difficulty, apiSessionToken, questionsPerRequest, challengeType = "") {
         this.quizMode = quizMode;
         this.category = category;
         this.difficulty = difficulty;
         this.apiSessionToken = apiSessionToken;
+        this.challengeType = challengeType;
 
         let numQuestions = questionsPerRequest;
         numQuestions =  numQuestions <= this.MAX_QUESTION_LIMIT ? numQuestions : this.MAX_QUESTION_LIMIT;
