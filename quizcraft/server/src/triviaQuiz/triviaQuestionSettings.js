@@ -21,7 +21,7 @@ class TriviaQuestionSettings {
         // numQuestions = numQuestions > 0 ? numQuestions : this.DEFAULT_NUM_QUESTIONS;
         //
         // this.questionsPerRequest = numQuestions;
-        this.questionsPerRequest = 50; // just set it to 50 for now.
+        this.questionsPerRequest = 10; // just set it to 50 for now.
     }
 }
 
