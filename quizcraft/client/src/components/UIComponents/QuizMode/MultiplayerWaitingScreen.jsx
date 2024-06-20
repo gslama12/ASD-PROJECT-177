@@ -1,8 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "../../../styles/MultiplayerWaitingScreen.css";
 
 const MultiplayerWaitingScreen = () => {
     const [showNotification, setShowNotification] = useState(true);
+    const [displayedText, setDisplayedText] = useState("");
+    const fullText = "Waiting for another player to join...";
+
+    useEffect(() => {
+        let index = 0;
+        const interval = setInterval(() => {
+            setDisplayedText((prev) => {
+                if (index < fullText.length) {
+                    return prev + fullText[index++];
+                } else {
+                    clearInterval(interval);
+                    return prev;
+                }
+            });
+        }, 100); // Adjust the speed by changing the interval duration
+
+        return () => clearInterval(interval); // Cleanup interval on component unmount
+    }, []);
 
     const handleCloseNotification = () => {
         setShowNotification(false);
@@ -19,7 +37,7 @@ const MultiplayerWaitingScreen = () => {
                 </div>
             )}
             <div className="loader"></div>
-            <h2>Waiting for another player to join...</h2>
+            <h2>{displayedText}</h2>
         </div>
     );
 };
