@@ -1,6 +1,7 @@
 stages:
   - build
   - cleanup
+  - deploy
 
 image: node:latest
 
