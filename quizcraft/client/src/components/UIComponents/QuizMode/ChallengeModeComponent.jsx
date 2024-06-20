@@ -66,7 +66,7 @@ function ChallengeModeComponent({ socket }) {
                             correctAnswer: question.correctAnswer,
                             challengeType: question.challengeType
                         });
-                    }, 500); // Reduced the delay for testing
+                    }, 1000);
                 }
             }
         });

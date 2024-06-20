@@ -18,6 +18,7 @@ const EVENTS = {
     GAME_COMPLETE: "quiz-game-complete", // For serving stats to client.
     GET_GAME_STATS: "quiz-get-game-stats",
     GET_USER_GAMES: "quiz-get-user-games",
+    GET_PLAYER_IDS: "get-player-ids",
 }
 
 // TODO: player IDs not implemented yet. Note: Is it possible to make socket-ids persistent?
@@ -379,6 +380,24 @@ module.exports = (socket, io) => {
 
         const result = await getUserGames(username);
         socket.emit(EVENTS.GET_USER_GAMES, constructDataResponse(result));
+    });
+
+    socket.on(EVENTS.GET_PLAYER_IDS, async (body) => {
+        const roomId = body?.roomId;
+
+        if (!roomId) {
+            const errorObject = constructErrorResponse("Request needs 'roomId' parameter.");
+            socket.emit('get-player-ids', errorObject);
+            return;
+        }
+
+        const playerIds = triviaQuizManager.getPlayerIdsForRoom(roomId);
+        if (playerIds) {
+            socket.emit('get-player-ids', constructDataResponse({ playerIds }));
+        } else {
+            const errorObject = constructErrorResponse(`No player IDs found for roomId ${roomId}.`);
+            socket.emit('get-player-ids', errorObject);
+        }
     });
 
 };
