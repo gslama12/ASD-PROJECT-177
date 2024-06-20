@@ -210,7 +210,8 @@ class TriviaQuiz {
             "correctAnswers": this.correctAnswers,
             "wrongAnswers": this.wrongAnswers,
             "challengeType": challengeType,
-            "challengeTypeModifier": challengeTypeModifier
+            "challengeTypeModifier": challengeTypeModifier,
+            "multiplayer": this.type
         }
     }
 
