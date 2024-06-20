@@ -17,7 +17,7 @@ function Header() {
     return (
         <div className="top-bar">
             <div className={"brand"}>
-                <div className={"brand-cont"}>
+                <div className={"brand-cont"} onClick={() => navigate('/home')}>
                     <div className={"brand-text"}>
                         QuizCraft
                     </div>

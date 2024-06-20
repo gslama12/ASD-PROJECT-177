@@ -11,12 +11,13 @@
     font-family: Arial, sans-serif;
     color: black;
     padding-top: 1em;
+    justify-content: center;
 }
 
 .stats-content {
     width: 80%;
     max-width: 800px;
-    max-height: 80%;
+    max-height: 81%;
     background: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 10px;
@@ -42,6 +43,7 @@
 
 .history-header {
     text-align: center;
+    margin-top: 10px;
 }
 
 .game-history {
