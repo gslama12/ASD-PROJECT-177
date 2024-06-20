@@ -68,12 +68,14 @@ deploy_preview:
     - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
     # - vercel build --token=$VERCEL_TOKEN
     - cd "${projectDirectory}/server"
-    - cd "../../"
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
     - vercel --token $VERCEL_TOKEN --preview --confirm --scope $VERCEL_ORG_ID --project $VERCEL_PROJECT_ID_1
-    - cd "${projectDirectory}/client"
     - cd "../../"
+    - cd "${projectDirectory}/client"
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
     - vercel --token $VERCEL_TOKEN --preview --confirm --scope $VERCEL_ORG_ID --project $VERCEL_PROJECT_ID_2
-
+    - cd "../../"
+    
     # - vercel deploy --prebuilt  --token=$VERCEL_TOKEN
 
 # deploy_production:
