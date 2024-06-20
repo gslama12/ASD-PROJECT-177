@@ -17,7 +17,7 @@ import quizMeImage from '../src/assets/quiz_me.png';
 import StatsPage from "./components/UIComponents/StatsComponent/StatsPage.jsx";
 import ChallengeSelectionComponent from "./components/UIComponents/QuizMode/ChallengeSelectionComponent.jsx";
 
-const WEBSOCKET_URL = "http://localhost:3001";
+const WEBSOCKET_URL = "http://server-oe6l148nu-besjana-jacajs-projects.vercel.app";
 
 function App() {
     const [socket, setSocket] = useState(null);
