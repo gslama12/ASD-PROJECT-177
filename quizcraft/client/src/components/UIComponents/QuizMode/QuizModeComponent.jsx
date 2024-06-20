@@ -11,7 +11,7 @@ function QuizModeComponent({ socket }) {
     const { user } = useUser();
 
     useEffect(() => {
-        socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id });
+        socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id, rounds: 10 });
 
         socket.on("quiz-new-single-player-game", (response) => {
             if (response.data) {
@@ -32,7 +32,7 @@ function QuizModeComponent({ socket }) {
 
                 if (gameComplete) {
                     setTimeout(() => {
-                        navigate("/quizfinished", { gameId: gameId });
+                        navigate("/quizfinished", { state: { gameId: response.data.gameInfo.gameId }});
                     }, 2000);
                 } else {
                     setTimeout(() => {
