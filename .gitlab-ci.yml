@@ -1,7 +1,6 @@
 stages:
   - build
   - cleanup
-  - deploy
 
 image: node:latest
 
@@ -31,7 +30,8 @@ add_ip_whitelist:
 cache:
   paths:
     - ${projectDirectory}/client/node_modules/
-
+    - ${projectDirectory}/server/node_modules/
+    
 build-job:
   stage: build
   script:
@@ -57,12 +57,4 @@ remove_ip_whitelist:
       --header "Content-Type: application/json" \
       --header "Accept: application/vnd.atlas.2023-01-01+json" \
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
-
-
-deploy:
-  stage: deploy
-  script: echo "Define your deployment script!"
-  environment: production
-
-
 
