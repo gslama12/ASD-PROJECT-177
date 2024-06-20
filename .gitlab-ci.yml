@@ -1,9 +1,8 @@
 stages:
   - build
   - cleanup
-  - deploy
-default:
-  image: node:latest
+
+image: node:latest
 
 variables:
   projectDirectory: quizcraft 
@@ -59,30 +58,11 @@ remove_ip_whitelist:
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
 
 
-deploy_preview:
-  stage: deploy
-  except:
-    - main
-  script:
-    - npm install --global vercel
-    # - vercel build --token=$VERCEL_TOKEN
-    - cd "${projectDirectory}/server"
-    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
-    - vercel --token $VERCEL_TOKEN --preview --confirm --scope $VERCEL_ORG_ID --project $VERCEL_PROJECT_ID_1
-    - cd "../../"
-    # - cd "${projectDirectory}/client"
-    # - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
-    # - vercel --token $VERCEL_TOKEN --preview --confirm --scope $VERCEL_ORG_ID --project $VERCEL_PROJECT_ID_2
-    # - cd "../../"
-    
-    # - vercel deploy --prebuilt  --token=$VERCEL_TOKEN
 
-# deploy_production:
-#   stage: deploy
-#   only:
-#     - main
-#   script:
-#     - npm install --global vercel
-#     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-#     - vercel build --prod --token=$VERCEL_TOKEN
-#     - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+
+deploy:
+  stage: deploy
+  script: echo "Define your deployment script!"
+  environment: production
+
+
