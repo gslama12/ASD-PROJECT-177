@@ -6,6 +6,7 @@ import TriviaSelector from "./TriviaSelector.jsx";
 import { useUser } from "../../../UserContext.jsx";
 import { getLocalStorageRoomId, setLocalStorageRoomId } from "../../../utils/LocalStorageHelper.js";
 import QuestionAnswerComponent from './QuestionAnswerComponent'; // Import the new component
+import MultiplayerWaitingScreen from './MultiplayerWaitingScreen';
 
 function TriviaModeComponent({ socket }) {
     const [questionData, setQuestionDataState] = useState(null);
@@ -13,6 +14,7 @@ function TriviaModeComponent({ socket }) {
     const [showTriviaSelector, setShowTriviaSelector] = useState(true);
     const [isMultiplayer, setIsMultiplayer] = useState(null);
     const [numRounds, setNumRounds] = useState(null);
+    const [isWaiting, setIsWaiting] = useState(false);
     const navigate = useNavigate();
     const { user } = useUser();
 
@@ -36,6 +38,7 @@ function TriviaModeComponent({ socket }) {
         socket.on("quiz-join-multiplayer-queue", (response) => {
             if (response?.data?.roomId) {
                 setLocalStorageRoomId(response.data.roomId);
+                setIsWaiting(true);
             } else {
                 console.error(`response '${response}' or roomId '${response?.data?.roomId}' are undefined.`);
             }
@@ -49,6 +52,7 @@ function TriviaModeComponent({ socket }) {
             }
             const requestBody = { userId: user._id, roomId: roomId, rounds: localStorage.getItem('numRounds') };
             socket.emit("quiz-new-multiplayer-game", requestBody);
+            setIsWaiting(false);
         });
 
         socket.on("quiz-new-multiplayer-game", (response) => {
@@ -127,8 +131,12 @@ function TriviaModeComponent({ socket }) {
             {!showTriviaSelector && (
                 <div className="trivia-mode-container">
                     <h1>Trivia Mode</h1>
-                    {questionData && (
-                        <QuestionAnswerComponent questionData={questionData} onAnswerSelected={handleAnswerSelected} />
+                    {isWaiting ? (
+                        <MultiplayerWaitingScreen />
+                    ) : (
+                        questionData && (
+                            <QuestionAnswerComponent questionData={questionData} onAnswerSelected={handleAnswerSelected} />
+                        )
                     )}
                 </div>
             )}
