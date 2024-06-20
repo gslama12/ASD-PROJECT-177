@@ -16,6 +16,9 @@ function QuizModeComponent({ socket }) {
     const [numRounds, setNumRounds] = useState(null);
     const [isWaiting, setIsWaiting] = useState(false);
     const navigate = useNavigate();
+    const [selectedCategorie, setSelectedCategory] = useState(null);
+    const [selectedDifficulty, setSelectedDifficulty] = useState(null);
+
     const { user } = useUser();
 
     const handleQuestionData = (response) => {
@@ -97,12 +100,26 @@ function QuizModeComponent({ socket }) {
 
     const setSettings = (settings) => {
         setNumRounds(settings.rounds);
+        setSelectedDifficulty(settings.difficulty);
+        setSelectedCategory(settings.category);
         if (settings.mode === "single-player") {
             setIsMultiplayer(false);
-            socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id, rounds: settings.rounds });
+            socket.emit("quiz-new-single-player-game", {
+                gameMode: "multiple",
+                userId: user._id,
+                rounds: settings.rounds,
+                category: settings.category,
+                difficulty: settings.difficulty
+            });
         } else if (settings.mode === "multi-player") {
             setIsMultiplayer(true);
-            socket.emit("quiz-join-multiplayer-queue", { gameMode: "multiple", userId: user._id, rounds: settings.rounds });
+            socket.emit("quiz-join-multiplayer-queue", {
+                gameMode: "multiple",
+                userId: user._id,
+                rounds: settings.rounds,
+                category: settings.category,
+                difficulty: settings.difficulty
+            });
         }
         setShowTriviaSelector(false);
     };
