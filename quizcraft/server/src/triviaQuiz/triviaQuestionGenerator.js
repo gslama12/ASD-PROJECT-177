@@ -1,5 +1,5 @@
 const {shuffleArrayInPlace} = require("../utils/arrayUtils");
-
+const ApiRateLimiter = require("./apiRateLimiter");
 
 // number of questions for a category https://opentdb.com/api_count.php?category=CATEGORY_ID_HERE
 // number of questions: https://opentdb.com/api_count_global.php
@@ -33,7 +33,28 @@ class TriviaQuestionGenerator {
         console.log('Fetching questions with URL:', api_url);
 
         try {
-            const response = await fetch(api_url);
+            let response;
+            // While loop may not be a clean approach, but it works. However, there is no way to cancel it.
+            while (true) {
+                // Use mutex to prevent race conditions
+                response = await ApiRateLimiter.mutex.runExclusive(async () => {
+                    if (ApiRateLimiter.canMakeApiCall()) {
+                        const responseTemp = await fetch(api_url);
+                        ApiRateLimiter.updateLastApiCallTimeStamp();
+                        return responseTemp;
+                    } else {
+                        return undefined;
+                    }
+                });
+
+                if (response) {
+                    break;
+                }
+
+                // Wait a second and try again
+                console.log(`Cannot make multiple API requests within ${ApiRateLimiter.timeBetweenApiCalls} seconds. Time since last API call: ${Date.now() - ApiRateLimiter.lastApiCallTimestamp}`)
+                await new Promise(resolve => setTimeout(resolve, 1000))
+            }
             const responseBody = await response.json();
 
             console.log('API response:', responseBody);
