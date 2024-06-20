@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/CommonStyles.css";
-import he from 'he';
 import TriviaSelector from "./TriviaSelector.jsx";
 import { useUser } from "../../../UserContext.jsx";
 import { getLocalStorageRoomId, setLocalStorageRoomId } from "../../../utils/LocalStorageHelper.js";
@@ -65,8 +64,6 @@ function TriviaModeComponent({ socket }) {
             if (response.data) {
                 const question = response.data.question;
                 const gameComplete = response.data.gameInfo.gameComplete;
-                const correctAnswer = question.correctAnswer;
-                const isCorrectAnswer = getIsPlayerAnswerCorrect(response);
 
                 if (gameComplete) {
                     setTimeout(() => {
@@ -79,30 +76,21 @@ function TriviaModeComponent({ socket }) {
                             answers: question.answers,
                             correctAnswer: question.correctAnswer
                         });
-                    }, 500); // Reduced the delay for testing
+                    }, 2000);
                 }
             }
         });
     }, [socket, navigate]);
 
-    const getIsPlayerAnswerCorrect = (response) => {
-        const playerId = user._id;
-        for (const player of response.data.players) {
-            if (player.id === playerId) {
-                return player.isCorrectAnswer;
-            }
-        }
-        return undefined;
-    };
-
     const setSettings = (settings) => {
         setNumRounds(settings.rounds);
+        console.log("ROUNDS: ", parseInt(settings.rounds));
         if (settings.mode === "single-player") {
             setIsMultiplayer(false);
-            socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id, rounds: settings.rounds });
+            socket.emit("quiz-new-single-player-game", { gameMode: "multiple", userId: user._id, rounds: parseInt(settings.rounds) });
         } else if (settings.mode === "multi-player") {
             setIsMultiplayer(true);
-            socket.emit("quiz-join-multiplayer-queue", { gameMode: "multiple", userId: user._id, rounds: settings.rounds });
+            socket.emit("quiz-join-multiplayer-queue", { gameMode: "multiple", userId: user._id, rounds: parseInt(settings.rounds) });
         }
         setShowTriviaSelector(false);
     };

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../UserContext";
-import Header from "../Generic/Header.jsx";
-import { FaCheck, FaTimes, FaQuestion, FaHeart, FaClock } from 'react-icons/fa';
+import {FaCheck, FaTimes, FaQuestion, FaHeart, FaClock, FaUsers} from 'react-icons/fa';
 import '../../../styles/ProfileStyles.css';
 import "../../../styles/QuizFinishedComponentStyle.css";
+import { getLocalStorageRoomId, setLocalStorageRoomId } from "../../../utils/LocalStorageHelper.js";
 
 function QuizFinished({ socket }) {
     const navigate = useNavigate();
@@ -18,6 +18,8 @@ function QuizFinished({ socket }) {
     const [startingLives, setStartingLives] = useState(null);
     const [startingTime, setStartingTime] = useState(null);
     const [multiplayer, setMultiplayer] = useState(null);
+    const [getPlayerIds, setPlayerIds] = useState(null);
+    const [getOponent, setOponent] = useState(null)
 
     useEffect(() => {
         socket.emit('quiz-get-game-info', { gameId: state.gameId });
@@ -34,6 +36,23 @@ function QuizFinished({ socket }) {
             }
             else if (response.data.gameInfo.challengeType === "timeattack") {
                 setStartingTime(response.data.gameInfo.challengeTypeModifier);
+            }
+            if (response.data.gameInfo.multiplayer) {
+                setMultiplayer(true);
+                response.data.players.forEach(player => {
+                    if (player.id !== user._id) {
+                        socket.emit("get-active-user-info", player.id);
+                    }
+                });
+            }
+        });
+
+        socket.on("get-active-user-info-response", (response) => {
+            console.log("Getting the Opponent: ", response);
+            if (response.data.success && response.data.user) {
+                setOponent(response.data.user.username);
+            } else {
+                console.error('Failed to get user info:', response?.message);
             }
         });
     }, [socket, navigate]);
@@ -92,9 +111,9 @@ function QuizFinished({ socket }) {
                                     </div>
                                 )}
                                 {multiplayer !== null &&  (
-                                    <div className="multiplayer">
+                                    <div className="stat-item">
                                         <FaUsers className="stat-icon people"/>
-                                        <p className="stat-value">You won against: </p>
+                                        <p className="stat-value">You won against: {getOponent}</p>
                                     </div>
                                     )}
                             </div>

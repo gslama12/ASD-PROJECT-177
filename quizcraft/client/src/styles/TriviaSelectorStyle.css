@@ -26,7 +26,7 @@
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.42);
 }
 
-.header {
+.header_trivia {
     height: 8vh;
     display: flex;
     flex-direction: column;
@@ -37,7 +37,7 @@
     font-size: xx-large;
 }
 
-.content {
+.content_trivia {
     width: 80vw;
     height: 72vh;
     display: flex;
