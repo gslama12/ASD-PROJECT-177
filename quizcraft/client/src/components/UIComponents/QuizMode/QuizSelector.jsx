@@ -74,9 +74,10 @@ function QuizSelector({ onStart }) {
                         <div className={"option-selector"}>
                             <select id="category" onChange={onCategoryInput}>
                                 <option value="">--Please choose an option--</option>
-                                <option value="sports">Sports</option>
-                                <option value="history">History</option>
-                                <option value="geography">Geography</option>
+                                <option value="Sports">Sports</option>
+                                <option value="History">History</option>
+                                <option value="Geography">Geography</option>
+                                <option value="Animals">Animals</option>
                                 {/* Add more categories as needed */}
                             </select>
                         </div>

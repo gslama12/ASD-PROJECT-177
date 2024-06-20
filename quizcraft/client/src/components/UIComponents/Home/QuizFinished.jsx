@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../UserContext";
 import "../../../styles/QuizFinishedComponentStyle.css";
 import Header from "../Generic/Header.jsx";
+import * as he from "he";
 
 function QuizFinished({ socket }) {
     const navigate = useNavigate();
@@ -67,7 +68,7 @@ function QuizFinished({ socket }) {
                             {questionAnswerHistory ? (
                                 questionAnswerHistory.map((obj, index) => (
                                     <div key={index}>
-                                        <p className="question">{obj.question.question}</p>
+                                        <p className="question">{he.decode(obj.question.question)}</p>
                                     </div>
                                 ))
                             ) : (
