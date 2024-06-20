@@ -15,11 +15,12 @@ class TriviaQuestionSettings {
         this.difficulty = difficulty;
         this.apiSessionToken = apiSessionToken;
 
-        let numQuestions = questionsPerRequest;
-        numQuestions =  numQuestions <= this.MAX_QUESTION_LIMIT ? numQuestions : this.MAX_QUESTION_LIMIT;
-        numQuestions = numQuestions > 0 ? numQuestions : this.DEFAULT_NUM_QUESTIONS;
-
-        this.questionsPerRequest = numQuestions;
+        // let numQuestions = questionsPerRequest;
+        // numQuestions =  numQuestions <= this.MAX_QUESTION_LIMIT ? numQuestions : this.MAX_QUESTION_LIMIT;
+        // numQuestions = numQuestions > 0 ? numQuestions : this.DEFAULT_NUM_QUESTIONS;
+        //
+        // this.questionsPerRequest = numQuestions;
+        this.questionsPerRequest = 50; // just set it to 50 for now.
     }
 }
 

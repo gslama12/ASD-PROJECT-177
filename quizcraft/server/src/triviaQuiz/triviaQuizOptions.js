@@ -16,8 +16,12 @@ class TriviaQuizOptions {
         this.categories = undefined;
     }
 
+    /**
+     * Sets category data. Only called once.
+     * @return {Promise<void>}
+     */
     async init() {
-        if (!this.categories === undefined) {
+        if (this.categories !== undefined) {
             return;
         }
         const allCategories = await this.#getAllCategories();

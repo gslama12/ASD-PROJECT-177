@@ -100,7 +100,8 @@ module.exports = (socket, io) => {
             return;
         }
 
-        const gameSettings = new TriviaQuestionSettings(gameMode, category, difficulty, undefined, rounds);
+        // set questionsPerRequest to undefined (selects 50 by default)
+        const gameSettings = new TriviaQuestionSettings(gameMode, category, difficulty, undefined, undefined);
 
 
         let roomId = triviaQuizManager.findMatchingPlayerInQueue(gameSettings, playerId);

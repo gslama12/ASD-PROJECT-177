@@ -21,6 +21,7 @@ class TriviaQuizManager {
      * @param category {String}
      * @param difficulty {String}
      * @param playerId {String}
+     * @param rounds {String}
      * @returns {Promise<undefined|TriviaQuiz>} Undefined on fail.
      */
     async createSinglePlayerGame(gameMode, category, difficulty, playerId, rounds) {

@@ -19,7 +19,7 @@ class TriviaQuiz {
         this.players = undefined;
 
         this.gameComplete = false;
-        this.numOfRounds = 10;
+        this.numOfRounds = undefined;
         this.currentRound = 0;
 
         this.correctAnswers = 0; // For tracking
@@ -29,18 +29,18 @@ class TriviaQuiz {
     }
 
     async initGameSettings(quizMode, category, difficulty, rounds, type = false) {
-        // Possible values: 1-50. Retrieving multiple questions at once reduces number of API calls we need to make.
-        this.numOfRounds = rounds;
+        const numOfRounds = rounds > 0 ? rounds : 10;
+        this.numOfRounds = numOfRounds;
         this.type = type;
-        const questionsPerRequest = this.numOfRounds;
 
         const apiSessionToken = await this.questionGenerator.getSessionToken();
         if (apiSessionToken === undefined) {
             return false;
         }
 
+        // sets "questionsPerRequest" to 50 by default
         this.questionSettings = new TriviaQuestionSettings(
-            quizMode, category, difficulty, apiSessionToken, questionsPerRequest
+            quizMode, category, difficulty, apiSessionToken, undefined
         );
 
         console.log('Initialized game settings:', this.questionSettings);
