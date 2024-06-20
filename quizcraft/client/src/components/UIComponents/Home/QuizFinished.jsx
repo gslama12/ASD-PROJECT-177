@@ -5,6 +5,7 @@ import { useUser } from "../../../UserContext";
 import {FaCheck, FaTimes, FaQuestion, FaHeart, FaClock, FaUsers} from 'react-icons/fa';
 import '../../../styles/ProfileStyles.css';
 import "../../../styles/QuizFinishedComponentStyle.css";
+import he from 'he';
 import { getLocalStorageRoomId, setLocalStorageRoomId } from "../../../utils/LocalStorageHelper.js";
 
 function QuizFinished({ socket }) {
@@ -25,7 +26,6 @@ function QuizFinished({ socket }) {
         socket.emit('quiz-get-game-info', { gameId: state.gameId });
 
         socket.on("quiz-get-game-info", (response) => {
-            console.log(response.data);
             setNumberCorrectAnswers(response.data.gameInfo.correctAnswers);
             setNumberIncorrectAnswers(response.data.gameInfo.wrongAnswers);
             setNumberQuestionsTotal(response.data.questionAnswerHistory.length);
@@ -65,7 +65,7 @@ function QuizFinished({ socket }) {
         <div className="page-container">
             <div className="quiz-finished-content">
                 <div className="header">
-                    <p>Quiz Finished</p>
+                    <p>Quiz Overview</p>
                 </div>
                 <div className="content">
                     <div className="stats">
@@ -129,7 +129,7 @@ function QuizFinished({ socket }) {
                                         <div key={index} className="question-item">
                                             <div className="question-row">
                                                 <p className="question">
-                                                    {index + 1}. {obj.question.question}
+                                                    {index + 1}. {he.decode(obj.question.question)}
                                                     {obj.question.correctAnswer === obj.answer
                                                         ? <FaCheck className="stat-icon correct-ratio"/>
                                                         : <FaTimes className="stat-icon incorrect"/>}
