@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
      }
      else {
        console.log("Fetching current user error");
-       socket.emit("get-active-user-response", constructErrorResponse("Could not find current user"));
+       socket.emit("get-active-user-info-response", constructErrorResponse("Could not find current user"));
      }
   });
 

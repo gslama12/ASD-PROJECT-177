@@ -192,6 +192,16 @@ class TriviaQuizManager {
 
         return queueElement.addPlayerReadyToStartGame(playerId);
     }
+
+    getPlayerIdsForRoom(roomId) {
+        const queueElement = this.getQueueElement(roomId);
+        if (queueElement) {
+            return queueElement.getPlayerIds();
+        } else {
+            console.error(`No queue element found for roomId ${roomId}`);
+            return null;
+        }
+    }
 }
 
 // This is only run once

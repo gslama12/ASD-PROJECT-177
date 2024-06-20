@@ -94,6 +94,10 @@ class TriviaQuizQueueElement {
     canStartGame() {
         return this.allPlayersReady;
     }
+
+    getPlayerIds() {
+        return this.playerIds;
+    }
 }
 
 module.exports = TriviaQuizQueueElement;

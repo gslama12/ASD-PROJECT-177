@@ -31,10 +31,10 @@ const TriviaSelector = ({ onStart }) => {
     return (
             <div className="selector-page">
                 <div className={"main-container-selector"}>
-                    <div className={"header"}>
+                    <div className={"header_trivia"}>
                         OPTIONS
                     </div>
-                    <div className={"content"}>
+                    <div className={"content_trivia"}>
                         <div className={"option-container"}>
                             <div className={"option-label"}>
                                 MODE
