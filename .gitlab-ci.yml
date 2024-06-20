@@ -58,11 +58,10 @@ remove_ip_whitelist:
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
 
 
-
-
 deploy:
   stage: deploy
   script: echo "Define your deployment script!"
   environment: production
+
 
 
