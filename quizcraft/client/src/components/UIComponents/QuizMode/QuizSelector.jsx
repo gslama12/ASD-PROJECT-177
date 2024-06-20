@@ -39,11 +39,11 @@ function QuizSelector({ onStart }) {
 
     return (
         <div className="selector-page">
-            <div className={"main-container-selector"}>
-                <div className={"header"}>
+            <div className={"main-container-selector_quiz"}>
+                <div className={"header_trivia"}>
                     OPTIONS
                 </div>
-                <div className={"content"}>
+                <div className={"content_trivia"}>
                     <div className={"option-container"}>
                         <div className={"option-label"}>
                             MODE
@@ -104,7 +104,7 @@ function QuizSelector({ onStart }) {
                             <p id={"num-rounds"}>{numberOfRounds}</p>
                         </div>
                     </div>
-                    <div className={"button-container"}>
+                    <div className={"button-container_quiz"}>
                         <button type="button" id="start-button" className="btn btn-primary" onClick={sendSelection}>START</button>
                     </div>
                 </div>

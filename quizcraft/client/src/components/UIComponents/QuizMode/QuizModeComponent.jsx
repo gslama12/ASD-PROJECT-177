@@ -18,7 +18,6 @@ function QuizModeComponent({ socket }) {
     const navigate = useNavigate();
     const [selectedCategorie, setSelectedCategory] = useState(null);
     const [selectedDifficulty, setSelectedDifficulty] = useState(null);
-
     const { user } = useUser();
 
     const handleQuestionData = (response) => {
