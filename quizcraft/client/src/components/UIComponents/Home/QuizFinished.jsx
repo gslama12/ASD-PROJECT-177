@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import Dropdown from 'react-bootstrap/Dropdown';
 import '../../../styles/ProfileStyles.css';
 import { useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ import { useUser } from "../../../UserContext";
 import "../../../styles/QuizFinishedComponentStyle.css";
 import Header from "../Generic/Header.jsx";
 
-function QuizFinished({socket}) {
+function QuizFinished({ socket }) {
     const navigate = useNavigate();
     const { user } = useUser();
     const { state } = useLocation();
@@ -15,56 +15,29 @@ function QuizFinished({socket}) {
     const [numberIncorrectAnswers, setNumberIncorrectAnswers] = useState(null);
     const [numberQuestionsTotal, setNumberQuestionsTotal] = useState(null);
     const [questionAnswerHistory, setQuestionAnswerHistory] = useState(null);
+    const [startingLives, setStartingLives] = useState(null);
+    const [startingTime, setStartingTime] = useState(null);
 
     useEffect(() => {
-        socket.emit('quiz-get-game-info', { gameId: state.gameId});
+        socket.emit('quiz-get-game-info', { gameId: state.gameId });
 
         socket.on("quiz-get-game-info", (response) => {
             setNumberCorrectAnswers(response.data.gameInfo.correctAnswers);
             setNumberIncorrectAnswers(response.data.gameInfo.wrongAnswers);
-            setNumberQuestionsTotal(response.data.gameInfo.numOfRounds);
+            setNumberQuestionsTotal(response.data.questionAnswerHistory.length);
             setQuestionAnswerHistory(response.data.questionAnswerHistory);
-        });
-    }, [socket, navigate]); // Empty dependency array to run the effect only once on mount
-
-
-
-/*  // TODO: player IDs not implemented yet
-    const getQuestionsForPlayer = () =>{
-        if (questionAnswerHistory && questionAnswerHistory.length > 0) {
-            let questions = [];
-            questionAnswerHistory.forEach((question) => {
-                if (question.playerId === user._id){
-                questions.push(question);
+            if (response.data.gameInfo.challengeType === "liveschallenge") {
+                setStartingLives(response.data.gameInfo.challengeTypeModifier);
             }
-            });
-            console.log("q", user);
-            return questions;
-        }
-    }
-*/
+            else if (response.data.gameInfo.challengeType === "timeattack") {
+                setStartingTime(response.data.gameInfo.challengeTypeModifier);
+            }
+        });
+    }, [socket, navigate]);
 
     return (
         <div className="page-container">
             <Header />
-{/*             <div className="top-bar">
-
-               <div className="profile-icon-container">
-                    <Dropdown>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic" className="profile-dropdown-toggle">
-                            <img src={profileIcon} alt="Profile" className="profile-icon" />
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            <Dropdown.ItemText className="dropdown-username">{user ? user.username : "Guest"}</Dropdown.ItemText>
-                            <Dropdown.Divider />
-                            <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item href="/login">Logout</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>
-            </div>*/}
             <div className="quiz-finished-content">
                 <div className="header">
                     <p>Quiz Overview</p>
@@ -78,6 +51,12 @@ function QuizFinished({socket}) {
                             <p className="stat-value">Questions Answered Correctly: {numberCorrectAnswers}</p>
                             <p className="stat-value">Questions Answered Incorrectly: {numberIncorrectAnswers}</p>
                             <p className="stat-value">Number of Answered Questions: {numberQuestionsTotal}</p>
+                            {startingLives !== null && (
+                                <p className="stat-value">Starting Lives: {startingLives}</p>
+                            )}
+                            {startingTime !== null && (
+                                <p className="stat-value">Starting Time: {startingTime} seconds</p>
+                            )}
                         </div>
                     </div>
                     <div className="question-history">
@@ -87,11 +66,11 @@ function QuizFinished({socket}) {
                         <div className="question-history-content">
                             {questionAnswerHistory ? (
                                 questionAnswerHistory.map((obj, index) => (
-                                  <div key={index}>
-                                    <p className="question">{obj.question.question}</p>
-                                  </div>
+                                    <div key={index}>
+                                        <p className="question">{obj.question.question}</p>
+                                    </div>
                                 ))
-                              ) : (
+                            ) : (
                                 <p>Loading...</p>
                             )}
                         </div>

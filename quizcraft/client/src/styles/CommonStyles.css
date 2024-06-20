@@ -1,0 +1,136 @@
+/* Common Container Styles */
+.question-answer-container, .quiz-mode-container, .challenge-mode-container, .trivia-mode-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    background: radial-gradient(circle at 50% 0, rgba(255, 50, 0, .5), rgba(255, 50, 0, 0) 70.71%),
+    radial-gradient(circle at 6.7% 75%, rgba(0, 50, 255, .5), rgba(0, 50, 255, 0) 70.71%),
+    radial-gradient(circle at 93.3% 75%, rgba(0, 255, 50, .5), rgba(0, 255, 50, 0) 70.71%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    height: 105vh;
+    width: 100vw;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Main Container Styles */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%; /* Set fixed width for consistency */
+    max-width: 100%;
+    background-color: rgba(115, 115, 115, 0.29);
+    border-radius: 20px;
+    padding: 15px;
+    box-sizing: border-box;
+    outline: 1px solid rgba(81, 81, 81, 0.27);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* Question Container Styles */
+.question-container, .question-container-trivia {
+    width: 100%;
+    height: 200px;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(81, 81, 81, 0.21);
+    border-radius: 20px;
+    margin-bottom: 20px;
+    font-size: xx-large;
+    box-shadow: 0px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Answers Container Styles */
+.answers-container, .answers-container-trivia {
+    margin-top: 30px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: column;
+    align-items: center;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.answers-container > button, .answers-container-trivia > button {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: 1px solid black;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: x-large;
+    text-align: center;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.42);
+}
+
+.answers-container > button:hover, .answers-container-trivia > button:hover {
+    transform: scale(1.02);
+}
+
+/* Answer Button States */
+.answer-button-selected, .answer-button-trivia-selected {
+    background-color: #d3d3d3;
+}
+
+.answer-button-correct, .answer-button-trivia-correct {
+    background-color: #4CAF50;
+}
+
+.answer-button-wrong, .answer-button-trivia-wrong {
+    background-color: #f44336;
+}
+
+/* Feedback Message */
+.feedback-message {
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+/* Lives Container */
+.lives-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Heart Icon */
+.heart {
+    font-size: 24px;
+    margin-left: 5px;
+}
+
+/* Specific Styles for Challenge Mode */
+.lives-container {
+    height: 7.5%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.lives-content {
+    outline: black 1px solid;
+    border-radius: 5px;
+    width: 280px;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(81, 81, 81, 0.21);
+}
+
