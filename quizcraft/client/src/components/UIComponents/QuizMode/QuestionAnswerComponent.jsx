@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import he from 'he';
 import "../../../styles/CommonStyles.css";
 
 const QuestionAnswerComponent = ({ questionData, onAnswerSelected }) => {
     const [question, setQuestion] = useState(null);
     const [answers, setAnswers] = useState([]);
-    const [selectedAnswer, setSelectedAnswer] = useState(null);
+    // const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [isAnswered, setIsAnswered] = useState(false);
     const [correctAnswer, setCorrectAnswer] = useState(null);
     const [buttonColors, setButtonColors] = useState([]);
@@ -15,7 +15,7 @@ const QuestionAnswerComponent = ({ questionData, onAnswerSelected }) => {
             setQuestion(he.decode(questionData.question));
             setAnswers(shuffleArray(questionData.answers));
             setCorrectAnswer(questionData.correctAnswer);
-            setSelectedAnswer(null);
+            // setSelectedAnswer(null);
             setIsAnswered(false);
             setButtonColors(Array(questionData.answers.length).fill(''));
         }
@@ -23,7 +23,7 @@ const QuestionAnswerComponent = ({ questionData, onAnswerSelected }) => {
 
     const handleAnswerClick = (answer, index) => {
         if (isAnswered) return;
-        setSelectedAnswer(answer);
+        // setSelectedAnswer(answer);
         setIsAnswered(true);
         updateButtonColors(answer, index);
         onAnswerSelected(answer);

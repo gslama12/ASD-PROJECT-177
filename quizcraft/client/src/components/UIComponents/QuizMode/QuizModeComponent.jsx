@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/CommonStyles.css";
-import he from 'he';
 import QuizSelector from "./QuizSelector.jsx";
 import { useUser } from "../../../UserContext.jsx";
 import { getLocalStorageRoomId, setLocalStorageRoomId } from "../../../utils/LocalStorageHelper.js";
@@ -13,11 +12,11 @@ function QuizModeComponent({ socket }) {
     const [gameId, setGameId] = useState(null);
     const [showTriviaSelector, setShowTriviaSelector] = useState(true);
     const [isMultiplayer, setIsMultiplayer] = useState(null);
-    const [numRounds, setNumRounds] = useState(null);
+    // const [numRounds, setNumRounds] = useState(null);
     const [isWaiting, setIsWaiting] = useState(false);
     const navigate = useNavigate();
-    const [selectedCategorie, setSelectedCategory] = useState(null);
-    const [selectedDifficulty, setSelectedDifficulty] = useState(null);
+    // const [selectedCategorie, setSelectedCategory] = useState(null);
+    // const [selectedDifficulty, setSelectedDifficulty] = useState(null);
     const { user } = useUser();
 
     const handleQuestionData = (response) => {
@@ -67,8 +66,9 @@ function QuizModeComponent({ socket }) {
             if (response.data) {
                 const question = response.data.question;
                 const gameComplete = response.data.gameInfo.gameComplete;
-                const correctAnswer = question.correctAnswer;
-                const isCorrectAnswer = getIsPlayerAnswerCorrect(response);
+                // const correctAnswer = question.correctAnswer;
+                // const isCorrectAnswer = getIsPlayerAnswerCorrect(response);
+
 
                 if (gameComplete) {
                     setTimeout(() => {
@@ -87,20 +87,20 @@ function QuizModeComponent({ socket }) {
         });
     }, [socket, navigate]);
 
-    const getIsPlayerAnswerCorrect = (response) => {
-        const playerId = user._id;
-        for (const player of response.data.players) {
-            if (player.id === playerId) {
-                return player.isCorrectAnswer;
-            }
-        }
-        return undefined;
-    };
+    // const getIsPlayerAnswerCorrect = (response) => {
+    //     const playerId = user._id;
+    //     for (const player of response.data.players) {
+    //         if (player.id === playerId) {
+    //             return player.isCorrectAnswer;
+    //         }
+    //     }
+    //     return undefined;
+    // };
 
     const setSettings = (settings) => {
-        setNumRounds(settings.rounds);
-        setSelectedDifficulty(settings.difficulty);
-        setSelectedCategory(settings.category);
+        // setNumRounds(settings.rounds);
+        // setSelectedDifficulty(settings.difficulty);
+        // setSelectedCategory(settings.category);
         if (settings.mode === "single-player") {
             setIsMultiplayer(false);
             socket.emit("quiz-new-single-player-game", {

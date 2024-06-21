@@ -1,10 +1,7 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { useUser } from "../../../UserContext";
 import "../../../styles/HomeComponentStyle.css";
 
-function HomeComponent({ socket }) {
-    const { user } = useUser();
+function HomeComponent() {
     return (
         <>
             <div className="home-container">

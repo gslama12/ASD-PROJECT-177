@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/CommonStyles.css";
 import TriviaSelector from "./TriviaSelector.jsx";
@@ -12,7 +12,7 @@ function TriviaModeComponent({ socket }) {
     const [gameId, setGameId] = useState(null);
     const [showTriviaSelector, setShowTriviaSelector] = useState(true);
     const [isMultiplayer, setIsMultiplayer] = useState(null);
-    const [numRounds, setNumRounds] = useState(null);
+    // const [numRounds, setNumRounds] = useState(null);
     const [isWaiting, setIsWaiting] = useState(false);
     const navigate = useNavigate();
     const { user } = useUser();
@@ -83,7 +83,7 @@ function TriviaModeComponent({ socket }) {
     }, [socket, navigate]);
 
     const setSettings = (settings) => {
-        setNumRounds(settings.rounds);
+        // setNumRounds(settings.rounds);
         console.log("ROUNDS: ", parseInt(settings.rounds));
         if (settings.mode === "single-player") {
             setIsMultiplayer(false);

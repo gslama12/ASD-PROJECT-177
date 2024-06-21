@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from "../../../UserContext";
 import { FaCheck, FaTimes, FaQuestion, FaHeart, FaClock, FaUsers } from 'react-icons/fa';
 import '../../../styles/ProfileStyles.css';
 import "../../../styles/QuizFinishedComponentStyle.css";
 import he from 'he';
-import { getLocalStorageRoomId } from "../../../utils/LocalStorageHelper.js";
 
 function QuizFinished({ socket }) {
     const navigate = useNavigate();

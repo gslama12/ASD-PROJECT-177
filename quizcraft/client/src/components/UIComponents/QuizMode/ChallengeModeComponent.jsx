@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "../../../styles/CommonStyles.css";
 import { useUser } from "../../../UserContext.jsx";
@@ -13,12 +13,12 @@ function ChallengeModeComponent({ socket }) {
     const [notDone, setNotDone] = useState(false);
     const [timeLeft, setTimeLeft] = useState(60); // default time for time-attack mode
     const navigate = useNavigate();
-    const [challengeSettings, setChallengeSettings] = useState({});
+    // const [challengeSettings, setChallengeSettings] = useState({});
     const { user } = useUser();
 
     useEffect(() => {
         const settings = location.state || { lives: 3, time: 60 }; // default values
-        setChallengeSettings(settings);
+        // setChallengeSettings(settings);
         let challengeTypeModifier = null;
         if (challengeType === 'liveschallenge' && !notDone) {
             setLives(settings.lives || 3);
