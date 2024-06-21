@@ -17,7 +17,7 @@ const MultiplayerWaitingScreen = () => {
                     return prev;
                 }
             });
-        }, 100); // Adjust the speed by changing the interval duration
+        }, 35); // Adjust the speed by changing the interval duration
 
         return () => clearInterval(interval); // Cleanup interval on component unmount
     }, []);

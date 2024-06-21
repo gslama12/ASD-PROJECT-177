@@ -8,7 +8,7 @@ const { Game, GameStats } = require('../models/quizModels');
 class TriviaQuiz {
     constructor(questionGenerator, questionSettings) {
         this.quizId = generateRandomUUID();
-        this.type = false; // false = single / true = multiplayer
+        this.isMultiplayerGame = false;
 
         // dependency injection for testing
         this.questionGenerator = questionGenerator || TriviaQuestionGenerator;
@@ -30,18 +30,17 @@ class TriviaQuiz {
         this.startingTime = null;
     }
 
-    async initGameSettings(quizMode, category, difficulty, rounds, type = false, challengeType = "", challengeTypeModifier = null) {
+    async initGameSettings(quizMode, category, difficulty, rounds, isMultiplayerGame = false, challengeType = "", challengeTypeModifier = null) {
         this.numOfRounds = rounds;
-        this.type = type;
+        this.isMultiplayerGame = isMultiplayerGame;
 
         const apiSessionToken = await this.questionGenerator.getSessionToken();
         if (apiSessionToken === undefined) {
             return false;
         }
 
-        // sets "questionsPerRequest" to 50 by default
         this.questionSettings = new TriviaQuestionSettings(
-            quizMode, category, difficulty, apiSessionToken, undefined, challengeType
+            quizMode, category, difficulty, apiSessionToken, rounds, challengeType
         );
 
         if (this.questionSettings.challengeType === 'liveschallenge') {
@@ -211,7 +210,7 @@ class TriviaQuiz {
             "wrongAnswers": this.wrongAnswers,
             "challengeType": challengeType,
             "challengeTypeModifier": challengeTypeModifier,
-            "multiplayer": this.type
+            "multiplayer": this.isMultiplayerGame
         }
     }
 
@@ -316,7 +315,7 @@ class TriviaQuiz {
                 difficulty: difficulty,
                 category: category,
                 numOfRounds: this.numOfRounds,
-                type: this.type
+                type: this.isMultiplayerGame
             });
             const savedGame = await gameData.save();
 
@@ -350,13 +349,13 @@ class TriviaQuiz {
 }
 
 
-async function triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds, type, challengeType = "", challengeTypeModifier = null) {
+async function triviaQuizFactory(gameMode, category, difficulty, playerIds, rounds, isMultiplayerGame, challengeType = "", challengeTypeModifier = null) {
     // Calling with undefined twice to work with new TriviaQuiz constructor.
     // questionGenerator will be set to singleton class instance
     // questionSettings is set via initGameSettings.
     const triviaQuiz = new TriviaQuiz(undefined, undefined);
 
-    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty, rounds, type, challengeType, challengeTypeModifier);
+    const initSettingsSuccess = await triviaQuiz.initGameSettings(gameMode, category, difficulty, rounds, isMultiplayerGame, challengeType, challengeTypeModifier);
     if (!initSettingsSuccess) {
         return undefined;
     }

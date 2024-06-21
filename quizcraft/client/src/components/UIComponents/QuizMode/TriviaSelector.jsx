@@ -63,7 +63,7 @@ const TriviaSelector = ({ onStart }) => {
                                 ROUNDS
                             </div>
                             <div className={"option-selector-range"}>
-                                <input type="range" id="range" className="form-range" min="1" max="20" onInput={onRangeInput}/>
+                                <input type="range" id="range" className="form-range" min="1" max="20" defaultValue={numberOfRounds} onInput={onRangeInput}/>
                                 <p id={"num-rounds"}>{numberOfRounds}</p>
                             </div>
                         </div>

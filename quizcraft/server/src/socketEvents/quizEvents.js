@@ -40,6 +40,7 @@ module.exports = (socket, io) => {
         const challengeType = body?.challengeType;
         const challengeTypeModifier = body?.challengeTypeModifier;
         console.log("LIVES: ", challengeTypeModifier)
+
         if (!gameMode || (gameMode !== "multiple" && gameMode !== "boolean")) {
             const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
             socket.emit(EVENTS.NEW_SINGLE_PLAYER_GAME, errorObject);
@@ -90,6 +91,7 @@ module.exports = (socket, io) => {
         const difficulty = body?.difficulty;
         const playerId = body?.userId;
         const rounds = body?.rounds;
+        // Note: challengeType is only relevant for single player
 
         if (!gameMode || (gameMode !== "multiple" && gameMode !== "boolean")) {
             const errorObject = constructErrorResponse("gameMode must be set to either 'multiple' or 'boolean'.");
@@ -103,15 +105,15 @@ module.exports = (socket, io) => {
             return;
         }
 
-        // set questionsPerRequest to undefined (selects 50 by default)
-        const gameSettings = new TriviaQuestionSettings(gameMode, category, difficulty, undefined, undefined);
+        // set apiSessionToken (doesn't exist yet) and challengeType (irrelevant) to undefined
+        const gameSettings = new TriviaQuestionSettings(gameMode, category, difficulty, undefined, rounds, undefined);
 
 
         let roomId = triviaQuizManager.findMatchingPlayerInQueue(gameSettings, playerId);
 
         if (!roomId) {
             // You are the first player in the queue with your gameSettings -> Add new entry
-            // Wait for other player to join queue before calling
+            // Wait for other player to join queue, then get notified via EVENTS.MULTIPLAYER_QUEUE_READY
             console.info(`First to join multiplayer queue with gameSettings ${gameSettings}`);
             roomId = triviaQuizManager.insertRoomQueueElement(gameSettings, playerId);
             socket.join(roomId);
@@ -134,7 +136,6 @@ module.exports = (socket, io) => {
         //  Also, how to handle TriviaQuizManager.roomQueue in such a case?
         socket.join(roomId);
         socket.emit(EVENTS.JOIN_MULTIPLAYER_QUEUE, constructDataResponse({"roomId": roomId}));
-
         io.to(roomId).emit(EVENTS.MULTIPLAYER_QUEUE_READY);
     });
 
@@ -148,7 +149,6 @@ module.exports = (socket, io) => {
     socket.on(EVENTS.NEW_MULTIPLAYER_GAME, async (body) => {
         const playerId = body?.userId;
         const roomId = body?.roomId;
-        const rounds = (body?.rounds) ? body.rounds : 10;  // default num rounds = 10
 
         if (!playerId || !roomId) {
             const errorObject = constructErrorResponse("Need playerId and roomId parameters.");
@@ -177,7 +177,7 @@ module.exports = (socket, io) => {
         }
 
         // You are the last player to join, create multiplayer game and inform all players of the room
-        const quizObject = await triviaQuizManager.createMultiplayerGame(queueElement, roomId, rounds)
+        const quizObject = await triviaQuizManager.createMultiplayerGame(queueElement, roomId)
         if (quizObject === undefined) {
             const errorObject = constructErrorResponse("Couldn't create new multiplayer game.");
             socket.emit(EVENTS.NEW_MULTIPLAYER_GAME, errorObject);

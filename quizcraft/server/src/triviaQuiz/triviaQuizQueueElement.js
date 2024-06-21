@@ -25,14 +25,12 @@ class TriviaQuizQueueElement {
             return false;
         }
         else if (this.gameSettings.category !== gameSettings?.category) {
-            // Category is not used
             return false;
         }
         else if (this.gameSettings.difficulty !== gameSettings?.difficulty) {
-            // Difficulty is not used (?)
             return false;
         }
-        else if (this.gameSettings.questionsPerRequest !== gameSettings?.questionsPerRequest) {
+        else if (this.gameSettings.numberOfRounds !== gameSettings?.numberOfRounds) {
             return false;
         }
 

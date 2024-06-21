@@ -52,7 +52,7 @@ function QuizModeComponent({ socket }) {
                 console.error(`userId '${user._id}' or roomId '${roomId}' are undefined.`);
                 return;
             }
-            const requestBody = { userId: user._id, roomId: roomId, rounds: localStorage.getItem('numRounds') };
+            const requestBody = { userId: user._id, roomId: roomId };
             socket.emit("quiz-new-multiplayer-game", requestBody);
             setIsWaiting(false);
         });
@@ -81,7 +81,7 @@ function QuizModeComponent({ socket }) {
                             answers: question.answers,
                             correctAnswer: question.correctAnswer
                         });
-                    }, 500); // Reduced the delay for testing
+                    }, 2000);
                 }
             }
         });

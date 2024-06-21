@@ -52,7 +52,7 @@ class TriviaQuestionGenerator {
                 }
 
                 // Wait a second and try again
-                console.log(`Cannot make multiple API requests within ${ApiRateLimiter.timeBetweenApiCalls} seconds. Time since last API call: ${Date.now() - ApiRateLimiter.lastApiCallTimestamp}`)
+                console.log(`Cannot make multiple API requests within ${ApiRateLimiter.timeBetweenApiCalls} seconds. Time since last API call: ${Date.now() - ApiRateLimiter.lastApiCallTimestamp} - let's try again in a second.`)
                 await new Promise(resolve => setTimeout(resolve, 1000))
             }
             const responseBody = await response.json();
