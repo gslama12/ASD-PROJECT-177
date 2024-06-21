@@ -30,7 +30,8 @@ add_ip_whitelist:
 cache:
   paths:
     - ${projectDirectory}/client/node_modules/
-
+    - ${projectDirectory}/server/node_modules/
+    
 build-job:
   stage: build
   script:
