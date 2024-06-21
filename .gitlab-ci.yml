@@ -1,4 +1,5 @@
 stages:
+  - lint
   - build
   - cleanup
 
@@ -58,3 +59,9 @@ remove_ip_whitelist:
       --header "Accept: application/vnd.atlas.2023-01-01+json" \
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
 
+eslint:
+  stage: lint
+  script:
+    - cd "${projectDirectory}/client" && npm i && npm run build
+    - npm run lint
+    - cd "../../"
