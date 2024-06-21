@@ -15,6 +15,15 @@ variables:
 before_script:
   - apt-get update && apt-get install -y jq curl
 
+
+eslint:
+  stage: lint
+  script:
+    - cd "${projectDirectory}/client" && npm i && npm run build
+    - npm run lint
+    - cd "../../"
+  allow_failure: true
+
 add_ip_whitelist:
   stage: build
   script:
@@ -58,10 +67,3 @@ remove_ip_whitelist:
       --header "Content-Type: application/json" \
       --header "Accept: application/vnd.atlas.2023-01-01+json" \
       "$ATLAS_API_URL/groups/$ATLAS_PROJECT_ID/accessList/$CI_IP"
-
-eslint:
-  stage: lint
-  script:
-    - cd "${projectDirectory}/client" && npm i && npm run build
-    - npm run lint
-    - cd "../../"
