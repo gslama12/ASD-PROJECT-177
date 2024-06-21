@@ -34,7 +34,7 @@ But then I google for some more lightweight solution and I saw that Vercel was p
 I have attached an url which will take you to the frontend part of the application. Behind the scenes (a.k.a in the console/dev tools) you can notice that it fails to connect to the server for obvious reasons).
 Another thing to notice is that if you try to refresh the page it will throw an error precisely because the route (/login) requires that it is connected to the server.
 
-https://client-phi-nine.vercel.app
+Link to hosted client: [Trivia API client](https://client-phi-nine.vercel.app)
 
 ## Results
 
